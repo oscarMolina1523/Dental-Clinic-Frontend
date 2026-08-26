@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import logo from "../assets/logo.webp";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -19,8 +20,8 @@ import {
 
 // Lista de elementos de navegación con sus íconos
 const navItems = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "pacientes", label: "Pacientes", icon: Users },
+  { id: "home", label: "Dashboard", icon: LayoutDashboard },
+  { id: "patients", label: "Pacientes", icon: Users },
   { id: "agenda", label: "Agenda", icon: Calendar },
   { id: "expedientes", label: "Expedientes", icon: FileText },
   { id: "odontograma", label: "Odontograma", icon: Stethoscope },
@@ -35,7 +36,6 @@ const navItems = [
 ];
 
 const AppSidebar: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
 
   return (
     <aside className="flex flex-col h-screen w-64 bg-[#001D4A] text-white px-4 py-6 justify-between select-none">
@@ -60,20 +60,22 @@ const AppSidebar: React.FC = () => {
         <nav className="flex flex-col gap-1 overflow-y-auto max-h-[calc(100vh-220px)] scrollbar-none">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+
             return (
-              <button
+              <NavLink
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-3 px-4 py-2.5 rounded-sm text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-[#1E69FF] text-white"
-                    : "text-blue-100 hover:bg-white/10 hover:text-white"
-                }`}
+                to={`/${item.id}`}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-4 py-2.5 rounded-sm text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "bg-[#1E69FF] text-white"
+                      : "text-blue-100 hover:bg-white/10 hover:text-white"
+                  }`
+                }
               >
                 <Icon className="h-5 w-5 shrink-0" />
                 <span className="truncate">{item.label}</span>
-              </button>
+              </NavLink>
             );
           })}
         </nav>
