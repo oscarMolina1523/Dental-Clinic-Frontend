@@ -7,7 +7,7 @@ export default class HTTPService {
 
   async getToken(): Promise<string> {
     const storedToken = localStorage.getItem("authToken");
-    return storedToken || "";
+    return storedToken || import.meta.env.VITE_TOKEN;
   }
 
   async get<T = unknown>(path: string): Promise<T> {

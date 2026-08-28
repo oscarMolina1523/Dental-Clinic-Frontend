@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Plus, Eye, Pencil, Trash2} from "lucide-react";
 import { mockUsersData } from "../data/userData";
 import type UserModel from "../models/UserModel";
 import type { TableAction, TableColumn } from "../shared/Table/types";
@@ -7,8 +7,11 @@ import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
+import CreateUserDrawer from "../components/user/CreateUserDrawer";
 
 const UsersPage: React.FC = () => {
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
+    useState(false);
   const ITEMS_PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -18,7 +21,7 @@ const UsersPage: React.FC = () => {
     "phoneNumber",
     "active",
     "roleId",
-];
+  ];
 
   const {
     search,
@@ -26,7 +29,7 @@ const UsersPage: React.FC = () => {
     filteredData,
   } = useTableSearch<UserModel>({
     data: mockUsersData,
-    fields:searchFields,
+    fields: searchFields,
     delay: 800,
   });
 
@@ -162,7 +165,11 @@ const UsersPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar usuario..."
           />
-          <button className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+          <button
+            onClick={() =>
+              setIsCreateDrawerOpen(true)
+            }
+            className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
             <Plus className="w-4 h-4" />
             <span>Nuevo Usuario</span>
           </button>
@@ -190,6 +197,9 @@ const UsersPage: React.FC = () => {
           label="usuarios"
         />
       </div>
+
+      <CreateUserDrawer isOpen={isCreateDrawerOpen} onHide={()=>setIsCreateDrawerOpen(false)}/>
+
     </div>
   );
 }

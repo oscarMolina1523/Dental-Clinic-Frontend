@@ -51,3 +51,16 @@ export default class User extends BaseModel {
   }
 
 }
+
+export interface CreateUserDTO {
+  roleId: string;
+  fullName: string;
+  image: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+  membershipNumber?: string;
+  active?: boolean;
+}
+
+export type UpdateUserDTO = Partial<CreateUserDTO>;
