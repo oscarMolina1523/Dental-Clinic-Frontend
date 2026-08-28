@@ -4,6 +4,7 @@ import ErrorPage from "../pages/ErrorPage";
 import HomePage from "../pages/Home";
 import PatientsPage from "../pages/Patients";
 import UsersPage from "../pages/Users";
+import TreatmentCatalogPage from "../pages/TreatmentCatalogPage";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: <UsersPage />,
+      },
+      {
+        path: "treatments",
+        element: <TreatmentCatalogPage />,
       },
     ],
   },

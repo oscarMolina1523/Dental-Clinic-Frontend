@@ -8,7 +8,7 @@ const sections: Record<string, string> = {
     "/agenda": "Agenda",
     "/expedientes": "Expedientes",
     "/odontograma": "Odontograma",
-    "/tratamientos": "Tratamientos",
+    "/treatments": "Tratamientos",
     "/planes": "Planes de Tratamiento",
     "/facturacion": "Facturación",
     "/caja": "Caja",
