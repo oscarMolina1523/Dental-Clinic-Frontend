@@ -12,7 +12,7 @@ const sections: Record<string, string> = {
     "/planes": "Planes de Tratamiento",
     "/facturacion": "Facturación",
     "/caja": "Caja",
-    "/inventario": "Inventario",
+    "/products": "Inventario",
     "/reportes": "Reportes",
     "/users": "Usuarios",
     "/configuracion": "Configuración",
