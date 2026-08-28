@@ -38,7 +38,7 @@ const UsersPage: React.FC = () => {
 
   const endIndex = startIndex + ITEMS_PER_PAGE;
 
-  const currentPatients = useMemo(
+  const currentUsers = useMemo(
     () =>
       filteredData.slice(
         startIndex,
@@ -171,7 +171,7 @@ const UsersPage: React.FC = () => {
         {/* Tabla de Usuarios */}
         <div className="overflow-x-auto">
           <DataTable
-            data={currentPatients}
+            data={currentUsers}
             columns={columns}
             actions={actions}
             getRowId={(user) => user.id}
