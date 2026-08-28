@@ -1,42 +1,39 @@
 import React, { useMemo, useState } from "react";
 import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { mockUsersData } from "../data/userData";
+import type UserModel from "../models/UserModel";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
-import type PatientModel from "../models/PatientModel";
-import { patientsMock } from "../data/patientData";
 
-const PatientsPage: React.FC = () => {
+const UsersPage: React.FC = () => {
   const ITEMS_PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
-  const searchFields: (keyof PatientModel)[] = [
-    "name",
-    "lastName",
-    "patientCode",
-    "idCard",
-    "gender",
-    "phoneNumber",
+  const searchFields: (keyof UserModel)[] = [
+    "fullName",
     "email",
-    "maritalStatus",
-  ];
+    "phoneNumber",
+    "active",
+    "roleId",
+];
 
   const {
     search,
     setSearch,
     filteredData,
-  } = useTableSearch<PatientModel>({
-    data: patientsMock,
-    fields: searchFields,
+  } = useTableSearch<UserModel>({
+    data: mockUsersData,
+    fields:searchFields,
     delay: 800,
   });
 
 
   const totalItems = filteredData.length; //obtenemos la cantidad total de items 
 
-  //para obtener solo los pacientes que queremos por pagina, los visibles
+  //para obtener solo los usuarios que queremos por pagina, los visibles
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
 
   const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -50,26 +47,22 @@ const PatientsPage: React.FC = () => {
     [startIndex, endIndex, filteredData]
   );
 
-  const getFullName = (patient: PatientModel): string => {
-    return `${patient.name} ${patient.lastName}`;
-  };
-
-  const columns: TableColumn<typeof patientsMock[number]>[] = [
+  const columns: TableColumn<typeof mockUsersData[number]>[] = [
     {
       key: "name",
       header: "Nombre",
       className: "pl-2",
-      render: (patient: PatientModel) => (
+      render: (user: UserModel) => (
         <div className="flex items-center gap-3">
 
           <img
-            src={patient.image}
-            alt={patient.name}
+            src={user.image}
+            alt={user.fullName}
             className="w-9 h-9 rounded-full object-cover border border-slate-200"
           />
 
           <span className="text-sm font-semibold text-slate-800">
-            {getFullName(patient)}
+            {user.fullName}
           </span>
 
         </div>
@@ -79,44 +72,37 @@ const PatientsPage: React.FC = () => {
     {
       key: "phone",
       header: "Teléfono",
-      render: (patient: PatientModel) => (
+      render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
-          {patient.phoneNumber}
+          {user.phoneNumber}
         </span>
       ),
     },
-    {
-      key: "gender",
-      header: "Género",
-      render: (patient: PatientModel) => (
-        <span className="text-sm text-slate-500">
-          {patient.gender}
-        </span>
-      ),
-    },
+
     {
       key: "email",
       header: "Email",
-      render: (patient: PatientModel) => (
+      render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
-          {patient.email}
+          {user.email}
         </span>
       ),
     },
     {
-      key: "maritalStatus",
-      header: "Estado Civil",
-      render: (patient: PatientModel) => (
+      key: "roleId",
+      header: "Role",
+      render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
-          {patient.maritalStatus}
+          {user.roleId}
         </span>
       ),
     },
+
     {
       key: "status",
       header: "Estado",
-      render: (patient: PatientModel) => (
-        patient.active ? (
+      render: (user: UserModel) => (
+        user.active ? (
           <span className="text-emerald-500 font-medium text-sm">
             Activo
           </span>
@@ -129,28 +115,28 @@ const PatientsPage: React.FC = () => {
     },
   ];
 
-  const actions: TableAction<typeof patientsMock[number]>[] = [
+  const actions: TableAction<typeof mockUsersData[number]>[] = [
     {
-      label: "Ver paciente",
+      label: "Ver Usuario",
       icon: <Eye className="w-4 h-4" />,
-      onClick: (patient) => {
-        console.log("Ver:", patient);
+      onClick: (user) => {
+        console.log("Ver:", user);
       },
     },
 
     {
-      label: "Editar paciente",
+      label: "Editar usuario",
       icon: <Pencil className="w-4 h-4" />,
-      onClick: (patient) => {
-        console.log("Editar:", patient);
+      onClick: (user) => {
+        console.log("Editar:", user);
       },
     },
 
     {
-      label: "Eliminar paciente",
+      label: "Eliminar Usuario",
       icon: <Trash2 className="w-4 h-4" />,
-      onClick: (patient) => {
-        console.log("Eliminar:", patient);
+      onClick: (user) => {
+        console.log("Eliminar:", user);
       },
     },
   ];
@@ -170,26 +156,26 @@ const PatientsPage: React.FC = () => {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         {/* Encabezado */}
         <div className="flex items-center justify-between pb-6 mb-2">
-          <h1 className="text-xl font-bold text-[#001D4A]">Pacientes</h1>
+          <h1 className="text-xl font-bold text-[#001D4A]">Usuarios</h1>
           <SearchInput
             value={search}
             onChange={handleSearch}
-            placeholder="Buscar paciente..."
+            placeholder="Buscar usuario..."
           />
           <button className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
             <Plus className="w-4 h-4" />
-            <span>Nuevo Paciente</span>
+            <span>Nuevo Usuario</span>
           </button>
         </div>
 
-        {/* Tabla de Pacientes */}
+        {/* Tabla de Usuarios */}
         <div className="overflow-x-auto">
           <DataTable
             data={currentPatients}
             columns={columns}
             actions={actions}
-            getRowId={(patient) => patient.id}
-            emptyMessage="No hay pacientes registrados."
+            getRowId={(user) => user.id}
+            emptyMessage="No hay usuarios registrados."
           />
         </div>
       </div>
@@ -201,11 +187,11 @@ const PatientsPage: React.FC = () => {
           totalItems={totalItems}
           itemsPerPage={ITEMS_PER_PAGE}
           onPageChange={setCurrentPage}
-          label="pacientes"
+          label="usuarios"
         />
       </div>
     </div>
   );
 }
 
-export default PatientsPage;
+export default UsersPage;
