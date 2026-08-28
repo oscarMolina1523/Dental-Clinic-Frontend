@@ -19,6 +19,7 @@ const PatientsPage: React.FC = () => {
     "idCard",
     "gender",
     "phoneNumber",
+    "active",
     "email",
     "maritalStatus",
   ];
@@ -58,7 +59,7 @@ const PatientsPage: React.FC = () => {
     {
       key: "name",
       header: "Nombre",
-      className: "pl-2",
+      className: "pl-2 w-100",
       render: (patient: PatientModel) => (
         <div className="flex items-center gap-3">
 
@@ -170,7 +171,7 @@ const PatientsPage: React.FC = () => {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         {/* Encabezado */}
         <div className="flex items-center justify-between pb-6 mb-2">
-          <h1 className="text-xl font-bold text-[#001D4A]">Pacientes</h1>
+          {/* <h1 className="text-xl font-bold text-[#001D4A]">Pacientes</h1> */}
           <SearchInput
             value={search}
             onChange={handleSearch}

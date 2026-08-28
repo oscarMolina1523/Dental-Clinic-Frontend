@@ -15,7 +15,7 @@ const DataTable = <T,>({
     return (
         <div className="overflow-x-auto">
 
-            <table className="w-full text-left border-collapse">
+            <table className="w-full table-fixed text-left border-collapse">
 
                 {/* HEADER */}
                 <thead>
