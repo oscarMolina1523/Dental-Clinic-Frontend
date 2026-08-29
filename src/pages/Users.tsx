@@ -10,11 +10,14 @@ import CreateUserDrawer from "../components/user/CreateUserDrawer";
 import { useUsers } from "../hooks/useUsers";
 import EditUserDrawer from "../components/user/EditUserDrawer";
 import SecurityUserDrawer from "../components/user/SecurityUserDrawer";
+import { useRoles } from "../hooks/useRoles";
 
 const UsersPage: React.FC = () => {
   const {
     data: users = [],
   } = useUsers();
+
+  const { data: roles = [] } = useRoles();
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
@@ -62,6 +65,11 @@ const UsersPage: React.FC = () => {
     [startIndex, endIndex, filteredData]
   );
 
+  //Creamos un mapa/diccionario optimizado para búsqueda rápida (O(1))
+  const roleMap = useMemo(() => {
+    return new Map(roles.map((role) => [role.id, role.name]));
+  }, [roles]);
+
   const columns: TableColumn<typeof users[number]>[] = [
     {
       key: "name",
@@ -108,7 +116,7 @@ const UsersPage: React.FC = () => {
       header: "Role",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
-          {user.roleId}
+          {roleMap.get(user.roleId) ?? "Cargando..."}
         </span>
       ),
     },

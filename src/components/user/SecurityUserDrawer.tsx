@@ -3,6 +3,7 @@ import Toast from "../../shared/Toast";
 import { useActivateUser, useChangeEmail, useChangePassword, useChangeRole, useDeactivateUser } from "../../hooks/useUsers";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import User from "../../models/UserModel";
+import { useRoles } from "../../hooks/useRoles";
 
 interface EditUserDrawerProps {
     isOpen: boolean;
@@ -16,6 +17,9 @@ const SecurityUserDrawer: React.FC<EditUserDrawerProps> = ({
     user,
 }) => {
     const [prevUser, setPrevUser] = useState<User | null>(user);
+
+    const { data: roles = [], isLoading: isLoadingRoles } = useRoles();
+
     // Hooks de mutación
     const { mutateAsync: changeEmail, isPending: isPendingEmail } = useChangeEmail();
     const { mutateAsync: changePassword, isPending: isPendingPassword } = useChangePassword();
@@ -108,6 +112,13 @@ const SecurityUserDrawer: React.FC<EditUserDrawerProps> = ({
 
         if (email !== user.email && !email?.trim()) {
             showToast("error", "El correo electrónico no puede estar vacío.");
+            return;
+        }
+
+        const isRoleValid = roles.some((role) => String(role.id) === String(roleId));
+
+        if (!roleId || !isRoleValid) {
+            showToast("error", "Debes seleccionar un rol válido de la lista.");
             return;
         }
 
@@ -262,11 +273,18 @@ const SecurityUserDrawer: React.FC<EditUserDrawerProps> = ({
                         <select
                             value={roleId}
                             onChange={(e) => setRoleId(e.target.value)}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            disabled={isLoadingRoles}
+                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
                         >
-                            <option value="">Seleccione un rol</option>
-                            <option value="1">Administrador</option>
-                            <option value="2">Usuario</option>
+                            <option value="">
+                                {isLoadingRoles ? "Cargando roles..." : "Seleccione un rol"}
+                            </option>
+                            {/* 3. Mapeo dinámico de los roles devueltos por la API */}
+                            {roles.map((role) => (
+                                <option key={role.id} value={role.id}>
+                                    {role.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
