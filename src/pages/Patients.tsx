@@ -6,9 +6,13 @@ import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type PatientModel from "../models/PatientModel";
-import { patientsMock } from "../data/patientData";
+import { usePatients } from "../hooks/usePatients";
 
 const PatientsPage: React.FC = () => {
+  const {
+    data: patients = [],
+  } = usePatients();
+
   const ITEMS_PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -29,7 +33,7 @@ const PatientsPage: React.FC = () => {
     setSearch,
     filteredData,
   } = useTableSearch<PatientModel>({
-    data: patientsMock,
+    data: patients,
     fields: searchFields,
     delay: 800,
   });
@@ -68,7 +72,7 @@ const PatientsPage: React.FC = () => {
     return `${patient.name} ${patient.lastName}`;
   };
 
-  const columns: TableColumn<typeof patientsMock[number]>[] = [
+  const columns: TableColumn<typeof patients[number]>[] = [
     {
       key: "name",
       header: "Nombre",
@@ -143,7 +147,7 @@ const PatientsPage: React.FC = () => {
     },
   ];
 
-  const actions: TableAction<typeof patientsMock[number]>[] = [
+  const actions: TableAction<typeof patients[number]>[] = [
     {
       label: "Ver paciente",
       icon: <Eye className="w-4 h-4" />,
