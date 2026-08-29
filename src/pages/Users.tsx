@@ -8,13 +8,19 @@ import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import CreateUserDrawer from "../components/user/CreateUserDrawer";
 import { useUsers } from "../hooks/useUsers";
+import EditUserDrawer from "../components/user/EditUserDrawer";
 
 const UsersPage: React.FC = () => {
   const {
     data: users = [],
   } = useUsers();
+
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] =
+    useState(false);
+
+  const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
   const ITEMS_PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -134,7 +140,9 @@ const UsersPage: React.FC = () => {
       label: "Editar usuario",
       icon: <Pencil className="w-4 h-4" />,
       onClick: (user) => {
-        console.log("Editar:", user);
+        setSelectedUser(user);
+
+        setIsEditDrawerOpen(true);
       },
     },
 
@@ -203,6 +211,27 @@ const UsersPage: React.FC = () => {
 
       <CreateUserDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
 
+      <EditUserDrawer
+        // key={selectedUser?.id ?? "new"}
+        isOpen={isEditDrawerOpen}
+        onHide={() => {
+          setIsEditDrawerOpen(false);
+          setSelectedUser(null);
+        }}
+        user={selectedUser}
+      />
+
+      {/* {selectedUser && (
+        <EditUserDrawer
+          key={selectedUser.id}
+          isOpen={isEditDrawerOpen}
+          onHide={() => {
+            setIsEditDrawerOpen(false);
+            setSelectedUser(null);
+          }}
+          user={selectedUser}
+        />
+      )} */}
     </div>
   );
 }

@@ -9,8 +9,8 @@ export default class User extends BaseModel {
   phoneNumber: string;
   membershipNumber?: string;
   active: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   constructor({
     id,
@@ -34,8 +34,8 @@ export default class User extends BaseModel {
     phoneNumber: string;
     membershipNumber?: string;
     active: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
   }) {
     super(id);
     this.roleId = roleId;

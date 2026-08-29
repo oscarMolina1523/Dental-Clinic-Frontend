@@ -1,26 +1,37 @@
 import React, { useState } from "react";
-import { useAddUser } from "../../hooks/useUsers";
 import Toast from "../../shared/Toast";
+import { useUpdateUser } from "../../hooks/useUsers";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
-interface CreateUserProps {
+import User from "../../models/UserModel";
+
+interface EditUserDrawerProps {
     isOpen: boolean;
     onHide: () => void;
+    user: User | null;
 }
 
-const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
-    const { mutate: addUser, isPending } = useAddUser();
+const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
+    isOpen,
+    onHide,
+    user,
+}) => {
+    const {
+        mutate: updateUser,
+        isPending,
+    } = useUpdateUser();
 
-    const [form, setForm] = useState({
-        name: "",
-        email: "",
-        password: "",
-        phone: "",
-    });
+    const [prevUser, setPrevUser] = useState<User | null>(user);
+    const [form, setForm] = useState<User | null>(user);
 
     const [toast, setToast] = useState<{
         type: "success" | "error";
         message: string;
     } | null>(null);
+
+    if (user !== prevUser) {
+        setPrevUser(user);
+        setForm(user);
+    }
 
     const showToast = (
         type: "success" | "error",
@@ -32,36 +43,28 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
         });
     };
 
-    const cleanForm = () => {
-        setForm({
-            name: "",
-            email: "",
-            password: "",
-            phone: "",
-        });
-
-        onHide();
-    };
-
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement>
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLSelectElement
+        >
     ) => {
         const { name, value } = e.target;
 
-        setForm((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        setForm((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                [name]: value,
+            };
+        });
     };
 
     const handleSubmit = () => {
-        const name = form.name.trim();
-        const email = form.email.trim();
-        const password = form.password.trim();
-        const phone = form.phone.trim();
+        if (!user || !form) {
+            return;
+        }
 
-        // Validaciones
-        if (!name) {
+        if (!form.fullName.trim()) {
             showToast(
                 "error",
                 "El nombre completo es obligatorio."
@@ -69,7 +72,7 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
             return;
         }
 
-        if (!email) {
+        if (!form.email.trim()) {
             showToast(
                 "error",
                 "El email es obligatorio."
@@ -77,56 +80,35 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
             return;
         }
 
-        // Validación básica de email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!emailRegex.test(email)) {
-            showToast(
-                "error",
-                "Ingrese un email válido."
-            );
-            return;
-        }
-
-        if (!password) {
-            showToast(
-                "error",
-                "La contraseña es obligatoria."
-            );
-            return;
-        }
-
-        if (password.length < 6) {
-            showToast(
-                "error",
-                "La contraseña debe tener al menos 6 caracteres."
-            );
-            return;
-        }
-
-        addUser(
+        updateUser(
             {
-                fullName: name,
-                email,
-                password,
-                phoneNumber: phone || "",
+                id: user.id,
+                user: {
+                    fullName: form.fullName.trim(),
+                    email: form.email.trim(),
+                    phoneNumber: form.phoneNumber.trim(),
+                    roleId: form.roleId,
+                    password: form.password,
+                    active: form.active,
+                    image: form.image,
+                    membershipNumber: form.membershipNumber
+                }
             },
             {
                 onSuccess: () => {
                     showToast(
                         "success",
-                        "El usuario se creó correctamente."
+                        "El usuario se actualizó correctamente."
                     );
 
-                    cleanForm();
-
+                    onHide();
                 },
 
                 onError: (error) => {
                     showToast(
                         "error",
                         error.message ||
-                        "No se pudo crear el usuario."
+                        "No se pudo actualizar el usuario."
                     );
                 },
             }
@@ -159,8 +141,8 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
             <GenericDrawer
                 isOpen={isOpen}
                 onHide={onHide}
-                title="Nuevo Usuario"
-                description="Registra un nuevo usuario"
+                title="Editar Usuario"
+                description="Modifica la información del usuario"
                 width="w-112.5"
                 footer={
                     <>
@@ -174,7 +156,6 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
                                 text-slate-600
                                 hover:bg-slate-100
                                 rounded-lg
-                                transition-colors
                                 cursor-pointer
                                 disabled:opacity-50
                             "
@@ -192,19 +173,19 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
                                 text-white
                                 bg-[#001D4A]
                                 rounded-lg
-                                transition-colors
                                 cursor-pointer
                                 disabled:opacity-50
                             "
                         >
                             {isPending
-                                ? "Creando..."
-                                : "Crear Usuario"}
+                                ? "Guardando..."
+                                : "Guardar Cambios"}
                         </button>
                     </>
                 }
             >
-                {/* BODY DEL CREATE */}
+                {/* TODO EL BODY ES EXCLUSIVO DE EDITAR */}
+
                 <div className="space-y-5">
 
                     <div>
@@ -214,10 +195,9 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
 
                         <input
                             type="text"
-                            name="name"
-                            value={form.name}
+                            name="fullName"
+                            value={form?.fullName || ""}
                             onChange={handleChange}
-                            placeholder="Ingrese el nombre completo"
                             className="
                                 w-full
                                 px-3 py-2.5
@@ -240,34 +220,8 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
                         <input
                             type="email"
                             name="email"
-                            value={form.email}
+                            value={form?.email || ""}
                             onChange={handleChange}
-                            placeholder="correo@ejemplo.com"
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Contraseña
-                        </label>
-
-                        <input
-                            type="password"
-                            name="password"
-                            value={form.password}
-                            onChange={handleChange}
-                            placeholder="Ingrese la contraseña"
                             className="
                                 w-full
                                 px-3 py-2.5
@@ -289,10 +243,9 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
 
                         <input
                             type="text"
-                            name="phone"
-                            value={form.phone}
+                            name="phoneNumber"
+                            value={form?.phoneNumber || ""}
                             onChange={handleChange}
-                            placeholder="Ingrese el teléfono"
                             className="
                                 w-full
                                 px-3 py-2.5
@@ -307,10 +260,135 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
                         />
                     </div>
 
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Rol
+                        </label>
+
+                        <select
+                            name="roleId"
+                            value={form?.roleId || ""}
+                            onChange={handleChange}
+                            className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                            "
+                        >
+                            <option value="">
+                                Seleccione un rol
+                            </option>
+
+                            <option value="1">
+                                Administrador
+                            </option>
+
+                            <option value="2">
+                                Usuario
+                            </option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Contraseña
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            value={form?.password || ""}
+                            onChange={handleChange}
+                            className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Imagen
+                        </label>
+
+                        <input
+                            type="text"
+                            name="image"
+                            value={form?.image || ""}
+                            onChange={handleChange}
+                            className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Codigo de Profesional
+                        </label>
+
+                        <input
+                            type="text"
+                            name="membershipNumber"
+                            value={form?.membershipNumber || ""}
+                            onChange={handleChange}
+                            className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                        />
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="checkbox"
+                            checked={form?.active ?? false}
+                            onChange={(e) =>
+                                setForm((prev) =>
+                                    prev
+                                        ? {
+                                            ...prev,
+                                            active: e.target.checked,
+                                        }
+                                        : prev
+                                )
+                            }
+                            className="w-4 h-4"
+                        />
+
+                        <label className="text-sm font-medium text-slate-700">
+                            Usuario activo
+                        </label>
+                    </div>
+
                 </div>
             </GenericDrawer>
         </>
     );
-}
+};
 
-export default CreateUserDrawer;
+export default EditUserDrawer;
