@@ -77,7 +77,7 @@ export default class PatientModel extends BaseModel {
 }
 
 export interface CreatePatientDTO {
-  image: string;
+  image?: string;
   name: string;
   lastName: string;
   idCard: string;

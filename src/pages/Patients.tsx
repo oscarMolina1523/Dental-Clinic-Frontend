@@ -7,11 +7,15 @@ import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type PatientModel from "../models/PatientModel";
 import { usePatients } from "../hooks/usePatients";
+import CreatePatientDrawer from "../components/patient/CreatePatientDrawer";
 
 const PatientsPage: React.FC = () => {
   const {
     data: patients = [],
   } = usePatients();
+
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
+      useState(false);
 
   const ITEMS_PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState(1);
@@ -194,7 +198,7 @@ const PatientsPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar paciente..."
           />
-          <button className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+          <button onClick={()=>setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
             <Plus className="w-4 h-4" />
             <span>Nuevo Paciente</span>
           </button>
@@ -222,6 +226,8 @@ const PatientsPage: React.FC = () => {
           label="pacientes"
         />
       </div>
+
+      <CreatePatientDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
     </div>
   );
 }
