@@ -1,14 +1,29 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
-import { mockUsersData } from "../data/userData";
+import { Plus, Eye, Pencil, Trash2, KeyRound } from "lucide-react";
 import type UserModel from "../models/UserModel";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
+import CreateUserDrawer from "../components/user/CreateUserDrawer";
+import { useUsers } from "../hooks/useUsers";
+import EditUserDrawer from "../components/user/EditUserDrawer";
+import SecurityUserDrawer from "../components/user/SecurityUserDrawer";
 
 const UsersPage: React.FC = () => {
+  const {
+    data: users = [],
+  } = useUsers();
+
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
+    useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] =
+    useState(false);
+  const [isSecurityDrawerOpen, setIsSecurityDrawerOpen] =
+    useState(false);
+
+  const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
   const ITEMS_PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -18,15 +33,15 @@ const UsersPage: React.FC = () => {
     "phoneNumber",
     "active",
     "roleId",
-];
+  ];
 
   const {
     search,
     setSearch,
     filteredData,
   } = useTableSearch<UserModel>({
-    data: mockUsersData,
-    fields:searchFields,
+    data: users,
+    fields: searchFields,
     delay: 800,
   });
 
@@ -47,7 +62,7 @@ const UsersPage: React.FC = () => {
     [startIndex, endIndex, filteredData]
   );
 
-  const columns: TableColumn<typeof mockUsersData[number]>[] = [
+  const columns: TableColumn<typeof users[number]>[] = [
     {
       key: "name",
       header: "Nombre",
@@ -115,7 +130,7 @@ const UsersPage: React.FC = () => {
     },
   ];
 
-  const actions: TableAction<typeof mockUsersData[number]>[] = [
+  const actions: TableAction<typeof users[number]>[] = [
     {
       label: "Ver Usuario",
       icon: <Eye className="w-4 h-4" />,
@@ -128,10 +143,19 @@ const UsersPage: React.FC = () => {
       label: "Editar usuario",
       icon: <Pencil className="w-4 h-4" />,
       onClick: (user) => {
-        console.log("Editar:", user);
+        setSelectedUser(user);
+
+        setIsEditDrawerOpen(true);
       },
     },
-
+    {
+      label: "Credenciales y Seguridad",
+      icon: <KeyRound className="w-4 h-4 text-amber-600" />,
+      onClick: (user) => {
+        setSelectedUser(user);
+        setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+      },
+    },
     {
       label: "Eliminar Usuario",
       icon: <Trash2 className="w-4 h-4" />,
@@ -162,7 +186,11 @@ const UsersPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar usuario..."
           />
-          <button className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+          <button
+            onClick={() =>
+              setIsCreateDrawerOpen(true)
+            }
+            className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
             <Plus className="w-4 h-4" />
             <span>Nuevo Usuario</span>
           </button>
@@ -190,6 +218,28 @@ const UsersPage: React.FC = () => {
           label="usuarios"
         />
       </div>
+
+      <CreateUserDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+
+      <EditUserDrawer
+        // key={selectedUser?.id ?? "new"}
+        isOpen={isEditDrawerOpen}
+        onHide={() => {
+          setIsEditDrawerOpen(false);
+          setSelectedUser(null);
+        }}
+        user={selectedUser}
+      />
+
+      <SecurityUserDrawer
+        // key={selectedUser?.id ?? "new"}
+        isOpen={isSecurityDrawerOpen}
+        onHide={() => {
+          setIsSecurityDrawerOpen(false);
+          setSelectedUser(null);
+        }}
+        user={selectedUser}
+      />
     </div>
   );
 }

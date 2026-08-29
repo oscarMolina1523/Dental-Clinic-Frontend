@@ -9,8 +9,8 @@ export default class User extends BaseModel {
   phoneNumber: string;
   membershipNumber?: string;
   active: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 
   constructor({
     id,
@@ -34,8 +34,8 @@ export default class User extends BaseModel {
     phoneNumber: string;
     membershipNumber?: string;
     active: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
   }) {
     super(id);
     this.roleId = roleId;
@@ -50,4 +50,43 @@ export default class User extends BaseModel {
     this.updatedAt = updatedAt;
   }
 
+}
+
+export interface CreateUserDTO {
+  roleId?: string; //el backend le da el role de viewer por default
+  fullName: string;
+  image?: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+  membershipNumber?: string;
+  active?: boolean;
+}
+
+export interface UpdateUserDTO {
+  fullName?: string;
+  image?: string;
+  phoneNumber: string;
+  membershipNumber?: string;
+};
+
+export interface ChangeEmailVariables {
+  id: string;
+  email: string;
+}
+
+export interface ChangePhoneNumberVariables {
+  id: string;
+  phoneNumber: string;
+}
+
+export interface ChangePasswordVariables {
+  id: string;
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ChangeRoleVariables {
+  id: string;
+  roleId: string;
 }
