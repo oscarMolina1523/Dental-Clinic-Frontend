@@ -53,9 +53,9 @@ export default class User extends BaseModel {
 }
 
 export interface CreateUserDTO {
-  roleId: string;
+  roleId?: string; //el backend le da el role de viewer por default
   fullName: string;
-  image: string;
+  image?: string;
   email: string;
   password: string;
   phoneNumber: string;

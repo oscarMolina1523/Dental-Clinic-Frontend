@@ -1,5 +1,6 @@
 import {
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 
@@ -18,42 +19,34 @@ const userService = new UserService();
 ========================================================= */
 
 export function useUsers() {
-  return useMutation<User[], Error, void>({
-    mutationKey: ["users"],
-
-    mutationFn: () =>
-      userService.getUsers(),
+  return useQuery<User[], Error>({
+    queryKey: ["users"],
+    queryFn: () => userService.getUsers(),
   });
 }
-
 
 /* =========================================================
    GET USER BY ID
 ========================================================= */
 
-export function useUserById() {
-  return useMutation<User | null, Error, string>({
-    mutationKey: ["userById"],
-
-    mutationFn: (id) =>
-      userService.getById(id),
+export function useUserById(id: string) {
+  return useQuery<User | null, Error>({
+    queryKey: ["userById", id],
+    queryFn: () => userService.getById(id),
+    enabled: !!id,
   });
 }
-
 
 /* =========================================================
    GET USERS BY DEPARTMENT
 ========================================================= */
 
 export function useUsersByDepartment() {
-  return useMutation<User[], Error, void>({
-    mutationKey: ["usersByDepartment"],
-
-    mutationFn: () =>
-      userService.getUserByDepartment(),
+  return useQuery<User[], Error>({
+    queryKey: ["usersByDepartment"],
+    queryFn: () => userService.getUserByDepartment(),
   });
 }
-
 
 /* =========================================================
    CREATE USER
@@ -62,11 +55,7 @@ export function useUsersByDepartment() {
 export function useAddUser() {
   const queryClient = useQueryClient();
 
-  return useMutation<
-    User | null,
-    Error,
-    CreateUserDTO
-  >({
+  return useMutation<User | null, Error, CreateUserDTO>({
     mutationKey: ["addUser"],
 
     mutationFn: (user) =>
@@ -80,7 +69,6 @@ export function useAddUser() {
   });
 }
 
-
 /* =========================================================
    UPDATE USER
 ========================================================= */
@@ -93,11 +81,7 @@ export interface UpdateUserVariables {
 export function useUpdateUser() {
   const queryClient = useQueryClient();
 
-  return useMutation<
-    User | null,
-    Error,
-    UpdateUserVariables
-  >({
+  return useMutation<User | null, Error, UpdateUserVariables>({
     mutationKey: ["updateUser"],
 
     mutationFn: ({ id, user }) =>
@@ -114,7 +98,6 @@ export function useUpdateUser() {
     },
   });
 }
-
 
 /* =========================================================
    DELETE USER

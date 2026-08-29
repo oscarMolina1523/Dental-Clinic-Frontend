@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2} from "lucide-react";
-import { mockUsersData } from "../data/userData";
+import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
 import type UserModel from "../models/UserModel";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
@@ -8,8 +7,12 @@ import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import CreateUserDrawer from "../components/user/CreateUserDrawer";
+import { useUsers } from "../hooks/useUsers";
 
 const UsersPage: React.FC = () => {
+  const {
+    data: users = [],
+  } = useUsers();
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
   const ITEMS_PER_PAGE = 5;
@@ -28,7 +31,7 @@ const UsersPage: React.FC = () => {
     setSearch,
     filteredData,
   } = useTableSearch<UserModel>({
-    data: mockUsersData,
+    data: users,
     fields: searchFields,
     delay: 800,
   });
@@ -50,7 +53,7 @@ const UsersPage: React.FC = () => {
     [startIndex, endIndex, filteredData]
   );
 
-  const columns: TableColumn<typeof mockUsersData[number]>[] = [
+  const columns: TableColumn<typeof users[number]>[] = [
     {
       key: "name",
       header: "Nombre",
@@ -118,7 +121,7 @@ const UsersPage: React.FC = () => {
     },
   ];
 
-  const actions: TableAction<typeof mockUsersData[number]>[] = [
+  const actions: TableAction<typeof users[number]>[] = [
     {
       label: "Ver Usuario",
       icon: <Eye className="w-4 h-4" />,
@@ -198,7 +201,7 @@ const UsersPage: React.FC = () => {
         />
       </div>
 
-      <CreateUserDrawer isOpen={isCreateDrawerOpen} onHide={()=>setIsCreateDrawerOpen(false)}/>
+      <CreateUserDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
 
     </div>
   );
