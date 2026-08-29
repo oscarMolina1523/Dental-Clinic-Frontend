@@ -83,24 +83,52 @@ export default class HTTPService {
     }
   }
 
-  async delete<T = unknown>(path: string): Promise<T> {
-    try {
-      const token = await this.getToken();
-      const url = `${this.baseUrl}/${path}`;
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
+  async delete(path: string): Promise<void> {
+  try {
+    const token = await this.getToken();
+    const url = `${this.baseUrl}/${path}`;
+
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+
+      let message = "Error en la eliminación";
+
+      if (text) {
+        try {
+          const json = JSON.parse(text);
+
+          if (
+            typeof json === "object" &&
+            json !== null &&
+            "message" in json
+          ) {
+            message = String(
+              (json as { message: unknown }).message
+            );
+          }
+        } catch {
+          // La respuesta no era JSON
+        }
       }
-      return (await response.json()) as T;
-    } catch (error: unknown) {
-      console.error("Error deleting data:", error);
-      throw error;
+
+      throw new Error(message);
     }
+
+    // El backend no devuelve contenido.
+    // Puede ser 204 No Content o 200 sin body.
+    return;
+
+  } catch (error: unknown) {
+    console.error("Error deleting data:", error);
+    throw error;
   }
+}
 }
