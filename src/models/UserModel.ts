@@ -63,4 +63,9 @@ export interface CreateUserDTO {
   active?: boolean;
 }
 
-export type UpdateUserDTO = Partial<CreateUserDTO>;
+export interface UpdateUserDTO {
+  fullName?: string;
+  image?: string;
+  phoneNumber: string;
+  membershipNumber?: string;
+};

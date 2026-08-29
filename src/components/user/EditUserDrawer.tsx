@@ -85,11 +85,11 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                 id: user.id,
                 user: {
                     fullName: form.fullName.trim(),
-                    email: form.email.trim(),
+                    // email: form.email.trim(),
                     phoneNumber: form.phoneNumber.trim(),
-                    roleId: form.roleId,
-                    password: form.password,
-                    active: form.active,
+                    // roleId: form.roleId,
+                    // password: form.password,
+                    // active: form.active,
                     image: form.image,
                     membershipNumber: form.membershipNumber
                 }
