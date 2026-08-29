@@ -37,8 +37,21 @@ const PatientsPage: React.FC = () => {
 
   const totalItems = filteredData.length; //obtenemos la cantidad total de items 
 
+  // Calculamos el total de páginas disponibles y obtenemos una página válida,
+  // evitando que currentPage apunte a una página que ya no existe, por ejemplo,
+  // después de eliminar el último usuario de la página actual.
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalItems / ITEMS_PER_PAGE)
+  );
+
+  const validPage = Math.min(
+    currentPage,
+    totalPages
+  );
+
   //para obtener solo los pacientes que queremos por pagina, los visibles
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 
   const endIndex = startIndex + ITEMS_PER_PAGE;
 
@@ -198,7 +211,7 @@ const PatientsPage: React.FC = () => {
       {/* Paginación de la Tabla */}
       <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
         <Pagination
-          currentPage={currentPage}
+          currentPage={validPage}
           totalItems={totalItems}
           itemsPerPage={ITEMS_PER_PAGE}
           onPageChange={setCurrentPage}

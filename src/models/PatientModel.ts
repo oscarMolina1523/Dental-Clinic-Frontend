@@ -75,3 +75,25 @@ export default class PatientModel extends BaseModel {
   }
 
 }
+
+export interface CreatePatientDTO {
+  image: string;
+  name: string;
+  lastName: string;
+  idCard: string;
+  birthdate: Date;
+  gender: string;
+  phoneNumber: string;
+  email: string;
+  address: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  maritalStatus: string;
+}
+
+export interface UpdatePatientDTO {
+  name: string;
+  lastName: string;
+  birthdate: Date;
+  gender: string;
+}

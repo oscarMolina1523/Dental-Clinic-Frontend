@@ -35,7 +35,7 @@ const UsersPage: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
-  const ITEMS_PER_PAGE = 5;
+  const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   const searchFields: (keyof UserModel)[] = [
