@@ -69,3 +69,24 @@ export interface UpdateUserDTO {
   phoneNumber: string;
   membershipNumber?: string;
 };
+
+export interface ChangeEmailVariables {
+  id: string;
+  email: string;
+}
+
+export interface ChangePhoneNumberVariables {
+  id: string;
+  phoneNumber: string;
+}
+
+export interface ChangePasswordVariables {
+  id: string;
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ChangeRoleVariables {
+  id: string;
+  roleId: string;
+}

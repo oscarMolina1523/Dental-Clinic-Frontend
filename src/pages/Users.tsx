@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Plus, Eye, Pencil, Trash2, KeyRound } from "lucide-react";
 import type UserModel from "../models/UserModel";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
@@ -9,6 +9,7 @@ import SearchInput from "../shared/Table/SearchInput";
 import CreateUserDrawer from "../components/user/CreateUserDrawer";
 import { useUsers } from "../hooks/useUsers";
 import EditUserDrawer from "../components/user/EditUserDrawer";
+import SecurityUserDrawer from "../components/user/SecurityUserDrawer";
 
 const UsersPage: React.FC = () => {
   const {
@@ -18,6 +19,8 @@ const UsersPage: React.FC = () => {
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
   const [isEditDrawerOpen, setIsEditDrawerOpen] =
+    useState(false);
+  const [isSecurityDrawerOpen, setIsSecurityDrawerOpen] =
     useState(false);
 
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
@@ -145,7 +148,14 @@ const UsersPage: React.FC = () => {
         setIsEditDrawerOpen(true);
       },
     },
-
+    {
+      label: "Credenciales y Seguridad",
+      icon: <KeyRound className="w-4 h-4 text-amber-600" />,
+      onClick: (user) => {
+        setSelectedUser(user);
+        setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+      },
+    },
     {
       label: "Eliminar Usuario",
       icon: <Trash2 className="w-4 h-4" />,
@@ -221,17 +231,15 @@ const UsersPage: React.FC = () => {
         user={selectedUser}
       />
 
-      {/* {selectedUser && (
-        <EditUserDrawer
-          key={selectedUser.id}
-          isOpen={isEditDrawerOpen}
-          onHide={() => {
-            setIsEditDrawerOpen(false);
-            setSelectedUser(null);
-          }}
-          user={selectedUser}
-        />
-      )} */}
+      <SecurityUserDrawer
+        // key={selectedUser?.id ?? "new"}
+        isOpen={isSecurityDrawerOpen}
+        onHide={() => {
+          setIsSecurityDrawerOpen(false);
+          setSelectedUser(null);
+        }}
+        user={selectedUser}
+      />
     </div>
   );
 }

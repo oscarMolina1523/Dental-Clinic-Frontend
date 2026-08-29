@@ -6,6 +6,10 @@ import {
 
 import type User from "../models/UserModel";
 import type {
+    ChangeEmailVariables,
+    ChangePasswordVariables,
+    ChangePhoneNumberVariables,
+    ChangeRoleVariables,
   CreateUserDTO,
   UpdateUserDTO,
 } from "../models/UserModel";
@@ -38,17 +42,6 @@ export function useUserById(id: string) {
 }
 
 /* =========================================================
-   GET USERS BY DEPARTMENT
-========================================================= */
-
-export function useUsersByDepartment() {
-  return useQuery<User[], Error>({
-    queryKey: ["usersByDepartment"],
-    queryFn: () => userService.getUserByDepartment(),
-  });
-}
-
-/* =========================================================
    CREATE USER
 ========================================================= */
 
@@ -58,8 +51,7 @@ export function useAddUser() {
   return useMutation<User | null, Error, CreateUserDTO>({
     mutationKey: ["addUser"],
 
-    mutationFn: (user) =>
-      userService.addUser(user),
+    mutationFn: (user) => userService.addUser(user),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -84,17 +76,11 @@ export function useUpdateUser() {
   return useMutation<User | null, Error, UpdateUserVariables>({
     mutationKey: ["updateUser"],
 
-    mutationFn: ({ id, user }) =>
-      userService.updateUser(id, user),
+    mutationFn: ({ id, user }) => userService.updateUser(id, user),
 
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["users"],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["userById", variables.id],
-      });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["userById", variables.id] });
     },
   });
 }
@@ -109,13 +95,121 @@ export function useDeleteUser() {
   return useMutation<void, Error, string>({
     mutationKey: ["deleteUser"],
 
-    mutationFn: (id) =>
-      userService.deleteUser(id),
+    mutationFn: (id) => userService.deleteUser(id),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["users"],
       });
+    },
+  });
+}
+
+/* =========================================================
+   CHANGE EMAIL
+========================================================= */
+
+export function useChangeEmail() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User | null, Error, ChangeEmailVariables>({
+    mutationKey: ["changeEmail"],
+
+    mutationFn: ({ id, email }) => userService.changeEmail(id, email),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["userById", variables.id] });
+    },
+  });
+}
+
+/* =========================================================
+   CHANGE PHONE NUMBER
+========================================================= */
+
+export function useChangePhoneNumber() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User | null, Error, ChangePhoneNumberVariables>({
+    mutationKey: ["changePhoneNumber"],
+
+    mutationFn: ({ id, phoneNumber }) =>
+      userService.changePhoneNumber(id, phoneNumber),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["userById", variables.id] });
+    },
+  });
+}
+
+/* =========================================================
+   CHANGE PASSWORD
+========================================================= */
+
+export function useChangePassword() {
+  return useMutation<{ message: string } | null, Error, ChangePasswordVariables>({
+    mutationKey: ["changePassword"],
+
+    mutationFn: ({ id, currentPassword, newPassword }) =>
+      userService.changePassword(id, currentPassword, newPassword),
+  });
+}
+
+/* =========================================================
+   CHANGE ROLE
+========================================================= */
+
+export function useChangeRole() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User | null, Error, ChangeRoleVariables>({
+    mutationKey: ["changeRole"],
+
+    mutationFn: ({ id, roleId }) => userService.changeRole(id, roleId),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["userById", variables.id] });
+    },
+  });
+}
+
+/* =========================================================
+   ACTIVATE USER
+========================================================= */
+
+export function useActivateUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User | null, Error, string>({
+    mutationKey: ["activateUser"],
+
+    mutationFn: (id) => userService.activateUser(id),
+
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["userById", id] });
+    },
+  });
+}
+
+/* =========================================================
+   DEACTIVATE USER
+========================================================= */
+
+export function useDeactivateUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation<User | null, Error, string>({
+    mutationKey: ["deactivateUser"],
+
+    mutationFn: (id) => userService.deactivateUser(id),
+
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["userById", id] });
     },
   });
 }

@@ -85,11 +85,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                 id: user.id,
                 user: {
                     fullName: form.fullName.trim(),
-                    // email: form.email.trim(),
                     phoneNumber: form.phoneNumber.trim(),
-                    // roleId: form.roleId,
-                    // password: form.password,
-                    // active: form.active,
                     image: form.image,
                     membershipNumber: form.membershipNumber
                 }
@@ -211,31 +207,6 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                             "
                         />
                     </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Email
-                        </label>
-
-                        <input
-                            type="email"
-                            name="email"
-                            value={form?.email || ""}
-                            onChange={handleChange}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        />
-                    </div>
-
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
                             Teléfono
@@ -245,63 +216,6 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                             type="text"
                             name="phoneNumber"
                             value={form?.phoneNumber || ""}
-                            onChange={handleChange}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Rol
-                        </label>
-
-                        <select
-                            name="roleId"
-                            value={form?.roleId || ""}
-                            onChange={handleChange}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                            "
-                        >
-                            <option value="">
-                                Seleccione un rol
-                            </option>
-
-                            <option value="1">
-                                Administrador
-                            </option>
-
-                            <option value="2">
-                                Usuario
-                            </option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Contraseña
-                        </label>
-
-                        <input
-                            type="password"
-                            name="password"
-                            value={form?.password || ""}
                             onChange={handleChange}
                             className="
                                 w-full
@@ -362,29 +276,6 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                             "
                         />
                     </div>
-
-                    <div className="flex items-center gap-3">
-                        <input
-                            type="checkbox"
-                            checked={form?.active ?? false}
-                            onChange={(e) =>
-                                setForm((prev) =>
-                                    prev
-                                        ? {
-                                            ...prev,
-                                            active: e.target.checked,
-                                        }
-                                        : prev
-                                )
-                            }
-                            className="w-4 h-4"
-                        />
-
-                        <label className="text-sm font-medium text-slate-700">
-                            Usuario activo
-                        </label>
-                    </div>
-
                 </div>
             </GenericDrawer>
         </>
