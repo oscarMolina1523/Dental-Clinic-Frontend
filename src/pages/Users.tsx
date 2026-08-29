@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2, KeyRound } from "lucide-react";
+import { Plus, Pencil, Trash2, KeyRound } from "lucide-react";
 import type UserModel from "../models/UserModel";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
@@ -7,14 +7,23 @@ import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import CreateUserDrawer from "../components/user/CreateUserDrawer";
-import { useUsers } from "../hooks/useUsers";
+import { useDeleteUser, useUsers } from "../hooks/useUsers";
 import EditUserDrawer from "../components/user/EditUserDrawer";
 import SecurityUserDrawer from "../components/user/SecurityUserDrawer";
+import { useRoles } from "../hooks/useRoles";
+import ConfirmModal from "../shared/ConfirmModal";
 
 const UsersPage: React.FC = () => {
   const {
     data: users = [],
   } = useUsers();
+
+  const {
+    mutate: deleteUser,
+    isPending: isDeleting
+  } = useDeleteUser();
+
+  const { data: roles = [] } = useRoles();
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
@@ -22,6 +31,8 @@ const UsersPage: React.FC = () => {
     useState(false);
   const [isSecurityDrawerOpen, setIsSecurityDrawerOpen] =
     useState(false);
+  // Estado para controlar el modal de eliminación
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
   const ITEMS_PER_PAGE = 5;
@@ -48,8 +59,21 @@ const UsersPage: React.FC = () => {
 
   const totalItems = filteredData.length; //obtenemos la cantidad total de items 
 
+  // Calculamos el total de páginas disponibles y obtenemos una página válida,
+  // evitando que currentPage apunte a una página que ya no existe, por ejemplo,
+  // después de eliminar el último usuario de la página actual.
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalItems / ITEMS_PER_PAGE)
+  );
+
+  const validPage = Math.min(
+    currentPage,
+    totalPages
+  );
+
   //para obtener solo los usuarios que queremos por pagina, los visibles
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 
   const endIndex = startIndex + ITEMS_PER_PAGE;
 
@@ -61,6 +85,11 @@ const UsersPage: React.FC = () => {
       ),
     [startIndex, endIndex, filteredData]
   );
+
+  //Creamos un mapa/diccionario optimizado para búsqueda rápida (O(1))
+  const roleMap = useMemo(() => {
+    return new Map(roles.map((role) => [role.id, role.name]));
+  }, [roles]);
 
   const columns: TableColumn<typeof users[number]>[] = [
     {
@@ -108,7 +137,7 @@ const UsersPage: React.FC = () => {
       header: "Role",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
-          {user.roleId}
+          {roleMap.get(user.roleId) ?? "Cargando..."}
         </span>
       ),
     },
@@ -132,14 +161,6 @@ const UsersPage: React.FC = () => {
 
   const actions: TableAction<typeof users[number]>[] = [
     {
-      label: "Ver Usuario",
-      icon: <Eye className="w-4 h-4" />,
-      onClick: (user) => {
-        console.log("Ver:", user);
-      },
-    },
-
-    {
       label: "Editar usuario",
       icon: <Pencil className="w-4 h-4" />,
       onClick: (user) => {
@@ -160,7 +181,8 @@ const UsersPage: React.FC = () => {
       label: "Eliminar Usuario",
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (user) => {
-        console.log("Eliminar:", user);
+        setSelectedUser(user);
+        setIsDeleteModalOpen(true);
       },
     },
   ];
@@ -173,6 +195,25 @@ const UsersPage: React.FC = () => {
      * volvemos a la primera página.
      */
     setCurrentPage(1);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!selectedUser) return;
+    const userId = selectedUser.id;
+
+    deleteUser(userId, {
+      onSuccess: () => {
+        setSelectedUser(null);
+        setIsDeleteModalOpen(false);
+      },
+
+      onError: (error) => {
+        console.error(
+          "Error al eliminar el usuario:",
+          error
+        );
+      },
+    });
   };
 
   return (
@@ -211,7 +252,7 @@ const UsersPage: React.FC = () => {
       {/* Paginación de la Tabla */}
       <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
         <Pagination
-          currentPage={currentPage}
+          currentPage={validPage}
           totalItems={totalItems}
           itemsPerPage={ITEMS_PER_PAGE}
           onPageChange={setCurrentPage}
@@ -239,6 +280,19 @@ const UsersPage: React.FC = () => {
           setSelectedUser(null);
         }}
         user={selectedUser}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title={`¿Estás seguro de eliminar a ${selectedUser?.fullName ?? "este usuario"}?`}
+        description="Esta acción no se puede deshacer. Todos los datos asociados a este usuario se perderán permanentemente."
+        confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
+        cancelText="Cancelar"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedUser(null);
+        }}
       />
     </div>
   );
