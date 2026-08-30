@@ -3,6 +3,7 @@ import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import type PatientModel from "../../models/PatientModel";
 import { useUpdatePatient } from "../../hooks/usePatients";
+import { genderData } from "../../data/genderData";
 
 interface EditPatientDrawerProps {
     isOpen: boolean;
@@ -100,7 +101,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
             return;
         }
 
-         if (!form.gender.trim()) {
+        if (!form.gender.trim()) {
             showToast(
                 "error",
                 "Debe seleccionar un género."
@@ -271,7 +272,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                             Género
                         </label>
 
-                        <input
+                        {/* <input
                             type="text"
                             name="gender"
                             value={form?.gender || ""}
@@ -287,7 +288,33 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                        /> */}
+                        <select
+                            name="gender"
+                            value={form?.gender || ""}
+                            onChange={handleChange}
+                            className="
+                                                        w-full 
+                                                        px-3 py-2.5 
+                                                        border border-slate-200 
+                                                        rounded-lg 
+                                                        text-sm 
+                                                        outline-none 
+                                                        focus:border-blue-500 
+                                                        focus:ring-2 
+                                                        focus:ring-blue-500/10
+                                                    "
+                        >
+                            <option value="">
+                                Seleccione un género
+                            </option>
+
+                            {genderData.map((status) => (
+                                <option key={status} value={status}>
+                                    {status}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import { useAddPatient } from "../../hooks/usePatients";
+import { maritalStatuses } from "../../data/maritalStatusData";
+import { genderData } from "../../data/genderData";
 interface CreatePatientProps {
     isOpen: boolean;
     onHide: () => void;
@@ -58,7 +60,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
     };
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement>
+        e: React.ChangeEvent<HTMLInputElement  | HTMLSelectElement>
     ) => {
         const { name, value } = e.target;
 
@@ -386,24 +388,32 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                             Género
                         </label>
 
-                        <input
-                            type="text"
+                        <select
                             name="gender"
                             value={form.gender}
                             onChange={handleChange}
-                            placeholder="Ingrese el su género"
                             className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
+                                w-full 
+                                px-3 py-2.5 
+                                border border-slate-200 
+                                rounded-lg 
+                                text-sm 
+                                outline-none 
+                                focus:border-blue-500 
+                                focus:ring-2 
                                 focus:ring-blue-500/10
                             "
-                        />
+                        >
+                            <option value="">
+                                Seleccione un género
+                            </option>
+
+                            {genderData.map((status) => (
+                                <option key={status} value={status}>
+                                    {status}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div>
@@ -532,25 +542,32 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                         <label className="block text-sm font-medium text-slate-700 mb-2">
                             Estado Civil
                         </label>
-
-                        <input
-                            type="text"
+                        <select
                             name="maritalStatus"
                             value={form.maritalStatus}
                             onChange={handleChange}
-                            placeholder="Ingrese el estado civil"
                             className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
+                                w-full 
+                                px-3 py-2.5 
+                                border border-slate-200 
+                                rounded-lg 
+                                text-sm 
+                                outline-none 
+                                focus:border-blue-500 
+                                focus:ring-2 
                                 focus:ring-blue-500/10
                             "
-                        />
+                        >
+                            <option value="">
+                                Seleccione un estado civil
+                            </option>
+
+                            {maritalStatuses.map((status) => (
+                                <option key={status} value={status}>
+                                    {status}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                 </div>
