@@ -6,15 +6,21 @@ import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type PatientModel from "../models/PatientModel";
-import { usePatients } from "../hooks/usePatients";
+import { useDeletePatient, usePatients } from "../hooks/usePatients";
 import CreatePatientDrawer from "../components/patient/CreatePatientDrawer";
 import EditPatientDrawer from "../components/patient/EditPatientDrawer";
 import SecurityPatientDrawer from "../components/patient/SecurityPatientDrawer";
+import ConfirmModal from "../shared/ConfirmModal";
 
 const PatientsPage: React.FC = () => {
   const {
     data: patients = [],
   } = usePatients();
+
+  const {
+    mutate: deletePatient,
+    isPending: isDeleting
+  } = useDeletePatient();
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
@@ -22,10 +28,12 @@ const PatientsPage: React.FC = () => {
     useState(false);
   const [isSecurityDrawerOpen, setIsSecurityDrawerOpen] =
     useState(false);
+  // Estado para controlar el modal de eliminación
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [selectedPatient, setSelectedPatient] = useState<PatientModel | null>(null);
 
-  const ITEMS_PER_PAGE = 5;
+  const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   const searchFields: (keyof PatientModel)[] = [
@@ -127,7 +135,7 @@ const PatientsPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
-      className:"w-105",
+      className: "w-105",
       render: (patient: PatientModel) => (
         <span className="text-sm text-slate-500">
           {patient.email}
@@ -188,7 +196,8 @@ const PatientsPage: React.FC = () => {
       label: "Eliminar paciente",
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (patient) => {
-        console.log("Eliminar:", patient);
+        setSelectedPatient(patient);
+        setIsDeleteModalOpen(true);
       },
     },
   ];
@@ -202,6 +211,26 @@ const PatientsPage: React.FC = () => {
      */
     setCurrentPage(1);
   };
+
+  const handleDeleteConfirm = () => {
+    if (!selectedPatient) return;
+    const patientId = selectedPatient.id;
+
+    deletePatient(patientId, {
+      onSuccess: () => {
+        setSelectedPatient(null);
+        setIsDeleteModalOpen(false);
+      },
+
+      onError: (error) => {
+        console.error(
+          "Error al eliminar el paciente:",
+          error
+        );
+      },
+    });
+  };
+
 
   return (
     <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
@@ -261,6 +290,19 @@ const PatientsPage: React.FC = () => {
           setSelectedPatient(null);
         }}
         patient={selectedPatient}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title={`¿Estás seguro de eliminar a ${selectedPatient?.name ?? "este paciente"}?`}
+        description="Esta acción no se puede deshacer. Todos los datos asociados a este paciente se perderán permanentemente."
+        confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
+        cancelText="Cancelar"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedPatient(null);
+        }}
       />
     </div>
   );
