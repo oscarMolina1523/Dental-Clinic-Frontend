@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Plus, Eye, Pencil, Trash2, KeyRound } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -9,6 +9,7 @@ import type PatientModel from "../models/PatientModel";
 import { usePatients } from "../hooks/usePatients";
 import CreatePatientDrawer from "../components/patient/CreatePatientDrawer";
 import EditPatientDrawer from "../components/patient/EditPatientDrawer";
+import SecurityPatientDrawer from "../components/patient/SecurityPatientDrawer";
 
 const PatientsPage: React.FC = () => {
   const {
@@ -18,6 +19,8 @@ const PatientsPage: React.FC = () => {
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
   const [isEditDrawerOpen, setIsEditDrawerOpen] =
+    useState(false);
+  const [isSecurityDrawerOpen, setIsSecurityDrawerOpen] =
     useState(false);
 
   const [selectedPatient, setSelectedPatient] = useState<PatientModel | null>(null);
@@ -124,6 +127,7 @@ const PatientsPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
+      className:"w-105",
       render: (patient: PatientModel) => (
         <span className="text-sm text-slate-500">
           {patient.email}
@@ -164,17 +168,22 @@ const PatientsPage: React.FC = () => {
         console.log("Ver:", patient);
       },
     },
-
     {
       label: "Editar paciente",
       icon: <Pencil className="w-4 h-4" />,
       onClick: (patient) => {
         setSelectedPatient(patient);
-
         setIsEditDrawerOpen(true);
       },
     },
-
+    {
+      label: "Credenciales y Seguridad",
+      icon: <KeyRound className="w-4 h-4 text-amber-600" />,
+      onClick: (user) => {
+        setSelectedPatient(user);
+        setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+      },
+    },
     {
       label: "Eliminar paciente",
       icon: <Trash2 className="w-4 h-4" />,
@@ -240,6 +249,15 @@ const PatientsPage: React.FC = () => {
         isOpen={isEditDrawerOpen}
         onHide={() => {
           setIsEditDrawerOpen(false);
+          setSelectedPatient(null);
+        }}
+        patient={selectedPatient}
+      />
+
+      <SecurityPatientDrawer
+        isOpen={isSecurityDrawerOpen}
+        onHide={() => {
+          setIsSecurityDrawerOpen(false);
           setSelectedPatient(null);
         }}
         patient={selectedPatient}

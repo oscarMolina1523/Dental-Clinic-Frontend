@@ -109,7 +109,7 @@ export function useDeleteUser() {
    CHANGE EMAIL
 ========================================================= */
 
-export function useChangeEmail() {
+export function useChangeUserEmail() {
   const queryClient = useQueryClient();
 
   return useMutation<User | null, Error, ChangeEmailVariables>({
@@ -128,7 +128,7 @@ export function useChangeEmail() {
    CHANGE PHONE NUMBER
 ========================================================= */
 
-export function useChangePhoneNumber() {
+export function useChangeUserPhoneNumber() {
   const queryClient = useQueryClient();
 
   return useMutation<User | null, Error, ChangePhoneNumberVariables>({
@@ -148,7 +148,7 @@ export function useChangePhoneNumber() {
    CHANGE PASSWORD
 ========================================================= */
 
-export function useChangePassword() {
+export function useChangeUserPassword() {
   return useMutation<{ message: string } | null, Error, ChangePasswordVariables>({
     mutationKey: ["changePassword"],
 
@@ -161,7 +161,7 @@ export function useChangePassword() {
    CHANGE ROLE
 ========================================================= */
 
-export function useChangeRole() {
+export function useChangeUserRole() {
   const queryClient = useQueryClient();
 
   return useMutation<User | null, Error, ChangeRoleVariables>({

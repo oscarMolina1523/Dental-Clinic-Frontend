@@ -97,3 +97,34 @@ export interface UpdatePatientDTO {
   birthdate: Date;
   gender: string;
 }
+
+export interface UpdatePatientVariables {
+  id: string;
+  patient: UpdatePatientDTO;
+}
+
+export interface ChangePatientPhoneNumberVariables {
+  id: string;
+  phoneNumber: string;
+}
+
+export interface ChangePatientEmailVariables {
+  id: string;
+  email: string;
+}
+
+export interface ChangePatientAddressVariables {
+  id: string;
+  address: string;
+}
+
+export interface UpdateEmergencyContactVariables {
+  id: string;
+  name: string;
+  phone: string;
+}
+
+export interface ChangePatientImageVariables {
+  id: string;
+  image: string;
+}

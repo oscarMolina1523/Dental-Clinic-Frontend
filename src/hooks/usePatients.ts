@@ -7,8 +7,13 @@ import {
 import type Patient from "../models/PatientModel";
 
 import type {
+  ChangePatientAddressVariables,
+  ChangePatientEmailVariables,
+  ChangePatientImageVariables,
+  ChangePatientPhoneNumberVariables,
   CreatePatientDTO,
-  UpdatePatientDTO,
+  UpdateEmergencyContactVariables,
+  UpdatePatientVariables,
 } from "../models/PatientModel";
 
 import PatientService from "../api/patient.service";
@@ -63,11 +68,6 @@ export function useAddPatient() {
    UPDATE PATIENT
 ========================================================= */
 
-export interface UpdatePatientVariables {
-  id: string;
-  patient: UpdatePatientDTO;
-}
-
 export function useUpdatePatient() {
   const queryClient = useQueryClient();
 
@@ -118,11 +118,6 @@ export function useDeletePatient() {
    CHANGE PHONE NUMBER
 ========================================================= */
 
-export interface ChangePatientPhoneNumberVariables {
-  id: string;
-  phoneNumber: string;
-}
-
 export function useChangePatientPhoneNumber() {
   const queryClient = useQueryClient();
 
@@ -154,11 +149,6 @@ export function useChangePatientPhoneNumber() {
 /* =========================================================
    CHANGE EMAIL
 ========================================================= */
-
-export interface ChangePatientEmailVariables {
-  id: string;
-  email: string;
-}
 
 export function useChangePatientEmail() {
   const queryClient = useQueryClient();
@@ -192,11 +182,6 @@ export function useChangePatientEmail() {
    CHANGE ADDRESS
 ========================================================= */
 
-export interface ChangePatientAddressVariables {
-  id: string;
-  address: string;
-}
-
 export function useChangePatientAddress() {
   const queryClient = useQueryClient();
 
@@ -228,12 +213,6 @@ export function useChangePatientAddress() {
 /* =========================================================
    UPDATE EMERGENCY CONTACT
 ========================================================= */
-
-export interface UpdateEmergencyContactVariables {
-  id: string;
-  name: string;
-  phone: string;
-}
 
 export function useUpdateEmergencyContact() {
   const queryClient = useQueryClient();
@@ -274,11 +253,6 @@ export function useUpdateEmergencyContact() {
 /* =========================================================
    CHANGE IMAGE
 ========================================================= */
-
-export interface ChangePatientImageVariables {
-  id: string;
-  image: string;
-}
 
 export function useChangePatientImage() {
   const queryClient = useQueryClient();

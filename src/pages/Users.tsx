@@ -126,6 +126,7 @@ const UsersPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
+      className:"w-105",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {user.email}
