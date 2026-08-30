@@ -7,11 +7,15 @@ import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type ProductModel from "../models/ProductModel";
 import { useProducts } from "../hooks/useProducts";
+import CreateProductDrawer from "../components/product/CreateProductDrawer";
 
 const ProductsPage: React.FC = () => {
   const {
     data: products = []
   } = useProducts(1, 10);
+
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
+      useState(false);
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -142,7 +146,7 @@ const ProductsPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar producto..."
           />
-          <button className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+          <button onClick={()=> setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
             <Plus className="w-4 h-4" />
             <span>Nuevo Producto</span>
           </button>
@@ -170,6 +174,8 @@ const ProductsPage: React.FC = () => {
           label="Productos"
         />
       </div>
+
+      <CreateProductDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
     </div>
   );
 }
