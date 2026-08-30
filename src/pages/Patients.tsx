@@ -1,15 +1,39 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, KeyRound } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type PatientModel from "../models/PatientModel";
-import { patientsMock } from "../data/patientData";
+import { useDeletePatient, usePatients } from "../hooks/usePatients";
+import CreatePatientDrawer from "../components/patient/CreatePatientDrawer";
+import EditPatientDrawer from "../components/patient/EditPatientDrawer";
+import SecurityPatientDrawer from "../components/patient/SecurityPatientDrawer";
+import ConfirmModal from "../shared/ConfirmModal";
 
 const PatientsPage: React.FC = () => {
-  const ITEMS_PER_PAGE = 5;
+  const {
+    data: patients = [],
+  } = usePatients();
+
+  const {
+    mutate: deletePatient,
+    isPending: isDeleting
+  } = useDeletePatient();
+
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
+    useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] =
+    useState(false);
+  const [isSecurityDrawerOpen, setIsSecurityDrawerOpen] =
+    useState(false);
+  // Estado para controlar el modal de eliminación
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const [selectedPatient, setSelectedPatient] = useState<PatientModel | null>(null);
+
+  const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   const searchFields: (keyof PatientModel)[] = [
@@ -29,7 +53,7 @@ const PatientsPage: React.FC = () => {
     setSearch,
     filteredData,
   } = useTableSearch<PatientModel>({
-    data: patientsMock,
+    data: patients,
     fields: searchFields,
     delay: 800,
   });
@@ -37,8 +61,21 @@ const PatientsPage: React.FC = () => {
 
   const totalItems = filteredData.length; //obtenemos la cantidad total de items 
 
+  // Calculamos el total de páginas disponibles y obtenemos una página válida,
+  // evitando que currentPage apunte a una página que ya no existe, por ejemplo,
+  // después de eliminar el último usuario de la página actual.
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalItems / ITEMS_PER_PAGE)
+  );
+
+  const validPage = Math.min(
+    currentPage,
+    totalPages
+  );
+
   //para obtener solo los pacientes que queremos por pagina, los visibles
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 
   const endIndex = startIndex + ITEMS_PER_PAGE;
 
@@ -55,7 +92,7 @@ const PatientsPage: React.FC = () => {
     return `${patient.name} ${patient.lastName}`;
   };
 
-  const columns: TableColumn<typeof patientsMock[number]>[] = [
+  const columns: TableColumn<typeof patients[number]>[] = [
     {
       key: "name",
       header: "Nombre",
@@ -98,6 +135,7 @@ const PatientsPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
+      className: "w-105",
       render: (patient: PatientModel) => (
         <span className="text-sm text-slate-500">
           {patient.email}
@@ -130,28 +168,36 @@ const PatientsPage: React.FC = () => {
     },
   ];
 
-  const actions: TableAction<typeof patientsMock[number]>[] = [
-    {
-      label: "Ver paciente",
-      icon: <Eye className="w-4 h-4" />,
-      onClick: (patient) => {
-        console.log("Ver:", patient);
-      },
-    },
-
+  const actions: TableAction<typeof patients[number]>[] = [
+    // {
+    //   label: "Ver paciente",
+    //   icon: <Eye className="w-4 h-4" />,
+    //   onClick: (patient) => {
+    //     console.log("Ver:", patient);
+    //   },
+    // },
     {
       label: "Editar paciente",
       icon: <Pencil className="w-4 h-4" />,
       onClick: (patient) => {
-        console.log("Editar:", patient);
+        setSelectedPatient(patient);
+        setIsEditDrawerOpen(true);
       },
     },
-
+    {
+      label: "Credenciales y Seguridad",
+      icon: <KeyRound className="w-4 h-4 text-amber-600" />,
+      onClick: (user) => {
+        setSelectedPatient(user);
+        setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+      },
+    },
     {
       label: "Eliminar paciente",
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (patient) => {
-        console.log("Eliminar:", patient);
+        setSelectedPatient(patient);
+        setIsDeleteModalOpen(true);
       },
     },
   ];
@@ -166,6 +212,26 @@ const PatientsPage: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleDeleteConfirm = () => {
+    if (!selectedPatient) return;
+    const patientId = selectedPatient.id;
+
+    deletePatient(patientId, {
+      onSuccess: () => {
+        setSelectedPatient(null);
+        setIsDeleteModalOpen(false);
+      },
+
+      onError: (error) => {
+        console.error(
+          "Error al eliminar el paciente:",
+          error
+        );
+      },
+    });
+  };
+
+
   return (
     <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
@@ -177,7 +243,7 @@ const PatientsPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar paciente..."
           />
-          <button className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+          <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
             <Plus className="w-4 h-4" />
             <span>Nuevo Paciente</span>
           </button>
@@ -198,13 +264,46 @@ const PatientsPage: React.FC = () => {
       {/* Paginación de la Tabla */}
       <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
         <Pagination
-          currentPage={currentPage}
+          currentPage={validPage}
           totalItems={totalItems}
           itemsPerPage={ITEMS_PER_PAGE}
           onPageChange={setCurrentPage}
           label="pacientes"
         />
       </div>
+
+      <CreatePatientDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+
+      <EditPatientDrawer
+        isOpen={isEditDrawerOpen}
+        onHide={() => {
+          setIsEditDrawerOpen(false);
+          setSelectedPatient(null);
+        }}
+        patient={selectedPatient}
+      />
+
+      <SecurityPatientDrawer
+        isOpen={isSecurityDrawerOpen}
+        onHide={() => {
+          setIsSecurityDrawerOpen(false);
+          setSelectedPatient(null);
+        }}
+        patient={selectedPatient}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title={`¿Estás seguro de eliminar a ${selectedPatient?.name ?? "este paciente"}?`}
+        description="Esta acción no se puede deshacer. Todos los datos asociados a este paciente se perderán permanentemente."
+        confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
+        cancelText="Cancelar"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedPatient(null);
+        }}
+      />
     </div>
   );
 }

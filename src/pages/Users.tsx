@@ -35,7 +35,7 @@ const UsersPage: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [selectedUser, setSelectedUser] = useState<UserModel | null>(null);
-  const ITEMS_PER_PAGE = 5;
+  const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   const searchFields: (keyof UserModel)[] = [
@@ -126,6 +126,7 @@ const UsersPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
+      className:"w-105",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {user.email}

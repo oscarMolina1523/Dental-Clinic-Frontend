@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import Toast from "../../shared/Toast";
-import { useActivateUser, useChangeEmail, useChangePassword, useChangeRole, useDeactivateUser } from "../../hooks/useUsers";
+import { useActivateUser, useChangeUserEmail, useChangeUserPassword, useChangeUserRole, useDeactivateUser } from "../../hooks/useUsers";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import User from "../../models/UserModel";
 import { useRoles } from "../../hooks/useRoles";
 
-interface EditUserDrawerProps {
+interface SecurityUserDrawerProps {
     isOpen: boolean;
     onHide: () => void;
     user: User | null;
 }
 
-const SecurityUserDrawer: React.FC<EditUserDrawerProps> = ({
+const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
     isOpen,
     onHide,
     user,
@@ -21,9 +21,9 @@ const SecurityUserDrawer: React.FC<EditUserDrawerProps> = ({
     const { data: roles = [], isLoading: isLoadingRoles } = useRoles();
 
     // Hooks de mutación
-    const { mutateAsync: changeEmail, isPending: isPendingEmail } = useChangeEmail();
-    const { mutateAsync: changePassword, isPending: isPendingPassword } = useChangePassword();
-    const { mutateAsync: changeRole, isPending: isPendingRole } = useChangeRole();
+    const { mutateAsync: changeEmail, isPending: isPendingEmail } = useChangeUserEmail();
+    const { mutateAsync: changePassword, isPending: isPendingPassword } = useChangeUserPassword();
+    const { mutateAsync: changeRole, isPending: isPendingRole } = useChangeUserRole();
     const { mutateAsync: activateUser, isPending: isPendingActivate } = useActivateUser();
     const { mutateAsync: deactivateUser, isPending: isPendingDeactivate } = useDeactivateUser();
 
