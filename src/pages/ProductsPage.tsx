@@ -6,10 +6,14 @@ import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type ProductModel from "../models/ProductModel";
-import { productsMock } from "../data/productsData";
+import { useProducts } from "../hooks/useProducts";
 
 const ProductsPage: React.FC = () => {
-  const ITEMS_PER_PAGE = 5;
+  const {
+    data: products = []
+  } = useProducts(1, 10);
+
+  const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
   const searchFields: (keyof ProductModel)[] = [
@@ -24,7 +28,7 @@ const ProductsPage: React.FC = () => {
     setSearch,
     filteredData,
   } = useTableSearch<ProductModel>({
-    data: productsMock,
+    data: products,
     fields: searchFields,
     delay: 800,
   });
@@ -47,7 +51,7 @@ const ProductsPage: React.FC = () => {
   );
 
 
-  const columns: TableColumn<typeof productsMock[number]>[] = [
+  const columns: TableColumn<typeof products[number]>[] = [
     {
       key: "name",
       header: "Nombre",
@@ -64,7 +68,7 @@ const ProductsPage: React.FC = () => {
 
     {
       key: "barcode",
-      header: "Código",
+      header: "Código de barra",
       render: (product: ProductModel) => (
         <span className="text-sm text-slate-500">
           {product.barcode}
@@ -91,7 +95,7 @@ const ProductsPage: React.FC = () => {
     },
   ];
 
-  const actions: TableAction<typeof productsMock[number]>[] = [
+  const actions: TableAction<typeof products[number]>[] = [
     {
       label: "Ver producto",
       icon: <Eye className="w-4 h-4" />,

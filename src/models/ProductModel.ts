@@ -1,7 +1,7 @@
 import BaseModel from "./BaseModel";
 
 export default class ProductModel extends BaseModel {
-  barcode: string;
+  barcode?: string;
   name: string;
   description: string;
   category_id: string;
@@ -16,7 +16,7 @@ export default class ProductModel extends BaseModel {
     measurement_unit_id,
   }: {
     id: string;
-    barcode: string;
+    barcode?: string;
     name: string;
     description: string;
     category_id: string;
@@ -29,4 +29,12 @@ export default class ProductModel extends BaseModel {
     this.category_id = category_id;
     this.measurement_unit_id = measurement_unit_id;
   }
+}
+
+export interface ProductDTO {
+  barcode?: string;
+  name: string;
+  description: string;
+  category_id: string;
+  measurement_unit_id: string;
 }
