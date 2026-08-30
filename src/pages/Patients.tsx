@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2, KeyRound } from "lucide-react";
+import { Plus, Pencil, Trash2, KeyRound } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -169,13 +169,13 @@ const PatientsPage: React.FC = () => {
   ];
 
   const actions: TableAction<typeof patients[number]>[] = [
-    {
-      label: "Ver paciente",
-      icon: <Eye className="w-4 h-4" />,
-      onClick: (patient) => {
-        console.log("Ver:", patient);
-      },
-    },
+    // {
+    //   label: "Ver paciente",
+    //   icon: <Eye className="w-4 h-4" />,
+    //   onClick: (patient) => {
+    //     console.log("Ver:", patient);
+    //   },
+    // },
     {
       label: "Editar paciente",
       icon: <Pencil className="w-4 h-4" />,
