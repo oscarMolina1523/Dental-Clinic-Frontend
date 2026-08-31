@@ -6,11 +6,12 @@ import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type ProductModel from "../models/ProductModel";
-import { useProducts } from "../hooks/useProducts";
+import { useDeleteProduct, useProducts } from "../hooks/useProducts";
 import CreateProductDrawer from "../components/product/CreateProductDrawer";
 import { useMeasurementUnites } from "../hooks/useMeasurementUnit";
 import { useCategories } from "../hooks/useCategories";
 import EditProductDrawer from "../components/product/EditProductDrawer";
+import ConfirmModal from "../shared/ConfirmModal";
 
 const ProductsPage: React.FC = () => {
   const {
@@ -18,11 +19,16 @@ const ProductsPage: React.FC = () => {
   } = useProducts(1, 10);
   const { data: measurementUnites = [] } = useMeasurementUnites();
   const { data: categories = [] } = useCategories();
+  const {
+      mutate: deleteProduct,
+      isPending: isDeleting
+    } = useDeleteProduct();
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
   const [isEditDrawerOpen, setIsEditDrawerOpen] =
     useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [selectedProduct, setSelectedProduct] = useState<ProductModel | null>(null);
 
@@ -146,7 +152,8 @@ const ProductsPage: React.FC = () => {
       label: "Eliminar producto",
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (product) => {
-        console.log("Eliminar:", product);
+        setSelectedProduct(product);
+        setIsDeleteModalOpen(true);
       },
     },
   ];
@@ -159,6 +166,25 @@ const ProductsPage: React.FC = () => {
      * volvemos a la primera página.
      */
     setCurrentPage(1);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!selectedProduct) return;
+    const productId = selectedProduct.id;
+
+    deleteProduct(productId, {
+      onSuccess: () => {
+        setSelectedProduct(null);
+        setIsDeleteModalOpen(false);
+      },
+
+      onError: (error) => {
+        console.error(
+          "Error al eliminar el producto:",
+          error
+        );
+      },
+    });
   };
 
   return (
@@ -210,6 +236,19 @@ const ProductsPage: React.FC = () => {
           setSelectedProduct(null);
         }}
         product={selectedProduct}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title={`¿Estás seguro de eliminar a ${selectedProduct?.name ?? "este producto"}?`}
+        description="Esta acción no se puede deshacer. Todos los datos asociados a este paciente se perderán permanentemente."
+        confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
+        cancelText="Cancelar"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedProduct(null);
+        }}
       />
     </div>
   );
