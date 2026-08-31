@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import { useAddProduct } from "../../hooks/useProducts";
+import { useCategories } from "../../hooks/useCategories";
+import { useMeasurementUnites } from "../../hooks/useMeasurementUnit";
 
 interface CreateProductProps {
     isOpen: boolean;
@@ -10,6 +12,8 @@ interface CreateProductProps {
 
 const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) => {
     const { mutate: addProduct, isPending } = useAddProduct();
+    const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
+    const { data: measurementUnites = [], isLoading: isLoadingMeasurementUnites } = useMeasurementUnites();
 
     const [form, setForm] = useState({
         name: "",
@@ -47,7 +51,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
     };
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement>
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         const { name, value } = e.target;
 
@@ -94,7 +98,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                 name,
                 barcode,
                 description,
-                category_id ,
+                category_id,
                 measurement_unit_id
             },
             {
@@ -273,7 +277,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                             Categoria
                         </label>
 
-                        <input
+                        {/* <input
                             type="text"
                             name="category_id"
                             value={form.category_id}
@@ -290,14 +294,32 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                        /> */}
+
+                        <select
+                            name="category_id"
+                            value={form.category_id}
+                            onChange={handleChange}
+                            disabled={isLoadingCategories}
+                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
+                        >
+                            <option value="">
+                                {isLoadingCategories ? "Cargando categorias..." : "Seleccione una categoria"}
+                            </option>
+                            {/* 3. Mapeo dinámico de los categories devueltos por la API */}
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
                             Unidad de medida
                         </label>
 
-                        <input
+                        {/* <input
                             type="text"
                             name="measurement_unit_id"
                             value={form.measurement_unit_id}
@@ -314,7 +336,24 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                        /> */}
+                        <select
+                            name="measurement_unit_id"
+                            value={form.measurement_unit_id}
+                            onChange={handleChange}
+                            disabled={isLoadingMeasurementUnites}
+                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
+                        >
+                            <option value="">
+                                {isLoadingMeasurementUnites ? "Cargando unidades de medida..." : "Seleccione una Unidad de medida"}
+                            </option>
+                            {/* 3. Mapeo dinámico de los unidades de medidas devueltos por la API */}
+                            {measurementUnites.map((measurementUnit) => (
+                                <option key={measurementUnit.id} value={measurementUnit.id}>
+                                    {measurementUnit.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                 </div>
