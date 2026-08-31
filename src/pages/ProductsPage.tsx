@@ -8,14 +8,18 @@ import SearchInput from "../shared/Table/SearchInput";
 import type ProductModel from "../models/ProductModel";
 import { useProducts } from "../hooks/useProducts";
 import CreateProductDrawer from "../components/product/CreateProductDrawer";
+import { useMeasurementUnites } from "../hooks/useMeasurementUnit";
+import { useCategories } from "../hooks/useCategories";
 
 const ProductsPage: React.FC = () => {
   const {
     data: products = []
   } = useProducts(1, 10);
+  const { data: measurementUnites = [] } = useMeasurementUnites();
+  const { data: categories = [] } = useCategories();
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
-      useState(false);
+    useState(false);
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,6 +58,14 @@ const ProductsPage: React.FC = () => {
     [startIndex, endIndex, filteredData]
   );
 
+  //Creamos un mapa/diccionario optimizado para búsqueda rápida (O(1))
+  const measurementMap = useMemo(() => {
+    return new Map(measurementUnites.map((measurement) => [measurement.id, measurement.name]));
+  }, [measurementUnites]);
+
+  const categoryMap = useMemo(() => {
+    return new Map(categories.map((category) => [category.id, category.name]));
+  }, [categories]);
 
   const columns: TableColumn<typeof products[number]>[] = [
     {
@@ -82,9 +94,10 @@ const ProductsPage: React.FC = () => {
     {
       key: "category_id",
       header: "Categoría",
+      className:"w-100",
       render: (product: ProductModel) => (
         <span className="text-sm text-slate-500">
-          {product.category_id}
+          {categoryMap.get(product.category_id) ?? "Cargando..."}
         </span>
       ),
     },
@@ -93,7 +106,7 @@ const ProductsPage: React.FC = () => {
       header: "Unidad de medida",
       render: (product: ProductModel) => (
         <span className="text-sm text-slate-500">
-          {product.measurement_unit_id}
+          {measurementMap.get(product.measurement_unit_id) ?? "Cargando..."}
         </span>
       ),
     },
@@ -146,7 +159,7 @@ const ProductsPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar producto..."
           />
-          <button onClick={()=> setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+          <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
             <Plus className="w-4 h-4" />
             <span>Nuevo Producto</span>
           </button>
