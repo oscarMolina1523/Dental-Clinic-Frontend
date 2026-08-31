@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -10,6 +10,7 @@ import { useProducts } from "../hooks/useProducts";
 import CreateProductDrawer from "../components/product/CreateProductDrawer";
 import { useMeasurementUnites } from "../hooks/useMeasurementUnit";
 import { useCategories } from "../hooks/useCategories";
+import EditProductDrawer from "../components/product/EditProductDrawer";
 
 const ProductsPage: React.FC = () => {
   const {
@@ -20,6 +21,11 @@ const ProductsPage: React.FC = () => {
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] =
+    useState(false);
+
+  const [selectedProduct, setSelectedProduct] = useState<ProductModel | null>(null);
+
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,7 +66,7 @@ const ProductsPage: React.FC = () => {
 
   //Creamos un mapa/diccionario optimizado para búsqueda rápida (O(1))
   const measurementMap = useMemo(() => {
-    return new Map(measurementUnites.map((measurement) => [measurement.id, measurement.name]));
+    return new Map(measurementUnites.map((measurement) => [measurement.id, measurement]));
   }, [measurementUnites]);
 
   const categoryMap = useMemo(() => {
@@ -94,7 +100,7 @@ const ProductsPage: React.FC = () => {
     {
       key: "category_id",
       header: "Categoría",
-      className:"w-100",
+      className: "w-100",
       render: (product: ProductModel) => (
         <span className="text-sm text-slate-500">
           {categoryMap.get(product.category_id) ?? "Cargando..."}
@@ -104,28 +110,35 @@ const ProductsPage: React.FC = () => {
     {
       key: "measurement_unit_id",
       header: "Unidad de medida",
-      render: (product: ProductModel) => (
-        <span className="text-sm text-slate-500">
-          {measurementMap.get(product.measurement_unit_id) ?? "Cargando..."}
-        </span>
-      ),
+      render: (product: ProductModel) => {
+        const measurement = measurementMap.get(product.measurement_unit_id);
+
+        return (
+            <span className="text-sm text-slate-500">
+                {measurement
+                    ? `${measurement.name} (${measurement.abreviation})`
+                    : "Cargando..."}
+            </span>
+        );
+    },
     },
   ];
 
   const actions: TableAction<typeof products[number]>[] = [
-    {
-      label: "Ver producto",
-      icon: <Eye className="w-4 h-4" />,
-      onClick: (product) => {
-        console.log("Ver:", product);
-      },
-    },
+    // {
+    //   label: "Ver producto",
+    //   icon: <Eye className="w-4 h-4" />,
+    //   onClick: (product) => {
+    //     console.log("Ver:", product);
+    //   },
+    // },
 
     {
       label: "Editar producto",
       icon: <Pencil className="w-4 h-4" />,
       onClick: (product) => {
-        console.log("Editar:", product);
+        setSelectedProduct(product);
+        setIsEditDrawerOpen(true);
       },
     },
 
@@ -189,6 +202,15 @@ const ProductsPage: React.FC = () => {
       </div>
 
       <CreateProductDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+
+      <EditProductDrawer
+        isOpen={isEditDrawerOpen}
+        onHide={() => {
+          setIsEditDrawerOpen(false);
+          setSelectedProduct(null);
+        }}
+        product={selectedProduct}
+      />
     </div>
   );
 }

@@ -272,23 +272,6 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                             Género
                         </label>
 
-                        {/* <input
-                            type="text"
-                            name="gender"
-                            value={form?.gender || ""}
-                            onChange={handleChange}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        /> */}
                         <select
                             name="gender"
                             value={form?.gender || ""}

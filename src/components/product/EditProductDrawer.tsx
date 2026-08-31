@@ -1,32 +1,43 @@
 import React, { useState } from "react";
 import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
-import { useAddProduct } from "../../hooks/useProducts";
+import type ProductModel from "../../models/ProductModel";
+import { useUpdateProduct } from "../../hooks/useProducts";
 import { useCategories } from "../../hooks/useCategories";
 import { useMeasurementUnites } from "../../hooks/useMeasurementUnit";
 
-interface CreateProductProps {
+interface EditProductDrawerProps {
     isOpen: boolean;
     onHide: () => void;
+    product: ProductModel | null;
 }
 
-const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) => {
-    const { mutate: addProduct, isPending } = useAddProduct();
+const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
+    isOpen,
+    onHide,
+    product,
+}) => {
+    const {
+        mutate: updateProduct,
+        isPending: isLoadingProducts,
+    } = useUpdateProduct();
+
     const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
     const { data: measurementUnites = [], isLoading: isLoadingMeasurementUnites } = useMeasurementUnites();
 
-    const [form, setForm] = useState({
-        name: "",
-        barcode: "",
-        description: "",
-        category_id: "",
-        measurement_unit_id: "",
-    });
+
+    const [prevProduct, setPrevProduct] = useState<ProductModel | null>(product);
+    const [form, setForm] = useState<ProductModel | null>(product);
 
     const [toast, setToast] = useState<{
         type: "success" | "error";
         message: string;
     } | null>(null);
+
+    if (product !== prevProduct) {
+        setPrevProduct(product);
+        setForm(product);
+    }
 
     const showToast = (
         type: "success" | "error",
@@ -38,46 +49,38 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
         });
     };
 
-    const cleanForm = () => {
-        setForm({
-            name: "",
-            barcode: "",
-            description: "",
-            category_id: "",
-            measurement_unit_id: "",
-        });
-
-        onHide();
-    };
-
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLSelectElement
+        >
     ) => {
         const { name, value } = e.target;
 
-        setForm((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+        setForm((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                [name]: value,
+            };
+        });
     };
 
-    const handleSubmit = () => {
-        const name = form.name.trim();
-        const barcode = form.barcode.trim();
-        const description = form.description.trim();
-        const category_id = form.category_id.trim();
-        const measurement_unit_id = form.measurement_unit_id.trim();
 
-        // Validaciones
-        if (!name) {
+
+    const handleSubmit = () => {
+        if (!product || !form) {
+            return;
+        }
+
+        if (!form.name.trim()) {
             showToast(
                 "error",
-                "El nombre del producto es obligatorio."
+                "El nombre es obligatorio."
             );
             return;
         }
 
-        if (!category_id) {
+        if (!form.category_id.trim()) {
             showToast(
                 "error",
                 "La categoria es obligatoria."
@@ -85,7 +88,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
             return;
         }
 
-        if (!measurement_unit_id) {
+        if (!form.measurement_unit_id.trim()) {
             showToast(
                 "error",
                 "La unidad de medida es obligatoria."
@@ -93,30 +96,32 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
             return;
         }
 
-        addProduct(
+        updateProduct(
             {
-                name,
-                barcode,
-                description,
-                category_id,
-                measurement_unit_id
+                id: product.id,
+                product: {
+                    name: form.name.trim(),
+                    barcode: form.barcode,
+                    description: form.description,
+                    category_id: form.category_id,
+                    measurement_unit_id: form.measurement_unit_id
+                }
             },
             {
                 onSuccess: () => {
                     showToast(
                         "success",
-                        "El producto se creó correctamente."
+                        "El producto se actualizó correctamente."
                     );
 
-                    cleanForm();
-
+                    onHide();
                 },
 
                 onError: (error) => {
                     showToast(
                         "error",
                         error.message ||
-                        "No se pudo crear el producto."
+                        "No se pudo actualizar el producto."
                     );
                 },
             }
@@ -149,22 +154,21 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
             <GenericDrawer
                 isOpen={isOpen}
                 onHide={onHide}
-                title="Nuevo Producto"
-                description="Registra un nuevo producto"
+                title="Editar Producto"
+                description="Modifica la información del producto"
                 width="w-112.5"
                 footer={
                     <>
                         <button
                             type="button"
                             onClick={onHide}
-                            disabled={isPending}
+                            disabled={isLoadingProducts}
                             className="
                                 px-4 py-2.5
                                 text-sm font-medium
                                 text-slate-600
                                 hover:bg-slate-100
                                 rounded-lg
-                                transition-colors
                                 cursor-pointer
                                 disabled:opacity-50
                             "
@@ -175,26 +179,26 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                         <button
                             type="button"
                             onClick={handleSubmit}
-                            disabled={isPending}
+                            disabled={isLoadingProducts}
                             className="
                                 px-4 py-2.5
                                 text-sm font-medium
                                 text-white
                                 bg-[#001D4A]
                                 rounded-lg
-                                transition-colors
                                 cursor-pointer
                                 disabled:opacity-50
                             "
                         >
-                            {isPending
-                                ? "Creando..."
-                                : "Crear Producto"}
+                            {isLoadingProducts
+                                ? "Guardando..."
+                                : "Guardar Cambios"}
                         </button>
                     </>
                 }
             >
-                {/* BODY DEL CREATE */}
+                {/* TODO EL BODY ES EXCLUSIVO DE EDITAR */}
+
                 <div className="space-y-5">
 
                     <div>
@@ -205,9 +209,8 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                         <input
                             type="text"
                             name="name"
-                            value={form.name}
+                            value={form?.name || ""}
                             onChange={handleChange}
-                            placeholder="Ingrese el nombre completo"
                             className="
                                 w-full
                                 px-3 py-2.5
@@ -221,18 +224,16 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                             "
                         />
                     </div>
-
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Codigo de barra
+                            Código de barra
                         </label>
 
                         <input
                             type="text"
                             name="barcode"
-                            value={form.barcode}
+                            value={form?.barcode || ""}
                             onChange={handleChange}
-                            placeholder="123456789"
                             className="
                                 w-full
                                 px-3 py-2.5
@@ -246,7 +247,6 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                             "
                         />
                     </div>
-
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
                             Descripción
@@ -255,9 +255,8 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                         <input
                             type="text"
                             name="description"
-                            value={form.description}
+                            value={form?.description || ""}
                             onChange={handleChange}
-                            placeholder="Ingrese una descripción"
                             className="
                                 w-full
                                 px-3 py-2.5
@@ -271,7 +270,6 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                             "
                         />
                     </div>
-
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
                             Categoria
@@ -279,7 +277,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
 
                         <select
                             name="category_id"
-                            value={form.category_id}
+                            value={form?.category_id || ""}
                             onChange={handleChange}
                             disabled={isLoadingCategories}
                             className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
@@ -301,7 +299,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                         </label>
                         <select
                             name="measurement_unit_id"
-                            value={form.measurement_unit_id}
+                            value={form?.measurement_unit_id || ""}
                             onChange={handleChange}
                             disabled={isLoadingMeasurementUnites}
                             className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
@@ -317,11 +315,10 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                             ))}
                         </select>
                     </div>
-
                 </div>
             </GenericDrawer>
         </>
     );
-}
+};
 
-export default CreateProductDrawer;
+export default EditProductDrawer;
