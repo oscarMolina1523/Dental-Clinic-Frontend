@@ -15,7 +15,8 @@ import {
   BarChart3,
   UserCheck,
   Settings,
-  ChevronDown
+  ChevronDown,
+  ScanBarcode
 } from "lucide-react";
 
 // Lista de elementos de navegación con sus íconos
@@ -29,7 +30,8 @@ const navItems = [
   { id: "planes", label: "Planes de Tratamiento", icon: FileCheck },
   { id: "facturacion", label: "Facturación", icon: Receipt },
   { id: "caja", label: "Caja", icon: Archive },
-  { id: "products", label: "Inventario", icon: Package },
+  { id: "products", label: "Productos", icon: ScanBarcode },
+  { id: "inventario", label: "Inventario", icon: Package },
   { id: "reportes", label: "Reportes", icon: BarChart3 },
   { id: "users", label: "Usuarios", icon: UserCheck },
   { id: "configuracion", label: "Configuración", icon: Settings },

@@ -1,17 +1,37 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type ProductModel from "../models/ProductModel";
-import { useProducts } from "../hooks/useProducts";
+import { useDeleteProduct, useProducts } from "../hooks/useProducts";
+import CreateProductDrawer from "../components/product/CreateProductDrawer";
+import { useMeasurementUnites } from "../hooks/useMeasurementUnit";
+import { useCategories } from "../hooks/useCategories";
+import EditProductDrawer from "../components/product/EditProductDrawer";
+import ConfirmModal from "../shared/ConfirmModal";
 
 const ProductsPage: React.FC = () => {
   const {
     data: products = []
   } = useProducts(1, 10);
+  const { data: measurementUnites = [] } = useMeasurementUnites();
+  const { data: categories = [] } = useCategories();
+  const {
+      mutate: deleteProduct,
+      isPending: isDeleting
+    } = useDeleteProduct();
+
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
+    useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] =
+    useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const [selectedProduct, setSelectedProduct] = useState<ProductModel | null>(null);
+
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,6 +70,14 @@ const ProductsPage: React.FC = () => {
     [startIndex, endIndex, filteredData]
   );
 
+  //Creamos un mapa/diccionario optimizado para búsqueda rápida (O(1))
+  const measurementMap = useMemo(() => {
+    return new Map(measurementUnites.map((measurement) => [measurement.id, measurement]));
+  }, [measurementUnites]);
+
+  const categoryMap = useMemo(() => {
+    return new Map(categories.map((category) => [category.id, category.name]));
+  }, [categories]);
 
   const columns: TableColumn<typeof products[number]>[] = [
     {
@@ -78,37 +106,45 @@ const ProductsPage: React.FC = () => {
     {
       key: "category_id",
       header: "Categoría",
+      className: "w-100",
       render: (product: ProductModel) => (
         <span className="text-sm text-slate-500">
-          {product.category_id}
+          {categoryMap.get(product.category_id) ?? "Cargando..."}
         </span>
       ),
     },
     {
       key: "measurement_unit_id",
       header: "Unidad de medida",
-      render: (product: ProductModel) => (
-        <span className="text-sm text-slate-500">
-          {product.measurement_unit_id}
-        </span>
-      ),
+      render: (product: ProductModel) => {
+        const measurement = measurementMap.get(product.measurement_unit_id);
+
+        return (
+            <span className="text-sm text-slate-500">
+                {measurement
+                    ? `${measurement.name} (${measurement.abreviation})`
+                    : "Cargando..."}
+            </span>
+        );
+    },
     },
   ];
 
   const actions: TableAction<typeof products[number]>[] = [
-    {
-      label: "Ver producto",
-      icon: <Eye className="w-4 h-4" />,
-      onClick: (product) => {
-        console.log("Ver:", product);
-      },
-    },
+    // {
+    //   label: "Ver producto",
+    //   icon: <Eye className="w-4 h-4" />,
+    //   onClick: (product) => {
+    //     console.log("Ver:", product);
+    //   },
+    // },
 
     {
       label: "Editar producto",
       icon: <Pencil className="w-4 h-4" />,
       onClick: (product) => {
-        console.log("Editar:", product);
+        setSelectedProduct(product);
+        setIsEditDrawerOpen(true);
       },
     },
 
@@ -116,7 +152,8 @@ const ProductsPage: React.FC = () => {
       label: "Eliminar producto",
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (product) => {
-        console.log("Eliminar:", product);
+        setSelectedProduct(product);
+        setIsDeleteModalOpen(true);
       },
     },
   ];
@@ -131,6 +168,25 @@ const ProductsPage: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleDeleteConfirm = () => {
+    if (!selectedProduct) return;
+    const productId = selectedProduct.id;
+
+    deleteProduct(productId, {
+      onSuccess: () => {
+        setSelectedProduct(null);
+        setIsDeleteModalOpen(false);
+      },
+
+      onError: (error) => {
+        console.error(
+          "Error al eliminar el producto:",
+          error
+        );
+      },
+    });
+  };
+
   return (
     <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
@@ -142,7 +198,7 @@ const ProductsPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar producto..."
           />
-          <button className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+          <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
             <Plus className="w-4 h-4" />
             <span>Nuevo Producto</span>
           </button>
@@ -170,6 +226,30 @@ const ProductsPage: React.FC = () => {
           label="Productos"
         />
       </div>
+
+      <CreateProductDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+
+      <EditProductDrawer
+        isOpen={isEditDrawerOpen}
+        onHide={() => {
+          setIsEditDrawerOpen(false);
+          setSelectedProduct(null);
+        }}
+        product={selectedProduct}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title={`¿Estás seguro de eliminar a ${selectedProduct?.name ?? "este producto"}?`}
+        description="Esta acción no se puede deshacer. Todos los datos asociados a este paciente se perderán permanentemente."
+        confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
+        cancelText="Cancelar"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedProduct(null);
+        }}
+      />
     </div>
   );
 }

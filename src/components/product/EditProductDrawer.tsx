@@ -1,37 +1,42 @@
 import React, { useState } from "react";
 import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
-import type PatientModel from "../../models/PatientModel";
-import { useUpdatePatient } from "../../hooks/usePatients";
-import { genderData } from "../../data/genderData";
+import type ProductModel from "../../models/ProductModel";
+import { useUpdateProduct } from "../../hooks/useProducts";
+import { useCategories } from "../../hooks/useCategories";
+import { useMeasurementUnites } from "../../hooks/useMeasurementUnit";
 
-interface EditPatientDrawerProps {
+interface EditProductDrawerProps {
     isOpen: boolean;
     onHide: () => void;
-    patient: PatientModel | null;
+    product: ProductModel | null;
 }
 
-const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
+const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
     isOpen,
     onHide,
-    patient,
+    product,
 }) => {
     const {
-        mutate: updatePatient,
-        isPending,
-    } = useUpdatePatient();
+        mutate: updateProduct,
+        isPending: isLoadingProducts,
+    } = useUpdateProduct();
 
-    const [prevPatient, setPrevPatient] = useState<PatientModel | null>(patient);
-    const [form, setForm] = useState<PatientModel | null>(patient);
+    const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
+    const { data: measurementUnites = [], isLoading: isLoadingMeasurementUnites } = useMeasurementUnites();
+
+
+    const [prevProduct, setPrevProduct] = useState<ProductModel | null>(product);
+    const [form, setForm] = useState<ProductModel | null>(product);
 
     const [toast, setToast] = useState<{
         type: "success" | "error";
         message: string;
     } | null>(null);
 
-    if (patient !== prevPatient) {
-        setPrevPatient(patient);
-        setForm(patient);
+    if (product !== prevProduct) {
+        setPrevProduct(product);
+        setForm(product);
     }
 
     const showToast = (
@@ -60,28 +65,10 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
         });
     };
 
-    /*
-     * Convierte Date -> YYYY-MM-DD
-     * para poder utilizarlo en <input type="date">
-     */
-    const formatDateForInput = (
-        date: Date | string | null | undefined
-    ): string => {
-        if (!date) return "";
 
-        if (typeof date === "string") {
-            return date.substring(0, 10);
-        }
-
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-    };
 
     const handleSubmit = () => {
-        if (!patient || !form) {
+        if (!product || !form) {
             return;
         }
 
@@ -93,45 +80,38 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
             return;
         }
 
-        if (!form.lastName.trim()) {
+        if (!form.category_id.trim()) {
             showToast(
                 "error",
-                "El apellido es obligatorio."
+                "La categoria es obligatoria."
             );
             return;
         }
 
-        if (!form.gender.trim()) {
+        if (!form.measurement_unit_id.trim()) {
             showToast(
                 "error",
-                "Debe seleccionar un género."
+                "La unidad de medida es obligatoria."
             );
             return;
         }
 
-        if (!form.birthdate) {
-            showToast(
-                "error",
-                "Debe seleccionar la fecha de nacimiento."
-            );
-            return;
-        }
-
-        updatePatient(
+        updateProduct(
             {
-                id: patient.id,
-                patient: {
+                id: product.id,
+                product: {
                     name: form.name.trim(),
-                    lastName: form.lastName.trim(),
-                    gender: form.gender,
-                    birthdate: form.birthdate
+                    barcode: form.barcode,
+                    description: form.description,
+                    category_id: form.category_id,
+                    measurement_unit_id: form.measurement_unit_id
                 }
             },
             {
                 onSuccess: () => {
                     showToast(
                         "success",
-                        "El paciente se actualizó correctamente."
+                        "El producto se actualizó correctamente."
                     );
 
                     onHide();
@@ -141,7 +121,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                     showToast(
                         "error",
                         error.message ||
-                        "No se pudo actualizar el paciente."
+                        "No se pudo actualizar el producto."
                     );
                 },
             }
@@ -174,15 +154,15 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
             <GenericDrawer
                 isOpen={isOpen}
                 onHide={onHide}
-                title="Editar Paciente"
-                description="Modifica la información del paciente"
+                title="Editar Producto"
+                description="Modifica la información del producto"
                 width="w-112.5"
                 footer={
                     <>
                         <button
                             type="button"
                             onClick={onHide}
-                            disabled={isPending}
+                            disabled={isLoadingProducts}
                             className="
                                 px-4 py-2.5
                                 text-sm font-medium
@@ -199,7 +179,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                         <button
                             type="button"
                             onClick={handleSubmit}
-                            disabled={isPending}
+                            disabled={isLoadingProducts}
                             className="
                                 px-4 py-2.5
                                 text-sm font-medium
@@ -210,7 +190,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                                 disabled:opacity-50
                             "
                         >
-                            {isPending
+                            {isLoadingProducts
                                 ? "Guardando..."
                                 : "Guardar Cambios"}
                         </button>
@@ -223,7 +203,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombres
+                            Nombre
                         </label>
 
                         <input
@@ -246,13 +226,13 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Apellidos
+                            Código de barra
                         </label>
 
                         <input
                             type="text"
-                            name="lastName"
-                            value={form?.lastName || ""}
+                            name="barcode"
+                            value={form?.barcode || ""}
                             onChange={handleChange}
                             className="
                                 w-full
@@ -269,59 +249,71 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Género
+                            Descripción
+                        </label>
+
+                        <input
+                            type="text"
+                            name="description"
+                            value={form?.description || ""}
+                            onChange={handleChange}
+                            className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Categoria
                         </label>
 
                         <select
-                            name="gender"
-                            value={form?.gender || ""}
+                            name="category_id"
+                            value={form?.category_id || ""}
                             onChange={handleChange}
-                            className="
-                                                        w-full 
-                                                        px-3 py-2.5 
-                                                        border border-slate-200 
-                                                        rounded-lg 
-                                                        text-sm 
-                                                        outline-none 
-                                                        focus:border-blue-500 
-                                                        focus:ring-2 
-                                                        focus:ring-blue-500/10
-                                                    "
+                            disabled={isLoadingCategories}
+                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
                         >
                             <option value="">
-                                Seleccione un género
+                                {isLoadingCategories ? "Cargando categorias..." : "Seleccione una categoria"}
                             </option>
-
-                            {genderData.map((status) => (
-                                <option key={status} value={status}>
-                                    {status}
+                            {/* 3. Mapeo dinámico de los categories devueltos por la API */}
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
                                 </option>
                             ))}
                         </select>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Fecha de nacimiento
+                            Unidad de medida
                         </label>
-
-                        <input
-                            key={isOpen ? "birthdate-open" : "birthdate-closed"}
-                            type="date"
-                            name="birthdate"
-                            value={formatDateForInput(form?.birthdate)}
+                        <select
+                            name="measurement_unit_id"
+                            value={form?.measurement_unit_id || ""}
                             onChange={handleChange}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        />
+                            disabled={isLoadingMeasurementUnites}
+                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
+                        >
+                            <option value="">
+                                {isLoadingMeasurementUnites ? "Cargando unidades de medida..." : "Seleccione una Unidad de medida"}
+                            </option>
+                            {/* 3. Mapeo dinámico de los unidades de medidas devueltos por la API */}
+                            {measurementUnites.map((measurementUnit) => (
+                                <option key={measurementUnit.id} value={measurementUnit.id}>
+                                    {measurementUnit.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             </GenericDrawer>
@@ -329,4 +321,4 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
     );
 };
 
-export default EditPatientDrawer;
+export default EditProductDrawer;
