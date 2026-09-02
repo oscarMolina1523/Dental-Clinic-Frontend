@@ -7,7 +7,8 @@ import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type TreatmentCatalogModel from "../models/TreatmentCatalogModel";
 import { useTreatments } from "../hooks/useTreatmentsCatalog";
-import CreateTreatmentCatalogDrawer from "../components/treatmentCatalog/CreateTreatmentCataglogDrawer";
+import CreateTreatmentCatalogDrawer from "../components/treatmentCatalog/CreateTreatmentCatalogDrawer";
+import EditTreatmentCatalogDrawer from "../components/treatmentCatalog/EditTreatmentCatalogDrawer";
 
 const TreatmentCatalogPage: React.FC = () => {
     const {
@@ -133,7 +134,8 @@ const TreatmentCatalogPage: React.FC = () => {
             label: "Editar tratamiento",
             icon: <Pencil className="w-4 h-4" />,
             onClick: (treatment) => {
-                console.log("Editar:", treatment);
+                setSelectedTreatment(treatment);
+                setIsEditDrawerOpen(true);
             },
         },
 
@@ -197,6 +199,15 @@ const TreatmentCatalogPage: React.FC = () => {
             </div>
 
             <CreateTreatmentCatalogDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+
+            <EditTreatmentCatalogDrawer
+                isOpen={isEditDrawerOpen}
+                onHide={() => {
+                    setIsEditDrawerOpen(false);
+                    setSelectedTreatment(null);
+                }}
+                treatment={selectedTreatment}
+            />
         </div>
     );
 }
