@@ -1,15 +1,37 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, KeyRound } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type TreatmentCatalogModel from "../models/TreatmentCatalogModel";
-import { treatmentCatalogMock } from "../data/treatmentCatalogData";
+import { useDeleteTreatment, useTreatments } from "../hooks/useTreatmentsCatalog";
+import CreateTreatmentCatalogDrawer from "../components/treatmentCatalog/CreateTreatmentCatalogDrawer";
+import EditTreatmentCatalogDrawer from "../components/treatmentCatalog/EditTreatmentCatalogDrawer";
+import ConfirmModal from "../shared/ConfirmModal";
+import SecurityTreatmentCatalogDrawer from "../components/treatmentCatalog/SecurityTreatmentCatalogDrawer";
 
 const TreatmentCatalogPage: React.FC = () => {
-    const ITEMS_PER_PAGE = 5;
+    const {
+        data: treatments = []
+    } = useTreatments();
+    const {
+        mutate: deleteTreatment,
+        isPending: isDeleting
+    } = useDeleteTreatment();
+
+    const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
+        useState(false);
+    const [isEditDrawerOpen, setIsEditDrawerOpen] =
+        useState(false);
+    const [isSecurityDrawerOpen, setIsSecurityDrawerOpen] =
+        useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+    const [selectedTreatment, setSelectedTreatment] = useState<TreatmentCatalogModel | null>(null);
+
+    const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
 
     const searchFields: (keyof TreatmentCatalogModel)[] = [
@@ -25,7 +47,7 @@ const TreatmentCatalogPage: React.FC = () => {
         setSearch,
         filteredData,
     } = useTableSearch<TreatmentCatalogModel>({
-        data: treatmentCatalogMock,
+        data: treatments,
         fields: searchFields,
         delay: 800,
     });
@@ -33,8 +55,18 @@ const TreatmentCatalogPage: React.FC = () => {
 
     const totalItems = filteredData.length; //obtenemos la cantidad total de items 
 
+    const totalPages = Math.max(
+        1,
+        Math.ceil(totalItems / ITEMS_PER_PAGE)
+    );
+
+    const validPage = Math.min(
+        currentPage,
+        totalPages
+    );
+
     //para obtener solo los tratamientos que queremos por pagina, los visibles
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 
     const endIndex = startIndex + ITEMS_PER_PAGE;
 
@@ -48,7 +80,7 @@ const TreatmentCatalogPage: React.FC = () => {
     );
 
 
-    const columns: TableColumn<typeof treatmentCatalogMock[number]>[] = [
+    const columns: TableColumn<typeof treatments[number]>[] = [
         {
             key: "name",
             header: "Nombre",
@@ -107,12 +139,21 @@ const TreatmentCatalogPage: React.FC = () => {
         },
     ];
 
-    const actions: TableAction<typeof treatmentCatalogMock[number]>[] = [
+    const actions: TableAction<typeof treatments[number]>[] = [
+        // {
+        //     label: "Ver tratamiento",
+        //     icon: <Eye className="w-4 h-4" />,
+        //     onClick: (treatment) => {
+        //         console.log("Ver:", treatment);
+        //     },
+        // },
+
         {
-            label: "Ver tratamiento",
-            icon: <Eye className="w-4 h-4" />,
+            label: "Credenciales y Seguridad",
+            icon: <KeyRound className="w-4 h-4 text-amber-600" />,
             onClick: (treatment) => {
-                console.log("Ver:", treatment);
+                setSelectedTreatment(treatment);
+                setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
             },
         },
 
@@ -120,7 +161,8 @@ const TreatmentCatalogPage: React.FC = () => {
             label: "Editar tratamiento",
             icon: <Pencil className="w-4 h-4" />,
             onClick: (treatment) => {
-                console.log("Editar:", treatment);
+                setSelectedTreatment(treatment);
+                setIsEditDrawerOpen(true);
             },
         },
 
@@ -128,7 +170,8 @@ const TreatmentCatalogPage: React.FC = () => {
             label: "Eliminar tratamiento",
             icon: <Trash2 className="w-4 h-4" />,
             onClick: (treatment) => {
-                console.log("Eliminar:", treatment);
+                setSelectedTreatment(treatment);
+                setIsDeleteModalOpen(true);
             },
         },
     ];
@@ -143,6 +186,25 @@ const TreatmentCatalogPage: React.FC = () => {
         setCurrentPage(1);
     };
 
+    const handleDeleteConfirm = () => {
+        if (!selectedTreatment) return;
+        const treatmentId = selectedTreatment.id;
+
+        deleteTreatment(treatmentId, {
+            onSuccess: () => {
+                setSelectedTreatment(null);
+                setIsDeleteModalOpen(false);
+            },
+
+            onError: (error) => {
+                console.error(
+                    "Error al eliminar el tratamiento:",
+                    error
+                );
+            },
+        });
+    };
+
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
@@ -154,7 +216,7 @@ const TreatmentCatalogPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar tratamiento..."
                     />
-                    <button className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+                    <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
                         <Plus className="w-4 h-4" />
                         <span>Nuevo Tratamiento</span>
                     </button>
@@ -175,13 +237,46 @@ const TreatmentCatalogPage: React.FC = () => {
             {/* Paginación de la Tabla */}
             <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
                 <Pagination
-                    currentPage={currentPage}
+                    currentPage={validPage}
                     totalItems={totalItems}
                     itemsPerPage={ITEMS_PER_PAGE}
                     onPageChange={setCurrentPage}
                     label="tratamientos"
                 />
             </div>
+
+            <CreateTreatmentCatalogDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+
+            <EditTreatmentCatalogDrawer
+                isOpen={isEditDrawerOpen}
+                onHide={() => {
+                    setIsEditDrawerOpen(false);
+                    setSelectedTreatment(null);
+                }}
+                treatment={selectedTreatment}
+            />
+
+            <SecurityTreatmentCatalogDrawer
+                isOpen={isSecurityDrawerOpen}
+                onHide={() => {
+                    setIsSecurityDrawerOpen(false);
+                    setSelectedTreatment(null);
+                }}
+                treatment={selectedTreatment}
+            />
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                title={`¿Estás seguro de eliminar a ${selectedTreatment?.name ?? "este tratamiento"}?`}
+                description="Esta acción no se puede deshacer. Todos los datos asociados a este tratamiento se perderán permanentemente."
+                confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
+                cancelText="Cancelar"
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => {
+                    setIsDeleteModalOpen(false);
+                    setSelectedTreatment(null);
+                }}
+            />
         </div>
     );
 }
