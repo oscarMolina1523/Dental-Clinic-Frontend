@@ -3,7 +3,7 @@ import BaseModel from "./BaseModel";
 export default class TreatmentCatalogModel extends BaseModel {
   code?: string;
   name: string;
-  description: string;
+  description?: string;
   basePrice: number;
   estimatedDurationMinutes: number;
   active: boolean;
@@ -20,7 +20,7 @@ export default class TreatmentCatalogModel extends BaseModel {
     id: string;
     code?: string;
     name: string;
-    description: string;
+    description?: string;
     basePrice: number;
     estimatedDurationMinutes: number;
     active: boolean;
@@ -37,12 +37,12 @@ export default class TreatmentCatalogModel extends BaseModel {
 
 export interface CreateTreatmentCatalogDTO {
   name: string;
-  description: string;
+  description?: string;
   basePrice: number;
   estimatedDurationMinutes: number;
 }
 
 export interface UpdateTreatmentCatalogDTO {
   name: string;
-  description: string;
+  description?: string;
 }

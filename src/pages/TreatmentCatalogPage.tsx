@@ -7,12 +7,22 @@ import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type TreatmentCatalogModel from "../models/TreatmentCatalogModel";
 import { useTreatments } from "../hooks/useTreatmentsCatalog";
+import CreateTreatmentCatalogDrawer from "../components/treatmentCatalog/CreateTreatmentCataglogDrawer";
 
 const TreatmentCatalogPage: React.FC = () => {
     const {
         data: treatments = []
-      } = useTreatments();
-    const ITEMS_PER_PAGE = 5;
+    } = useTreatments();
+
+    const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
+        useState(false);
+    const [isEditDrawerOpen, setIsEditDrawerOpen] =
+        useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+    const [selectedTreatment, setSelectedTreatment] = useState<TreatmentCatalogModel | null>(null);
+
+    const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
 
     const searchFields: (keyof TreatmentCatalogModel)[] = [
@@ -157,7 +167,7 @@ const TreatmentCatalogPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar tratamiento..."
                     />
-                    <button className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+                    <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
                         <Plus className="w-4 h-4" />
                         <span>Nuevo Tratamiento</span>
                     </button>
@@ -185,6 +195,8 @@ const TreatmentCatalogPage: React.FC = () => {
                     label="tratamientos"
                 />
             </div>
+
+            <CreateTreatmentCatalogDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
         </div>
     );
 }
