@@ -6,9 +6,12 @@ import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type TreatmentCatalogModel from "../models/TreatmentCatalogModel";
-import { treatmentCatalogMock } from "../data/treatmentCatalogData";
+import { useTreatments } from "../hooks/useTreatmentsCatalog";
 
 const TreatmentCatalogPage: React.FC = () => {
+    const {
+        data: treatments = []
+      } = useTreatments();
     const ITEMS_PER_PAGE = 5;
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -25,7 +28,7 @@ const TreatmentCatalogPage: React.FC = () => {
         setSearch,
         filteredData,
     } = useTableSearch<TreatmentCatalogModel>({
-        data: treatmentCatalogMock,
+        data: treatments,
         fields: searchFields,
         delay: 800,
     });
@@ -48,7 +51,7 @@ const TreatmentCatalogPage: React.FC = () => {
     );
 
 
-    const columns: TableColumn<typeof treatmentCatalogMock[number]>[] = [
+    const columns: TableColumn<typeof treatments[number]>[] = [
         {
             key: "name",
             header: "Nombre",
@@ -107,7 +110,7 @@ const TreatmentCatalogPage: React.FC = () => {
         },
     ];
 
-    const actions: TableAction<typeof treatmentCatalogMock[number]>[] = [
+    const actions: TableAction<typeof treatments[number]>[] = [
         {
             label: "Ver tratamiento",
             icon: <Eye className="w-4 h-4" />,

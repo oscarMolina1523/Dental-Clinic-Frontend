@@ -7,7 +7,7 @@ export default class TreatmentCatalogService extends HTTPService {
 
   constructor() {
     super();
-    this.path = "treatment-catalog";
+    this.path = "treatmentCatalog";
   }
 
   /**
