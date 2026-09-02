@@ -20,9 +20,9 @@ const ProductsPage: React.FC = () => {
   const { data: measurementUnites = [] } = useMeasurementUnites();
   const { data: categories = [] } = useCategories();
   const {
-      mutate: deleteProduct,
-      isPending: isDeleting
-    } = useDeleteProduct();
+    mutate: deleteProduct,
+    isPending: isDeleting
+  } = useDeleteProduct();
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
@@ -56,8 +56,18 @@ const ProductsPage: React.FC = () => {
 
   const totalItems = filteredData.length; //obtenemos la cantidad total de items 
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalItems / ITEMS_PER_PAGE)
+  );
+
+  const validPage = Math.min(
+    currentPage,
+    totalPages
+  );
+
   //para obtener solo los Productos que queremos por pagina, los visibles
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 
   const endIndex = startIndex + ITEMS_PER_PAGE;
 
@@ -120,13 +130,13 @@ const ProductsPage: React.FC = () => {
         const measurement = measurementMap.get(product.measurement_unit_id);
 
         return (
-            <span className="text-sm text-slate-500">
-                {measurement
-                    ? `${measurement.name} (${measurement.abreviation})`
-                    : "Cargando..."}
-            </span>
+          <span className="text-sm text-slate-500">
+            {measurement
+              ? `${measurement.name} (${measurement.abreviation})`
+              : "Cargando..."}
+          </span>
         );
-    },
+      },
     },
   ];
 
@@ -219,7 +229,7 @@ const ProductsPage: React.FC = () => {
       {/* Paginación de la Tabla */}
       <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
         <Pagination
-          currentPage={currentPage}
+          currentPage={validPage}
           totalItems={totalItems}
           itemsPerPage={ITEMS_PER_PAGE}
           onPageChange={setCurrentPage}
@@ -241,7 +251,7 @@ const ProductsPage: React.FC = () => {
       <ConfirmModal
         isOpen={isDeleteModalOpen}
         title={`¿Estás seguro de eliminar a ${selectedProduct?.name ?? "este producto"}?`}
-        description="Esta acción no se puede deshacer. Todos los datos asociados a este paciente se perderán permanentemente."
+        description="Esta acción no se puede deshacer. Todos los datos asociados a este producto se perderán permanentemente."
         confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
         cancelText="Cancelar"
         onConfirm={handleDeleteConfirm}

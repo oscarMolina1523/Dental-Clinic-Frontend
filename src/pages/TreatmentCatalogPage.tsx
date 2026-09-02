@@ -6,14 +6,19 @@ import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import type TreatmentCatalogModel from "../models/TreatmentCatalogModel";
-import { useTreatments } from "../hooks/useTreatmentsCatalog";
+import { useDeleteTreatment, useTreatments } from "../hooks/useTreatmentsCatalog";
 import CreateTreatmentCatalogDrawer from "../components/treatmentCatalog/CreateTreatmentCatalogDrawer";
 import EditTreatmentCatalogDrawer from "../components/treatmentCatalog/EditTreatmentCatalogDrawer";
+import ConfirmModal from "../shared/ConfirmModal";
 
 const TreatmentCatalogPage: React.FC = () => {
     const {
         data: treatments = []
     } = useTreatments();
+    const {
+        mutate: deleteTreatment,
+        isPending: isDeleting
+    } = useDeleteTreatment();
 
     const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
         useState(false);
@@ -47,8 +52,18 @@ const TreatmentCatalogPage: React.FC = () => {
 
     const totalItems = filteredData.length; //obtenemos la cantidad total de items 
 
+    const totalPages = Math.max(
+        1,
+        Math.ceil(totalItems / ITEMS_PER_PAGE)
+    );
+
+    const validPage = Math.min(
+        currentPage,
+        totalPages
+    );
+
     //para obtener solo los tratamientos que queremos por pagina, los visibles
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 
     const endIndex = startIndex + ITEMS_PER_PAGE;
 
@@ -143,7 +158,8 @@ const TreatmentCatalogPage: React.FC = () => {
             label: "Eliminar tratamiento",
             icon: <Trash2 className="w-4 h-4" />,
             onClick: (treatment) => {
-                console.log("Eliminar:", treatment);
+                setSelectedTreatment(treatment);
+                setIsDeleteModalOpen(true);
             },
         },
     ];
@@ -156,6 +172,25 @@ const TreatmentCatalogPage: React.FC = () => {
          * volvemos a la primera página.
          */
         setCurrentPage(1);
+    };
+
+    const handleDeleteConfirm = () => {
+        if (!selectedTreatment) return;
+        const treatmentId = selectedTreatment.id;
+
+        deleteTreatment(treatmentId, {
+            onSuccess: () => {
+                setSelectedTreatment(null);
+                setIsDeleteModalOpen(false);
+            },
+
+            onError: (error) => {
+                console.error(
+                    "Error al eliminar el tratamiento:",
+                    error
+                );
+            },
+        });
     };
 
     return (
@@ -190,7 +225,7 @@ const TreatmentCatalogPage: React.FC = () => {
             {/* Paginación de la Tabla */}
             <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
                 <Pagination
-                    currentPage={currentPage}
+                    currentPage={validPage}
                     totalItems={totalItems}
                     itemsPerPage={ITEMS_PER_PAGE}
                     onPageChange={setCurrentPage}
@@ -207,6 +242,19 @@ const TreatmentCatalogPage: React.FC = () => {
                     setSelectedTreatment(null);
                 }}
                 treatment={selectedTreatment}
+            />
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                title={`¿Estás seguro de eliminar a ${selectedTreatment?.name ?? "este tratamiento"}?`}
+                description="Esta acción no se puede deshacer. Todos los datos asociados a este tratamiento se perderán permanentemente."
+                confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
+                cancelText="Cancelar"
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => {
+                    setIsDeleteModalOpen(false);
+                    setSelectedTreatment(null);
+                }}
             />
         </div>
     );
