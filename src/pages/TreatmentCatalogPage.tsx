@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, KeyRound } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -10,6 +10,7 @@ import { useDeleteTreatment, useTreatments } from "../hooks/useTreatmentsCatalog
 import CreateTreatmentCatalogDrawer from "../components/treatmentCatalog/CreateTreatmentCatalogDrawer";
 import EditTreatmentCatalogDrawer from "../components/treatmentCatalog/EditTreatmentCatalogDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
+import SecurityTreatmentCatalogDrawer from "../components/treatmentCatalog/SecurityTreatmentCatalogDrawer";
 
 const TreatmentCatalogPage: React.FC = () => {
     const {
@@ -23,6 +24,8 @@ const TreatmentCatalogPage: React.FC = () => {
     const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
         useState(false);
     const [isEditDrawerOpen, setIsEditDrawerOpen] =
+        useState(false);
+    const [isSecurityDrawerOpen, setIsSecurityDrawerOpen] =
         useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -137,11 +140,20 @@ const TreatmentCatalogPage: React.FC = () => {
     ];
 
     const actions: TableAction<typeof treatments[number]>[] = [
+        // {
+        //     label: "Ver tratamiento",
+        //     icon: <Eye className="w-4 h-4" />,
+        //     onClick: (treatment) => {
+        //         console.log("Ver:", treatment);
+        //     },
+        // },
+
         {
-            label: "Ver tratamiento",
-            icon: <Eye className="w-4 h-4" />,
+            label: "Credenciales y Seguridad",
+            icon: <KeyRound className="w-4 h-4 text-amber-600" />,
             onClick: (treatment) => {
-                console.log("Ver:", treatment);
+                setSelectedTreatment(treatment);
+                setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
             },
         },
 
@@ -239,6 +251,15 @@ const TreatmentCatalogPage: React.FC = () => {
                 isOpen={isEditDrawerOpen}
                 onHide={() => {
                     setIsEditDrawerOpen(false);
+                    setSelectedTreatment(null);
+                }}
+                treatment={selectedTreatment}
+            />
+
+            <SecurityTreatmentCatalogDrawer
+                isOpen={isSecurityDrawerOpen}
+                onHide={() => {
+                    setIsSecurityDrawerOpen(false);
                     setSelectedTreatment(null);
                 }}
                 treatment={selectedTreatment}
