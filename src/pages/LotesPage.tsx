@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye} from "lucide-react";
+import { Plus, Eye, Pencil } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -8,6 +8,7 @@ import SearchInput from "../shared/Table/SearchInput";
 import { useInventoryLotes } from "../hooks/useInventorylotes";
 import type InventoryLoteModel from "../models/InventoryLote";
 import CreateInventoryLoteDrawer from "../components/inventory/CreateInventoryLoteDrawer";
+import EditInventoryLoteDrawer from "../components/inventory/EditInventoryLoteDrawer";
 
 const LotesPage: React.FC = () => {
   const {
@@ -16,6 +17,10 @@ const LotesPage: React.FC = () => {
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] =
+    useState(false);
+
+  const [selectedLote, setSelectedLote] = useState<InventoryLoteModel | null>(null);
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -126,6 +131,14 @@ const LotesPage: React.FC = () => {
         console.log("Ver:", lote);
       },
     },
+    {
+      label: "Editar Lote",
+      icon: <Pencil className="w-4 h-4" />,
+      onClick: (lote) => {
+        setSelectedLote(lote);
+        setIsEditDrawerOpen(true);
+      },
+    },
   ];
 
   const handleSearch = (value: string) => {
@@ -180,6 +193,14 @@ const LotesPage: React.FC = () => {
 
       <CreateInventoryLoteDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
 
+      <EditInventoryLoteDrawer
+        isOpen={isEditDrawerOpen}
+        onHide={() => {
+          setIsEditDrawerOpen(false);
+          setSelectedLote(null);
+        }}
+        lote={selectedLote}
+      />
     </div>
   );
 }
