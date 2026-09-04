@@ -26,6 +26,7 @@ export default class InventoryOrchestratorService extends HTTPService {
   async createLote(
     data: CreateInventoryOrchestratorRequest
   ): Promise<InventoryOrchestratorResponse | null> {
+    console.log("data:", data);
     const response = await super.post<
       InventoryOrchestratorResponse,
       CreateInventoryOrchestratorRequest

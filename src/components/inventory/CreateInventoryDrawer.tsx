@@ -145,8 +145,8 @@ const CreateInventoryDrawer: React.FC<CreateInventoryProps> = ({ isOpen, onHide 
             <GenericDrawer
                 isOpen={isOpen}
                 onHide={onHide}
-                title="Nuevo Producto"
-                description="Registra un nuevo producto"
+                title="Nuevo Inventario"
+                description="Registra un nuevo inventario para un producto"
                 width="w-112.5"
                 footer={
                     <>

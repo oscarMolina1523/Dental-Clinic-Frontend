@@ -1,7 +1,7 @@
-import type { InventoryMovementStatus } from "../utils/InventoryMovementStatus.enum";
-
+import type { InventoryMovementStatus } from "../utils/inventoryMovementStatus.enum";
 export interface CreateInventoryOrchestratorRequest {
     productId: string;
+    productName: string;
     supplierId: string;
     loteNumber: string;
     quantity: number;
@@ -33,12 +33,14 @@ export interface InventoryOrchestratorResponse {
 interface InventoryMinimumDataModel {
     id: string;
     productId: string;
+    productName: string;
     minimumStock: number;
 }
 
 interface InventoryLoteMinimumDataModel {
     id: string;
     productId: string;
+    productName: string;
     supplierId: string;
     loteNumber: string;
     quantity: number;
@@ -49,6 +51,7 @@ interface InventoryLoteMinimumDataModel {
 interface InventoryMovementMinimumDataModel {
     id: string;
     productId: string;
+    productName: string;
     type: InventoryMovementStatus;
     quantity: number;
     userId: string;
