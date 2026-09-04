@@ -21,6 +21,7 @@ const InventoryPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const searchFields: (keyof InventoryModel)[] = [
+    "productName",
     "currentStock",
     "minimumStock"
   ];
