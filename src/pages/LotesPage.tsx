@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil } from "lucide-react";
+import { Plus, Eye, Pencil, Watch } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -9,6 +9,7 @@ import { useInventoryLotes } from "../hooks/useInventorylotes";
 import type InventoryLoteModel from "../models/InventoryLote";
 import CreateInventoryLoteDrawer from "../components/inventory/CreateInventoryLoteDrawer";
 import EditInventoryLoteDrawer from "../components/inventory/EditInventoryLoteDrawer";
+import ExpiredLoteDrawer from "../components/inventory/ExpiredLoteDrawer";
 
 const LotesPage: React.FC = () => {
   const {
@@ -18,6 +19,8 @@ const LotesPage: React.FC = () => {
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
   const [isEditDrawerOpen, setIsEditDrawerOpen] =
+    useState(false);
+  const [isSecurityDrawerOpen, setIsSecurityDrawerOpen] =
     useState(false);
 
   const [selectedLote, setSelectedLote] = useState<InventoryLoteModel | null>(null);
@@ -132,6 +135,14 @@ const LotesPage: React.FC = () => {
       },
     },
     {
+      label: "Credenciales y Seguridad",
+      icon: <Watch className="w-4 h-4 text-amber-600" />,
+      onClick: (lote) => {
+        setSelectedLote(lote);
+        setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+      },
+    },
+    {
       label: "Editar Lote",
       icon: <Pencil className="w-4 h-4" />,
       onClick: (lote) => {
@@ -197,6 +208,16 @@ const LotesPage: React.FC = () => {
         isOpen={isEditDrawerOpen}
         onHide={() => {
           setIsEditDrawerOpen(false);
+          setSelectedLote(null);
+        }}
+        lote={selectedLote}
+      />
+
+      <ExpiredLoteDrawer
+        // key={selectedLote?.id ?? "new"}
+        isOpen={isSecurityDrawerOpen}
+        onHide={() => {
+          setIsSecurityDrawerOpen(false);
           setSelectedLote(null);
         }}
         lote={selectedLote}
