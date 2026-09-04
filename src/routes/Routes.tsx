@@ -6,6 +6,7 @@ import PatientsPage from "../pages/Patients";
 import UsersPage from "../pages/Users";
 import TreatmentCatalogPage from "../pages/TreatmentCatalogPage";
 import ProductsPage from "../pages/ProductsPage";
+import InventoryPage from "../pages/InventoryPage";
 
 const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
       {
         path: "products",
         element: <ProductsPage />,
+      },
+      {
+        path: "inventories",
+        element: <InventoryPage />,
       },
     ],
   },
