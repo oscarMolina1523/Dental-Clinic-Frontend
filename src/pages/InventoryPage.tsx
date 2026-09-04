@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye} from "lucide-react";
+import { Plus, Eye, Pencil } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
-import {  useInventories } from "../hooks/useInventory";
+import { useInventories } from "../hooks/useInventory";
 import type InventoryModel from "../models/InventoryModel";
 import CreateInventoryDrawer from "../components/inventory/CreateInventoryDrawer";
+import EditInventoryDrawer from "../components/inventory/EditInventoryDrawer";
 
 const InventoryPage: React.FC = () => {
   const {
@@ -16,6 +17,9 @@ const InventoryPage: React.FC = () => {
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] =
+    useState(false);
+  const [selectedInventory, setSelectedInventory] = useState<InventoryModel | null>(null);
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -108,6 +112,14 @@ const InventoryPage: React.FC = () => {
         console.log("Ver:", inventory);
       },
     },
+    {
+      label: "Editar inventario",
+      icon: <Pencil className="w-4 h-4" />,
+      onClick: (inventory) => {
+        setSelectedInventory(inventory);
+        setIsEditDrawerOpen(true);
+      },
+    },
   ];
 
   const handleSearch = (value: string) => {
@@ -161,6 +173,15 @@ const InventoryPage: React.FC = () => {
       </div>
 
       <CreateInventoryDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+
+      <EditInventoryDrawer
+        isOpen={isEditDrawerOpen}
+        onHide={() => {
+          setIsEditDrawerOpen(false);
+          setSelectedInventory(null);
+        }}
+        inventory={selectedInventory}
+      />
 
     </div>
   );

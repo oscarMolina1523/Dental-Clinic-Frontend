@@ -63,6 +63,17 @@ const CreateInventoryDrawer: React.FC<CreateInventoryProps> = ({ isOpen, onHide 
         }));
     };
 
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const { name, value } = e.target;
+
+        setForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
     const handleSubmit = () => {
         const productId = form.productId.trim();
         const productName = form.productName.trim();
@@ -214,6 +225,31 @@ const CreateInventoryDrawer: React.FC<CreateInventoryProps> = ({ isOpen, onHide 
                                 </option>
                             ))}
                         </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Cantidad minima de stock
+                        </label>
+
+                        <input
+                            type="number"
+                            name="minimumStock"
+                            value={form.minimumStock}
+                            onChange={handleChange}
+                            placeholder="Ingrese la cantidad mínima de stock"
+                            className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                        />
                     </div>
                 </div>
             </GenericDrawer>
