@@ -7,6 +7,7 @@ import UsersPage from "../pages/Users";
 import TreatmentCatalogPage from "../pages/TreatmentCatalogPage";
 import ProductsPage from "../pages/ProductsPage";
 import InventoryPage from "../pages/InventoryPage";
+import LotesPage from "../pages/LotesPage";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "inventories",
         element: <InventoryPage />,
+      },
+      {
+        path: "inventory-lotes",
+        element: <LotesPage />,
       },
     ],
   },

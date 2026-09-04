@@ -32,6 +32,7 @@ const navItems = [
   { id: "caja", label: "Caja", icon: Archive },
   { id: "products", label: "Productos", icon: ScanBarcode },
   { id: "inventories", label: "Inventario", icon: Package },
+  { id: "inventory-lotes", label: "Lotes", icon: Package },
   { id: "reportes", label: "Reportes", icon: BarChart3 },
   { id: "users", label: "Usuarios", icon: UserCheck },
   { id: "configuracion", label: "Configuración", icon: Settings },
