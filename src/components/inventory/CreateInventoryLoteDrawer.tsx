@@ -6,6 +6,7 @@ import { useInventoryLotes } from "../../hooks/useInventorylotes";
 import type InventoryLoteModel from "../../models/InventoryLote";
 import { useCreateInventoryLote } from "../../hooks/useInventoryOrchestrator";
 import type { CreateInventoryOrchestratorRequest } from "../../models/InventoryOrchestratorModel";
+import { useSuppliers } from "../../hooks/useSupplier";
 
 interface CreateInventoryLoteProps {
     isOpen: boolean;
@@ -17,6 +18,10 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
     const {
         data: inventoryLotes = []
     } = useInventoryLotes();
+    const {
+        data: suppliers = [],
+        isLoading: isLoadingSuppliers
+    } = useSuppliers();
     const {
         data: products = [],
         isLoading: isLoadingProducts
@@ -70,6 +75,15 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
             ...prev,
             productId: selectedId,
             productName: selectedProduct ? selectedProduct.name : "",
+        }));
+    };
+
+    const handleSupplierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedId = e.target.value;
+
+        setForm((prev) => ({
+            ...prev,
+            supplierId: selectedId,
         }));
     };
 
@@ -270,24 +284,23 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                             Proveedores
                         </label>
 
-                        <input
-                            type="text"
+                         <select
                             name="supplierId"
                             value={form.supplierId}
-                            onChange={handleChange}
-                            placeholder="Ingrese el ID del proveedor"
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        />
+                            onChange={handleSupplierChange}
+                            disabled={isLoadingSuppliers}
+                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
+                        >
+                            <option value="">
+                                {isLoadingSuppliers ? "Cargando proveedores..." : "Seleccione un proveedor"}
+                            </option>
+                            {/* 3. Mapeo dinámico de los suppliers devueltos por la API */}
+                            {suppliers.map((supplier) => (
+                                <option key={supplier.id} value={supplier.id}>
+                                    {supplier.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div>
