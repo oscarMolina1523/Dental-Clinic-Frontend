@@ -1,41 +1,47 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil } from "lucide-react";
+import { Plus, Eye, Pencil, Watch } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
-import { useInventories } from "../hooks/useInventory";
-import type InventoryModel from "../models/InventoryModel";
-import CreateInventoryDrawer from "../components/inventory/CreateInventoryDrawer";
-import EditInventoryDrawer from "../components/inventory/EditInventoryDrawer";
+import { useInventoryLotes } from "../hooks/useInventorylotes";
+import type InventoryLoteModel from "../models/InventoryLote";
+import CreateInventoryLoteDrawer from "../components/inventory/CreateInventoryLoteDrawer";
+import EditInventoryLoteDrawer from "../components/inventory/EditInventoryLoteDrawer";
+import ExpiredLoteDrawer from "../components/inventory/ExpiredLoteDrawer";
 
-const InventoryPage: React.FC = () => {
+const LotesPage: React.FC = () => {
   const {
-    data: inventories = []
-  } = useInventories();
+    data: inventoryLotes = []
+  } = useInventoryLotes();
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
   const [isEditDrawerOpen, setIsEditDrawerOpen] =
     useState(false);
-  const [selectedInventory, setSelectedInventory] = useState<InventoryModel | null>(null);
+  const [isSecurityDrawerOpen, setIsSecurityDrawerOpen] =
+    useState(false);
+
+  const [selectedLote, setSelectedLote] = useState<InventoryLoteModel | null>(null);
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
-  const searchFields: (keyof InventoryModel)[] = [
+  const searchFields: (keyof InventoryLoteModel)[] = [
     "productName",
-    "currentStock",
-    "minimumStock"
+    "loteNumber",
+    "quantity",
+    "dueDate",
+    "entryDate",
   ];
 
   const {
     search,
     setSearch,
     filteredData,
-  } = useTableSearch<InventoryModel>({
-    data: inventories,
+  } = useTableSearch<InventoryLoteModel>({
+    data: inventoryLotes,
     fields: searchFields,
     delay: 800,
   });
@@ -53,7 +59,7 @@ const InventoryPage: React.FC = () => {
     totalPages
   );
 
-  //para obtener solo los Productos que queremos por pagina, los visibles
+  //para obtener solo los lotes que queremos por pagina, los visibles
   const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 
   const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -67,12 +73,12 @@ const InventoryPage: React.FC = () => {
     [startIndex, endIndex, filteredData]
   );
 
-  const columns: TableColumn<typeof inventories[number]>[] = [
+  const columns: TableColumn<typeof inventoryLotes[number]>[] = [
     {
       key: "productName",
-      header: "Nombre del inventario",
+      header: "Producto",
       className: "pl-2 w-100",
-      render: (inventory: InventoryModel) => (
+      render: (inventory: InventoryLoteModel) => (
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-slate-800">
             {inventory.productName}
@@ -83,40 +89,64 @@ const InventoryPage: React.FC = () => {
     },
 
     {
-      key: "currentStock",
-      header: "Stock actual",
-      className: "w-100",
-      render: (inventory: InventoryModel) => (
+      key: "quantity",
+      header: "Cantidad",
+      render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
-          {inventory.currentStock}
+          {inventory.quantity}
         </span>
       ),
     },
     {
-      key: "minimumStock",
-      header: "Stock mínimo",
-      className: "w-100",
-      render: (inventory: InventoryModel) => (
+      key: "loteNumber",
+      header: "Número de lote",
+      render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
-          {inventory.minimumStock}
+          {inventory.loteNumber}
         </span>
       ),
-    }
+    },
+    {
+      key: "dueDate",
+      header: "Fecha de vencimiento",
+      render: (inventory: InventoryLoteModel) => (
+        <span className="text-sm text-slate-500">
+          {inventory.dueDate ? new Date(inventory.dueDate).toLocaleDateString() : "N/A"}
+        </span>
+      ),
+    },
+    {
+      key: "entryDate",
+      header: "Fecha de entrada",
+      render: (inventory: InventoryLoteModel) => (
+        <span className="text-sm text-slate-500">
+          {inventory.entryDate ? new Date(inventory.entryDate).toLocaleDateString() : "N/A"}
+        </span>
+      ),
+    },
   ];
 
-  const actions: TableAction<typeof inventories[number]>[] = [
+  const actions: TableAction<typeof inventoryLotes[number]>[] = [
     {
-      label: "Ver inventario",
+      label: "Ver Lote",
       icon: <Eye className="w-4 h-4" />,
-      onClick: (inventory) => {
-        console.log("Ver:", inventory);
+      onClick: (lote) => {
+        console.log("Ver:", lote);
       },
     },
     {
-      label: "Editar inventario",
+      label: "Credenciales y Seguridad",
+      icon: <Watch className="w-4 h-4 text-amber-600" />,
+      onClick: (lote) => {
+        setSelectedLote(lote);
+        setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+      },
+    },
+    {
+      label: "Editar Lote",
       icon: <Pencil className="w-4 h-4" />,
-      onClick: (inventory) => {
-        setSelectedInventory(inventory);
+      onClick: (lote) => {
+        setSelectedLote(lote);
         setIsEditDrawerOpen(true);
       },
     },
@@ -141,22 +171,22 @@ const InventoryPage: React.FC = () => {
           <SearchInput
             value={search}
             onChange={handleSearch}
-            placeholder="Buscar inventario..."
+            placeholder="Buscar lote..."
           />
           <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
             <Plus className="w-4 h-4" />
-            <span>Nuevo Inventario</span>
+            <span>Nuevo Lote</span>
           </button>
         </div>
 
-        {/* Tabla de Inventarios */}
+        {/* Tabla de Lotes */}
         <div className="overflow-x-auto">
           <DataTable
             data={currentProducts}
             columns={columns}
             actions={actions}
-            getRowId={(inventory) => inventory.id}
-            emptyMessage="No hay Inventarios registrados."
+            getRowId={(lote) => lote.id}
+            emptyMessage="No hay Lotes registrados."
           />
         </div>
       </div>
@@ -168,23 +198,32 @@ const InventoryPage: React.FC = () => {
           totalItems={totalItems}
           itemsPerPage={ITEMS_PER_PAGE}
           onPageChange={setCurrentPage}
-          label="Inventarios"
+          label="Lotes"
         />
       </div>
 
-      <CreateInventoryDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+      <CreateInventoryLoteDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
 
-      <EditInventoryDrawer
+      <EditInventoryLoteDrawer
         isOpen={isEditDrawerOpen}
         onHide={() => {
           setIsEditDrawerOpen(false);
-          setSelectedInventory(null);
+          setSelectedLote(null);
         }}
-        inventory={selectedInventory}
+        lote={selectedLote}
       />
 
+      <ExpiredLoteDrawer
+        // key={selectedLote?.id ?? "new"}
+        isOpen={isSecurityDrawerOpen}
+        onHide={() => {
+          setIsSecurityDrawerOpen(false);
+          setSelectedLote(null);
+        }}
+        lote={selectedLote}
+      />
     </div>
   );
 }
 
-export default InventoryPage;
+export default LotesPage;
