@@ -72,8 +72,8 @@ export interface CreateAppointmentDTO {
 }
 
 export interface UpdateAppointmentDTO {
-  patientId?: string;
-  patientFullName?: string;
+  patientId: string;
+  patientFullName: string;
   dentistId: string;
   dentistFullName: string;
   startAppointmentTime: Date;
