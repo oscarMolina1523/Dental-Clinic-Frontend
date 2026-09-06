@@ -7,6 +7,7 @@ import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import { useAppointments } from "../hooks/useAppointment";
 import type AppointmentModel from "../models/AppointmentModel";
+import CreateAppointmentDrawer from "../components/appointment/CreateAppointmentDrawer";
 
 const AppointmentPage: React.FC = () => {
     const {
@@ -232,8 +233,8 @@ const AppointmentPage: React.FC = () => {
                 />
             </div>
 
-            {/* <CreateInventoryLoteDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
-
+            <CreateAppointmentDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+            {/* 
       <EditInventoryLoteDrawer
         isOpen={isEditDrawerOpen}
         onHide={() => {
