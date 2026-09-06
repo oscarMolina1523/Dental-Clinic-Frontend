@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 const sections: Record<string, string> = {
     "/home": "Dashboard",
     "/patients": "Pacientes",
-    "/agenda": "Agenda",
+    "/agenda": "Citas y Agenda",
     "/expedientes": "Expedientes",
     "/odontograma": "Odontograma",
     "/treatments": "Tratamientos",
