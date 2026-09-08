@@ -415,71 +415,71 @@ const AppointmentPage: React.FC = () => {
 
                         <div className="p-3 space-y-1">
 
-    {/* SCHEDULED -> CONFIRMED */}
-    {canConfirm(selectedAppointment.status) && (
-        <button
-            disabled={isPendingAny}
-            onClick={() => handleConfirm(selectedAppointment.id)}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
-        >
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Confirmar Cita</span>
-        </button>
-    )}
+                            {/* SCHEDULED -> CONFIRMED */}
+                            {canConfirm(selectedAppointment.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() => handleConfirm(selectedAppointment.id)}
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                    <span>Confirmar Cita</span>
+                                </button>
+                            )}
 
-    {/* CONFIRMED -> IN_PROGRESS */}
-    {canStart(selectedAppointment.status) && (
-        <button
-            disabled={isPendingAny}
-            onClick={() => handleStart(selectedAppointment.id)}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
-        >
-            <Play className="w-4 h-4 text-blue-600" />
-            <span>Iniciar Cita (En curso)</span>
-        </button>
-    )}
+                            {/* CONFIRMED -> IN_PROGRESS */}
+                            {canStart(selectedAppointment.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() => handleStart(selectedAppointment.id)}
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <Play className="w-4 h-4 text-blue-600" />
+                                    <span>Iniciar Cita (En curso)</span>
+                                </button>
+                            )}
 
-    {/* IN_PROGRESS -> COMPLETED */}
-    {canComplete(selectedAppointment.status) && (
-        <button
-            disabled={isPendingAny}
-            onClick={() => handleComplete(selectedAppointment.id)}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
-        >
-            <Check className="w-4 h-4 text-indigo-600" />
-            <span>Completar Cita</span>
-        </button>
-    )}
+                            {/* IN_PROGRESS -> COMPLETED */}
+                            {canComplete(selectedAppointment.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() => handleComplete(selectedAppointment.id)}
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <Check className="w-4 h-4 text-indigo-600" />
+                                    <span>Completar Cita</span>
+                                </button>
+                            )}
 
-    {/* CONFIRMED -> NO_SHOW */}
-    {canNoShow(selectedAppointment.status) && (
-        <button
-            disabled={isPendingAny}
-            onClick={() => handleNoShow(selectedAppointment.id)}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
-        >
-            <UserX className="w-4 h-4 text-amber-600" />
-            <span>Marcar No Asistió (No Show)</span>
-        </button>
-    )}
+                            {/* CONFIRMED -> NO_SHOW */}
+                            {canNoShow(selectedAppointment.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() => handleNoShow(selectedAppointment.id)}
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <UserX className="w-4 h-4 text-amber-600" />
+                                    <span>Marcar No Asistió (No Show)</span>
+                                </button>
+                            )}
 
-    {/* CANCELAR */}
-    {canCancel(selectedAppointment.status) && (
-        <>
-            <div className="my-1 border-t border-slate-100" />
+                            {/* CANCELAR */}
+                            {canCancel(selectedAppointment.status) && (
+                                <>
+                                    <div className="my-1 border-t border-slate-100" />
 
-            <button
-                disabled={isPendingAny}
-                onClick={() => setIsCancelModalOpen(true)}
-                className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-rose-600 hover:bg-rose-50 rounded-xl transition-colors disabled:opacity-50 font-medium"
-            >
-                <XCircle className="w-4 h-4 text-rose-600" />
-                <span>Cancelar Cita</span>
-            </button>
-        </>
-    )}
+                                    <button
+                                        disabled={isPendingAny}
+                                        onClick={() => setIsCancelModalOpen(true)}
+                                        className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-rose-600 hover:bg-rose-50 rounded-xl transition-colors disabled:opacity-50 font-medium"
+                                    >
+                                        <XCircle className="w-4 h-4 text-rose-600" />
+                                        <span>Cancelar Cita</span>
+                                    </button>
+                                </>
+                            )}
 
-</div>
+                        </div>
                     </div>
                 </div>
             )}
