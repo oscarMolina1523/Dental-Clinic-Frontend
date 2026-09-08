@@ -24,6 +24,8 @@ export interface TableAction<T> {
      */
     onClick: (item: T) => void;
 
+    hidden?: (item: T) => boolean;
+
     className?: string;
 }
 

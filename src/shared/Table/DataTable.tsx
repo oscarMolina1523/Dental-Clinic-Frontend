@@ -98,25 +98,30 @@ const DataTable = <T,>({
 
                                         <div className="flex items-center justify-end gap-1">
 
-                                            {actions.map((action, actionIndex) => (
+                                            {actions.map((action, actionIndex) => {
 
-                                                <button
-                                                    key={actionIndex}
-                                                    onClick={() =>
-                                                        action.onClick(item)
-                                                    }
-                                                    title={action.label}
-                                                    className={
-                                                        action.className ??
-                                                        "p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
-                                                    }
-                                                >
-                                                    {action.icon ?? (
-                                                        <MoreVertical className="w-4 h-4" />
-                                                    )}
-                                                </button>
+                                                // Si hidden existe y devuelve true,
+                                                // no mostramos esta acción.
+                                                if (action.hidden?.(item)) {
+                                                    return null;
+                                                }
 
-                                            ))}
+                                                return (
+                                                    <button
+                                                        key={actionIndex}
+                                                        onClick={() => action.onClick(item)}
+                                                        title={action.label}
+                                                        className={
+                                                            action.className ??
+                                                            "p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                                                        }
+                                                    >
+                                                        {action.icon ?? (
+                                                            <MoreVertical className="w-4 h-4" />
+                                                        )}
+                                                    </button>
+                                                );
+                                            })}
 
                                         </div>
 
