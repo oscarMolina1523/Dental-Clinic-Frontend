@@ -5,34 +5,56 @@ import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
-import { useAppointments, useCancelAppointment, useCompleteAppointment, useConfirmAppointment, useMarkAppointmentAsNoShow, useStartAppointment } from "../hooks/useAppointment";
+import { useAppointments } from "../hooks/useAppointment";
 import type AppointmentModel from "../models/AppointmentModel";
 import CreateAppointmentDrawer from "../components/appointment/CreateAppointmentDrawer";
 import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawet";
 import Toast from "../shared/Toast";
+import useAppointmentPage from "../components/appointment/useAppointmentPage";
 
 const AppointmentPage: React.FC = () => {
     const {
         data: appointments = []
     } = useAppointments();
 
-    const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
-        useState(false);
-    const [isEditDrawerOpen, setIsEditDrawerOpen] =
-        useState(false);
-    const [isStatusModalOpen, setIsStatusModalOpen] =
-        useState(false);
-    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const {
+        isCreateDrawerOpen,
+        setIsCreateDrawerOpen,
 
-    // React Query Mutations
-    const confirmMutation = useConfirmAppointment();
-    const startMutation = useStartAppointment();
-    const completeMutation = useCompleteAppointment();
-    const cancelMutation = useCancelAppointment();
-    const noShowMutation = useMarkAppointmentAsNoShow();
+        isEditDrawerOpen,
+        setIsEditDrawerOpen,
 
-    const [selectedAppointment, setSelectedAppointment] = useState<AppointmentModel | null>(null);
-    const [cancelNotes, setCancelNotes] = useState("");
+        isStatusModalOpen,
+        setIsStatusModalOpen,
+
+        isCancelModalOpen,
+        setIsCancelModalOpen,
+
+        selectedAppointment,
+        setSelectedAppointment,
+
+        cancelNotes,
+        setCancelNotes,
+
+        toast,
+        setToast,
+        cancelMutation,
+
+        handleConfirm,
+        handleStart,
+        handleComplete,
+        handleNoShow,
+        handleCancelSubmit,
+
+        canChangeStatus,
+        canConfirm,
+        canStart,
+        canComplete,
+        canNoShow,
+        canCancel,
+
+        isPendingAny,
+    } = useAppointmentPage();
 
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -55,22 +77,6 @@ const AppointmentPage: React.FC = () => {
         fields: searchFields,
         delay: 800,
     });
-
-    const [toast, setToast] = useState<{
-        type: "success" | "error";
-        message: string;
-    } | null>(null);
-
-    const showToast = (
-        type: "success" | "error",
-        message: string
-    ) => {
-        setToast({
-            type,
-            message,
-        });
-    };
-
 
     const totalItems = filteredData.length; //obtenemos la cantidad total de items 
 
@@ -97,117 +103,6 @@ const AppointmentPage: React.FC = () => {
             ),
         [startIndex, endIndex, filteredData]
     );
-
-    // Manejadores de acciones
-    const handleConfirm = (id: string) => {
-        confirmMutation.mutate(id, {
-            onSuccess: () => {
-                setIsStatusModalOpen(false);
-            },
-            onError: (error) => {
-                showToast(
-                    "error",
-                    error.message ||
-                    "No se pudo confirmar la cita."
-                );
-            },
-        });
-    };
-
-    const handleStart = (id: string) => {
-        startMutation.mutate(id, {
-            onSuccess: () => {
-                setIsStatusModalOpen(false);
-            },
-            onError: (error) => {
-                showToast(
-                    "error",
-                    error.message ||
-                    "No se pudo iniciar la cita."
-                );
-            },
-        });
-    };
-
-    const handleComplete = (id: string) => {
-        completeMutation.mutate(id, {
-            onSuccess: () => {
-                setIsStatusModalOpen(false);
-            },
-            onError: (error) => {
-                showToast(
-                    "error",
-                    error.message ||
-                    "No se pudo completar la cita."
-                );
-            },
-        });
-    };
-
-    const handleNoShow = (id: string) => {
-        noShowMutation.mutate(id, {
-            onSuccess: () => {
-                setIsStatusModalOpen(false);
-            },
-            onError: (error) => {
-                showToast(
-                    "error",
-                    error.message ||
-                    "No se pudo poner en no atendida la cita"
-                );
-            },
-        });
-    };
-
-    const handleCancelSubmit = () => {
-        if (!selectedAppointment || !cancelNotes.trim()) return;
-
-        cancelMutation.mutate(
-            {
-                id: selectedAppointment.id,
-                notes: cancelNotes,
-            },
-            {
-                onSuccess: () => {
-                    setCancelNotes("");
-                    setIsCancelModalOpen(false);
-                    setIsStatusModalOpen(false);
-                },
-                onError: (error) => {
-                    showToast(
-                        "error",
-                        error.message ||
-                        "No se pudo cancelar la cita."
-                    );
-                },
-            }
-        );
-    };
-
-    const canChangeStatus = (status: AppointmentModel["status"]) => {
-        return [
-            "SCHEDULED",
-            "CONFIRMED",
-            "IN_PROGRESS",
-        ].includes(status);
-    };
-
-    const canConfirm = (status: AppointmentModel["status"]) =>
-        status === "SCHEDULED";
-
-    const canStart = (status: AppointmentModel["status"]) =>
-        status === "CONFIRMED";
-
-    const canComplete = (status: AppointmentModel["status"]) =>
-        status === "IN_PROGRESS";
-
-    const canNoShow = (status: AppointmentModel["status"]) =>
-        status === "CONFIRMED";
-
-    const canCancel = (status: AppointmentModel["status"]) =>
-        status !== "COMPLETED" &&
-        status !== "CANCELLED" &&
-        status !== "NO_SHOW";
 
     const columns: TableColumn<typeof appointments[number]>[] = [
         {
@@ -323,13 +218,6 @@ const AppointmentPage: React.FC = () => {
          */
         setCurrentPage(1);
     };
-
-    const isPendingAny =
-        confirmMutation.isPending ||
-        startMutation.isPending ||
-        completeMutation.isPending ||
-        cancelMutation.isPending ||
-        noShowMutation.isPending;
 
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
