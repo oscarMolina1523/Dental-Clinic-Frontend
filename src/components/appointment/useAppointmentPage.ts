@@ -20,6 +20,9 @@ export default function useAppointmentPage() {
   const [isCancelModalOpen, setIsCancelModalOpen] =
     useState(false);
 
+  const [isPrescriptionDrawerOpen, setIsPrescriptionDrawerOpen] =
+    useState(false);
+
 
   /* =========================================================
      CITA SELECCIONADA
@@ -95,7 +98,7 @@ export default function useAppointmentPage() {
           showToast(
             "error",
             error.message ||
-              "No se pudo confirmar la cita."
+            "No se pudo confirmar la cita."
           );
         },
       }
@@ -120,7 +123,7 @@ export default function useAppointmentPage() {
           showToast(
             "error",
             error.message ||
-              "No se pudo iniciar la cita."
+            "No se pudo iniciar la cita."
           );
         },
       }
@@ -145,7 +148,7 @@ export default function useAppointmentPage() {
           showToast(
             "error",
             error.message ||
-              "No se pudo completar la cita."
+            "No se pudo completar la cita."
           );
         },
       }
@@ -170,7 +173,7 @@ export default function useAppointmentPage() {
           showToast(
             "error",
             error.message ||
-              "No se pudo poner en no atendida la cita."
+            "No se pudo poner en no atendida la cita."
           );
         },
       }
@@ -210,11 +213,22 @@ export default function useAppointmentPage() {
           showToast(
             "error",
             error.message ||
-              "No se pudo cancelar la cita."
+            "No se pudo cancelar la cita."
           );
         },
       }
     );
+  };
+
+  const handleCreatePrescription = (
+    appointment: AppointmentModel
+  ) => {
+
+    setSelectedAppointment(appointment);
+
+    setIsStatusModalOpen(false);
+
+    setIsPrescriptionDrawerOpen(true);
   };
 
 
@@ -230,6 +244,7 @@ export default function useAppointmentPage() {
       "SCHEDULED",
       "CONFIRMED",
       "IN_PROGRESS",
+      "COMPLETED",
     ].includes(status);
   };
 
@@ -299,6 +314,9 @@ export default function useAppointmentPage() {
     isCancelModalOpen,
     setIsCancelModalOpen,
 
+    isPrescriptionDrawerOpen,
+    setIsPrescriptionDrawerOpen,
+
 
     /* Cita seleccionada */
     selectedAppointment,
@@ -330,6 +348,7 @@ export default function useAppointmentPage() {
     handleComplete,
     handleNoShow,
     handleCancelSubmit,
+    handleCreatePrescription,
 
 
     /* Validaciones */

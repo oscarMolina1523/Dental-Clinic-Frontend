@@ -32,7 +32,6 @@ export default class MedicalPrescriptionDetail extends BaseModel {
 }
 
 export interface MedicalPrescriptionDetailDto {
-  medicalPrescriptionId: string;
   medicine: string;
   dose: string;
   frequency: string;

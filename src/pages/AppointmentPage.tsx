@@ -11,6 +11,7 @@ import CreateAppointmentDrawer from "../components/appointment/CreateAppointment
 import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawet";
 import Toast from "../shared/Toast";
 import useAppointmentPage from "../components/appointment/useAppointmentPage";
+import CreateMedicalPrescriptionDrawer from "../components/medicalPrescription/CreateMedicalPrescriptionDrawer";
 
 const AppointmentPage: React.FC = () => {
     const {
@@ -54,6 +55,10 @@ const AppointmentPage: React.FC = () => {
         canCancel,
 
         isPendingAny,
+
+        isPrescriptionDrawerOpen,
+        setIsPrescriptionDrawerOpen,
+        handleCreatePrescription
     } = useAppointmentPage();
 
     const ITEMS_PER_PAGE = 10;
@@ -205,7 +210,16 @@ const AppointmentPage: React.FC = () => {
                 setSelectedAppointment(appointment);
                 setIsStatusModalOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
             },
-            hidden: (appointment) => !canChangeStatus(appointment.status),
+            hidden: (appointment) => {
+                /*
+                 * El menú aparece para citas que todavía
+                 * permiten cambios de estado.
+                 *
+                 * También aparece para COMPLETED porque
+                 * desde ahí podemos crear la receta.
+                 */
+                return !canChangeStatus(appointment.status);
+            },
         },
     ];
 
@@ -302,6 +316,21 @@ const AppointmentPage: React.FC = () => {
                         </div>
 
                         <div className="p-3 space-y-1">
+
+                            {selectedAppointment.status === "COMPLETED" && (
+                                <button
+                                    onClick={() =>
+                                        handleCreatePrescription(
+                                            selectedAppointment
+                                        )
+                                    }
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors"
+                                >
+                                    <Plus className="w-4 h-4 text-emerald-600" />
+
+                                    <span>Crear Receta</span>
+                                </button>
+                            )}
 
                             {/* SCHEDULED -> CONFIRMED */}
                             {canConfirm(selectedAppointment.status) && (
@@ -420,6 +449,15 @@ const AppointmentPage: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            <CreateMedicalPrescriptionDrawer
+                isOpen={isPrescriptionDrawerOpen}
+                onHide={() => {
+                    setIsPrescriptionDrawerOpen(false);
+                    setSelectedAppointment(null);
+                }}
+                appointment={selectedAppointment}
+            />
         </div>
     );
 }
