@@ -111,7 +111,13 @@ const LotesPage: React.FC = () => {
       header: "Fecha de vencimiento",
       render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
-          {inventory.dueDate ? new Date(inventory.dueDate).toLocaleDateString() : "N/A"}
+          {inventory.dueDate ? new Date(inventory.dueDate).toLocaleString("es-NI", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }) : "N/A"}
         </span>
       ),
     },
@@ -120,7 +126,13 @@ const LotesPage: React.FC = () => {
       header: "Fecha de entrada",
       render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
-          {inventory.entryDate ? new Date(inventory.entryDate).toLocaleDateString() : "N/A"}
+          {inventory.entryDate ? new Date(inventory.entryDate).toLocaleString("es-NI", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }) : "N/A"}
         </span>
       ),
     },

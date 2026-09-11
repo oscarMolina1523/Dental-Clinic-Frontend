@@ -31,32 +31,45 @@ export default class HTTPService {
     }
   }
 
-  async post<T = unknown, B = unknown>(path: string, body: B): Promise<T> {
+  async post<T = unknown, B = unknown>(
+    path: string,
+    body?: B
+  ): Promise<T> {
     try {
       const token = await this.getToken();
       const url = `${this.baseUrl}/${path}`;
+
       const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(body),
+        ...(body !== undefined && {
+          body: JSON.stringify(body),
+        }),
       });
 
       const json = await response.json();
 
       if (!response.ok) {
         const message =
-          typeof json === "object" && json !== null && "message" in json
+          typeof json === "object" &&
+            json !== null &&
+            "message" in json
             ? String((json as { message: unknown }).message)
             : "Error en la solicitud";
+
         throw new Error(message);
       }
+
       return json as T;
     } catch (error: unknown) {
       const message =
-        error instanceof Error ? error.message : "Error desconocido";
+        error instanceof Error
+          ? error.message
+          : "Error desconocido";
+
       throw new Error(message, { cause: error });
     }
   }
@@ -84,51 +97,51 @@ export default class HTTPService {
   }
 
   async delete(path: string): Promise<void> {
-  try {
-    const token = await this.getToken();
-    const url = `${this.baseUrl}/${path}`;
+    try {
+      const token = await this.getToken();
+      const url = `${this.baseUrl}/${path}`;
 
-    const response = await fetch(url, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    if (!response.ok) {
-      const text = await response.text();
+      if (!response.ok) {
+        const text = await response.text();
 
-      let message = "Error en la eliminación";
+        let message = "Error en la eliminación";
 
-      if (text) {
-        try {
-          const json = JSON.parse(text);
+        if (text) {
+          try {
+            const json = JSON.parse(text);
 
-          if (
-            typeof json === "object" &&
-            json !== null &&
-            "message" in json
-          ) {
-            message = String(
-              (json as { message: unknown }).message
-            );
+            if (
+              typeof json === "object" &&
+              json !== null &&
+              "message" in json
+            ) {
+              message = String(
+                (json as { message: unknown }).message
+              );
+            }
+          } catch {
+            // La respuesta no era JSON
           }
-        } catch {
-          // La respuesta no era JSON
         }
+
+        throw new Error(message);
       }
 
-      throw new Error(message);
+      // El backend no devuelve contenido.
+      // Puede ser 204 No Content o 200 sin body.
+      return;
+
+    } catch (error: unknown) {
+      console.error("Error deleting data:", error);
+      throw error;
     }
-
-    // El backend no devuelve contenido.
-    // Puede ser 204 No Content o 200 sin body.
-    return;
-
-  } catch (error: unknown) {
-    console.error("Error deleting data:", error);
-    throw error;
   }
-}
 }
