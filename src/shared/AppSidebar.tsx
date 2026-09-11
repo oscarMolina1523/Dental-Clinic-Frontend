@@ -16,7 +16,8 @@ import {
   UserCheck,
   Settings,
   ChevronDown,
-  ScanBarcode
+  ScanBarcode,
+  Pill
 } from "lucide-react";
 
 // Lista de elementos de navegación con sus íconos
@@ -24,6 +25,7 @@ const navItems = [
   { id: "home", label: "Dashboard", icon: LayoutDashboard },
   { id: "patients", label: "Pacientes", icon: Users },
   { id: "agenda", label: "Agenda", icon: Calendar },
+  { id: "prescriptions", label: "Recetas", icon: Pill },
   { id: "expedientes", label: "Expedientes", icon: FileText },
   { id: "odontograma", label: "Odontograma", icon: Stethoscope },
   { id: "treatments", label: "Tratamientos", icon: ClipboardList },

@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 
-type SearchField<T> = keyof T;
+export type SearchField<T> = {
+    [K in keyof T & string]:
+        T[K] extends readonly (infer U)[]
+            ? K | `${K}.${string & keyof U}`
+            : T[K] extends object
+                ? K | `${K}.${string & keyof T[K]}`
+                : K
+}[keyof T & string];
 
 const normalizeValue = (value: unknown): string => {
     if (value === null || value === undefined) {
@@ -30,6 +37,29 @@ const normalizeText = (value: unknown): string => {
         .trim();
 };
 
+const getNestedValue = (
+    object: unknown,
+    path: string
+): unknown => {
+
+    return path
+        .split(".")
+        .reduce(
+            (current: unknown, key: string) => {
+
+                if (
+                    current !== null &&
+                    typeof current === "object"
+                ) {
+                    return (current as Record<string, unknown>)[key];
+                }
+
+                return undefined;
+            },
+            object
+        );
+};
+
 const itemMatchesSearch = <T,>(
     item: T,
     search: string,
@@ -44,7 +74,10 @@ const itemMatchesSearch = <T,>(
 
     return fields.some((field) => {
 
-        const value = item[field];
+        const value = getNestedValue(
+            item,
+            String(field)
+        );
 
         return normalizeText(value)
             .includes(normalizedSearch);

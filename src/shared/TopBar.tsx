@@ -6,6 +6,7 @@ const sections: Record<string, string> = {
     "/home": "Dashboard",
     "/patients": "Pacientes",
     "/agenda": "Citas y Agenda",
+    "/prescriptions": "Administrador de recetas",
     "/expedientes": "Expedientes",
     "/odontograma": "Odontograma",
     "/treatments": "Tratamientos",
