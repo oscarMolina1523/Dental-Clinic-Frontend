@@ -42,3 +42,14 @@ export default class TreatmentPlan extends BaseModel {
   }
 
 }
+
+
+export interface TreatmentPlanDto {
+  patientId: string;
+  dentistId: string;
+  code: string;
+  status: TreatmentPlanStatus;
+  totalAmount: number;
+  discount: number;
+  createdAt: Date;
+}

@@ -40,3 +40,12 @@ export default class TreatmentPlanDetail extends BaseModel {
     this.status = status;
   }
 }
+
+export interface TreatmentPlanDetailDto {
+  treatmentId: string;
+  toothNumber: number;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+  status: TreatmentPlanDetailStatus;
+}
