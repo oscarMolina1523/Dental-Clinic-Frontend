@@ -4,6 +4,7 @@ import BaseModel from "./BaseModel";
 export default class TreatmentPlanDetail extends BaseModel {
   planId: string;
   treatmentId: string;
+  treatmentName: string;
    toothNumber: number;
    quantity: number;
    unitPrice: number; //almacena el precio del momento que tenia el tratamiento, asi en el futuro cuando aumente el precio este tendra el de ese momento y no se cambiara
@@ -14,6 +15,7 @@ export default class TreatmentPlanDetail extends BaseModel {
     id,
     planId,
     treatmentId,
+    treatmentName,
     toothNumber,
     quantity,
     unitPrice,
@@ -23,6 +25,7 @@ export default class TreatmentPlanDetail extends BaseModel {
     id: string;
     planId: string;
     treatmentId: string;
+    treatmentName: string;
     toothNumber: number;
     quantity: number;
     unitPrice: number;
@@ -33,6 +36,7 @@ export default class TreatmentPlanDetail extends BaseModel {
 
     this.planId = planId;
     this.treatmentId = treatmentId;
+    this.treatmentName = treatmentName;
     this.toothNumber = toothNumber;
     this.quantity = quantity;
     this.unitPrice = unitPrice;
@@ -43,6 +47,7 @@ export default class TreatmentPlanDetail extends BaseModel {
 
 export interface TreatmentPlanDetailDto {
   treatmentId: string;
+  treatmentName: string;
   toothNumber: number;
   quantity: number;
   unitPrice: number;

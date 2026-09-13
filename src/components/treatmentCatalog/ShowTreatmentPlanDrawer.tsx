@@ -461,7 +461,7 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                                     <input
                                                         type="text"
                                                         value={
-                                                            detail.treatmentId ||
+                                                            detail.treatmentName ||
                                                             "N/A"
                                                         }
                                                         disabled

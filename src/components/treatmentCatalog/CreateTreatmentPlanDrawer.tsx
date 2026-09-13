@@ -88,6 +88,7 @@ const CreateTreatmentPlanDrawer: React.FC<
             useState<TreatmentPlanDetailDto[]>([
                 {
                     treatmentId: "",
+                    treatmentName: "",
                     toothNumber: 0,
                     quantity: 1,
                     unitPrice: 0,
@@ -139,6 +140,7 @@ const CreateTreatmentPlanDrawer: React.FC<
             setDetails([
                 {
                     treatmentId: "",
+                    treatmentName: "",
                     toothNumber: 0,
                     quantity: 1,
                     unitPrice: 0,
@@ -253,44 +255,38 @@ const CreateTreatmentPlanDrawer: React.FC<
             index: number,
             treatmentId: string
         ) => {
-
-            const selectedTreatment =
-                treatments.find(
-                    (treatment) =>
-                        String(treatment.id) === treatmentId
-                );
-
-
-            setDetails((prev) =>
-
-                prev.map(
-                    (detail, detailIndex) => {
-                        if (detailIndex !== index) {
-                            return detail;
-                        }
-
-                        const unitPrice =
-                            selectedTreatment
-                                ? Number(selectedTreatment.basePrice) || 0
-                                : 0;
-
-                        const subtotal =
-                            unitPrice *
-                            Number(detail.quantity || 0);
-
-                        return {
-                            ...detail,
-                            treatmentId,
-                            unitPrice,
-                            subtotal
-
-                        };
-
-                    }
-                )
-
+            const selectedTreatment = treatments.find(
+                (treatment) =>
+                    String(treatment.id) === treatmentId
             );
 
+            setDetails((prev) =>
+                prev.map((detail, detailIndex) => {
+                    if (detailIndex !== index) {
+                        return detail;
+                    }
+
+                    const unitPrice = selectedTreatment
+                        ? Number(selectedTreatment.basePrice) || 0
+                        : 0;
+
+                    const treatmentName = selectedTreatment
+                        ? selectedTreatment.name
+                        : "";
+
+                    const subtotal =
+                        unitPrice *
+                        Number(detail.quantity || 0);
+
+                    return {
+                        ...detail,
+                        treatmentId,
+                        treatmentName,
+                        unitPrice,
+                        subtotal,
+                    };
+                })
+            );
         };
 
 
@@ -372,6 +368,7 @@ const CreateTreatmentPlanDrawer: React.FC<
                 {
 
                     treatmentId: "",
+                    treatmentName: "",
 
                     toothNumber: 0,
 
@@ -567,6 +564,7 @@ const CreateTreatmentPlanDrawer: React.FC<
                 discount: form.discount,
                 details: details.map((detail) => ({
                     treatmentId: detail.treatmentId,
+                    treatmentName: detail.treatmentName,
                     toothNumber: detail.toothNumber,
                     quantity: detail.quantity,
                     unitPrice: detail.unitPrice,
@@ -1277,7 +1275,7 @@ const CreateTreatmentPlanDrawer: React.FC<
                                 font-bold
                                 text-[#001D4A]
                             ">
-                                C$ {calculateFinalTotal().toFixed(2)}
+                                    C$ {calculateFinalTotal().toFixed(2)}
 
                                 </span>
 
