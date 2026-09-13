@@ -5,14 +5,17 @@ import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch, type SearchField } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
-import { useTreatmentPlansOrchestrator } from "../hooks/useTreatmentPlanOrchestrator";
+import { useDeleteTreatmentPlanOrchestrator, useTreatmentPlansOrchestrator } from "../hooks/useTreatmentPlanOrchestrator";
 import type { TreatmentPlanOrchestratorResponse } from "../models/TreatmentPlanOrchestratorModel";
 import CreateTreatmentPlanDrawer from "../components/treatmentCatalog/CreateTreatmentPlanDrawer";
+import ConfirmModal from "../shared/ConfirmModal";
 
 const TreatmentPlanPage: React.FC = () => {
     const {
         data: treatments = []
     } = useTreatmentPlansOrchestrator();
+
+    const {mutate: deleteTreatment, isPending: isDeleting} = useDeleteTreatmentPlanOrchestrator();
 
     const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
         useState(false);
@@ -174,24 +177,24 @@ const TreatmentPlanPage: React.FC = () => {
         setCurrentPage(1);
     };
 
-    // const handleDeleteConfirm = () => {
-    //     if (!selectedTreatment) return;
-    //     const treatmentId = selectedTreatment.id;
+    const handleDeleteConfirm = () => {
+        if (!selectedTreatment) return;
+        const treatmentId = selectedTreatment.treatmentPlan.id;
 
-    //     deleteTreatment(treatmentId, {
-    //         onSuccess: () => {
-    //             setSelectedTreatment(null);
-    //             setIsDeleteModalOpen(false);
-    //         },
+        deleteTreatment(treatmentId, {
+            onSuccess: () => {
+                setSelectedTreatment(null);
+                setIsDeleteModalOpen(false);
+            },
 
-    //         onError: (error) => {
-    //             console.error(
-    //                 "Error al eliminar el plan de tratamiento:",
-    //                 error
-    //             );
-    //         },
-    //     });
-    // };
+            onError: (error) => {
+                console.error(
+                    "Error al eliminar el plan de tratamiento:",
+                    error
+                );
+            },
+        });
+    };
 
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
@@ -235,28 +238,9 @@ const TreatmentPlanPage: React.FC = () => {
 
             <CreateTreatmentPlanDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
 
-            {/* 
-            <EditTreatmentCatalogDrawer
-                isOpen={isEditDrawerOpen}
-                onHide={() => {
-                    setIsEditDrawerOpen(false);
-                    setSelectedTreatment(null);
-                }}
-                treatment={selectedTreatment}
-            />
-
-            <SecurityTreatmentCatalogDrawer
-                isOpen={isSecurityDrawerOpen}
-                onHide={() => {
-                    setIsSecurityDrawerOpen(false);
-                    setSelectedTreatment(null);
-                }}
-                treatment={selectedTreatment}
-            />
-
             <ConfirmModal
                 isOpen={isDeleteModalOpen}
-                title={`¿Estás seguro de eliminar a ${selectedTreatment?.name ?? "este plan de tratamiento"}?`}
+                title={`¿Estás seguro de eliminar a este plan de tratamientos`}
                 description="Esta acción no se puede deshacer. Todos los datos asociados a este plan de tratamiento se perderán permanentemente."
                 confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
                 cancelText="Cancelar"
@@ -265,7 +249,7 @@ const TreatmentPlanPage: React.FC = () => {
                     setIsDeleteModalOpen(false);
                     setSelectedTreatment(null);
                 }}
-            /> */}
+            />
         </div>
     );
 }
