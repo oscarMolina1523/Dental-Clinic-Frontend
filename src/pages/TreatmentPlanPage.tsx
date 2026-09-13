@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, KeyRound } from "lucide-react";
+import { Plus, Trash2, Menu, XCircle, Check, Play, CheckCircle2, Send, X } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -9,17 +9,26 @@ import { useDeleteTreatmentPlanOrchestrator, useTreatmentPlansOrchestrator } fro
 import type { TreatmentPlanOrchestratorResponse } from "../models/TreatmentPlanOrchestratorModel";
 import CreateTreatmentPlanDrawer from "../components/treatmentCatalog/CreateTreatmentPlanDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
+import type { TreatmentPlanStatus } from "../utils/treatmentPlanStatus.enum";
+import { useAcceptTreatmentPlan, useCancelTreatmentPlan, useCompleteTreatmentPlan, useProposeTreatmentPlan, useStartTreatmentPlan } from "../hooks/useTreatmentPlan";
 
 const TreatmentPlanPage: React.FC = () => {
     const {
         data: treatments = []
     } = useTreatmentPlansOrchestrator();
 
-    const {mutate: deleteTreatment, isPending: isDeleting} = useDeleteTreatmentPlanOrchestrator();
+    const proposeMutation = useProposeTreatmentPlan();
+    const acceptMutation = useAcceptTreatmentPlan();
+    const startMutation = useStartTreatmentPlan();
+    const completeMutation = useCompleteTreatmentPlan();
+    const cancelMutation = useCancelTreatmentPlan();
+
+    const { mutate: deleteTreatment, isPending: isDeleting } = useDeleteTreatmentPlanOrchestrator();
 
     const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
         useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 
     const [selectedTreatment, setSelectedTreatment] = useState<TreatmentPlanOrchestratorResponse | null>(null);
 
@@ -70,6 +79,72 @@ const TreatmentPlanPage: React.FC = () => {
         [startIndex, endIndex, filteredData]
     );
 
+    const canPropose = (status: TreatmentPlanStatus): boolean => {
+        return status === "DRAFT";
+    };
+
+    const canAccept = (status: TreatmentPlanStatus): boolean => {
+        return status === "PROPOSED";
+    };
+
+    const canStart = (status: TreatmentPlanStatus): boolean => {
+        return status === "ACCEPTED";
+    };
+
+    const canComplete = (status: TreatmentPlanStatus): boolean => {
+        return status === "IN_PROGRESS";
+    };
+
+    const canCancel = (status: TreatmentPlanStatus): boolean => {
+        return (
+            status === "DRAFT" ||
+            status === "PROPOSED" ||
+            status === "ACCEPTED" ||
+            status === "IN_PROGRESS"
+        );
+    };
+
+    const handlePropose = (id: string) => {
+        proposeMutation.mutate(id, {
+            onSuccess: () => {
+                setSelectedTreatment(null);
+                setIsStatusModalOpen(false);
+            },
+        });
+    };
+
+    const handleAccept = (id: string) => {
+        acceptMutation.mutate(id, {
+            onSuccess: () => {
+                setIsStatusModalOpen(false);
+            },
+        });
+    };
+
+    const handleStart = (id: string) => {
+        startMutation.mutate(id, {
+            onSuccess: () => {
+                setIsStatusModalOpen(false);
+            },
+        });
+    };
+
+    const handleComplete = (id: string) => {
+        completeMutation.mutate(id, {
+            onSuccess: () => {
+                setIsStatusModalOpen(false);
+            },
+        });
+    };
+
+    const handleCancel = (id: string) => {
+        cancelMutation.mutate(id, {
+            onSuccess: () => {
+                setIsStatusModalOpen(false);
+            },
+        });
+    };
+
 
     const columns: TableColumn<typeof treatments[number]>[] = [
         {
@@ -114,20 +189,20 @@ const TreatmentPlanPage: React.FC = () => {
             ),
         },
         {
-              key: "createdAt",
-              header: "Fecha de creación",
-              render: (treatment: TreatmentPlanOrchestratorResponse) => (
+            key: "createdAt",
+            header: "Fecha de creación",
+            render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
-                  {treatment.treatmentPlan.createdAt ? new Date(treatment.treatmentPlan.createdAt).toLocaleString("es-NI", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }) : "N/A"}
+                    {treatment.treatmentPlan.createdAt ? new Date(treatment.treatmentPlan.createdAt).toLocaleString("es-NI", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    }) : "N/A"}
                 </span>
-              ),
-            },
+            ),
+        },
     ];
 
     const actions: TableAction<typeof treatments[number]>[] = [
@@ -140,23 +215,21 @@ const TreatmentPlanPage: React.FC = () => {
         // },
 
         {
-            label: "Credenciales y Seguridad",
-            icon: <KeyRound className="w-4 h-4 text-amber-600" />,
+            label: "Cambios de estados",
+            icon: <Menu className="w-4 h-4 text-amber-600" />,
             onClick: (treatment) => {
                 setSelectedTreatment(treatment);
-                setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+                setIsStatusModalOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+            },
+            hidden: (treatment) => {
+                const status = treatment.treatmentPlan.status;
+
+                return (
+                    status === "COMPLETED" ||
+                    status === "CANCELLED"
+                );
             },
         },
-
-        {
-            label: "Editar plan de tratamiento",
-            icon: <Pencil className="w-4 h-4" />,
-            onClick: (treatment) => {
-                setSelectedTreatment(treatment);
-                setIsEditDrawerOpen(true);
-            },
-        },
-
         {
             label: "Eliminar plan de tratamiento",
             icon: <Trash2 className="w-4 h-4" />,
@@ -195,6 +268,13 @@ const TreatmentPlanPage: React.FC = () => {
             },
         });
     };
+
+    const isPendingAny =
+        proposeMutation.isPending ||
+        acceptMutation.isPending ||
+        startMutation.isPending ||
+        completeMutation.isPending ||
+        cancelMutation.isPending;
 
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
@@ -235,6 +315,150 @@ const TreatmentPlanPage: React.FC = () => {
                     label="plan de tratamientos"
                 />
             </div>
+
+            {isStatusModalOpen && selectedTreatment && (
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+
+                        {/* HEADER */}
+                        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-semibold text-slate-800">
+                                    Acciones Rápidas
+                                </h3>
+
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    Estado actual:{" "}
+                                    <span className="font-medium text-slate-700">
+                                        {selectedTreatment.treatmentPlan.status}
+                                    </span>
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => setIsStatusModalOpen(false)}
+                                className="text-slate-400 hover:text-slate-600 rounded-lg p-1 transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* ACTIONS */}
+                        <div className="p-3 space-y-1">
+
+                            {/* =================================================
+                    DRAFT -> PROPOSED
+                ================================================= */}
+                            {canPropose(selectedTreatment.treatmentPlan.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() =>
+                                        handlePropose(selectedTreatment.treatmentPlan.id)
+                                    }
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <Send className="w-4 h-4 text-blue-600" />
+
+                                    <span>
+                                        {proposeMutation.isPending
+                                            ? "Proponiendo..."
+                                            : "Proponer Plan"}
+                                    </span>
+                                </button>
+                            )}
+
+                            {/* =================================================
+                    PROPOSED -> ACCEPTED
+                ================================================= */}
+                            {canAccept(selectedTreatment.treatmentPlan.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() =>
+                                        handleAccept(selectedTreatment.treatmentPlan.id)
+                                    }
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+
+                                    <span>
+                                        {acceptMutation.isPending
+                                            ? "Aceptando..."
+                                            : "Aceptar Plan"}
+                                    </span>
+                                </button>
+                            )}
+
+                            {/* =================================================
+                    ACCEPTED -> IN_PROGRESS
+                ================================================= */}
+                            {canStart(selectedTreatment.treatmentPlan.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() =>
+                                        handleStart(selectedTreatment.treatmentPlan.id)
+                                    }
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <Play className="w-4 h-4 text-blue-600" />
+
+                                    <span>
+                                        {startMutation.isPending
+                                            ? "Iniciando..."
+                                            : "Iniciar Plan"}
+                                    </span>
+                                </button>
+                            )}
+
+                            {/* =================================================
+                    IN_PROGRESS -> COMPLETED
+                ================================================= */}
+                            {canComplete(selectedTreatment.treatmentPlan.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() =>
+                                        handleComplete(selectedTreatment.treatmentPlan.id)
+                                    }
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <Check className="w-4 h-4 text-indigo-600" />
+
+                                    <span>
+                                        {completeMutation.isPending
+                                            ? "Completando..."
+                                            : "Completar Plan"}
+                                    </span>
+                                </button>
+                            )}
+
+                            {/* =================================================
+                    CANCELAR
+                ================================================= */}
+                            {canCancel(selectedTreatment.treatmentPlan.status) && (
+                                <>
+                                    <div className="my-1 border-t border-slate-100" />
+
+                                    <button
+                                        disabled={isPendingAny}
+                                        onClick={() =>
+                                            handleCancel(selectedTreatment.treatmentPlan.id)
+                                        }
+                                        className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-rose-600 hover:bg-rose-50 rounded-xl transition-colors disabled:opacity-50 font-medium"
+                                    >
+                                        <XCircle className="w-4 h-4 text-rose-600" />
+
+                                        <span>
+                                            {cancelMutation.isPending
+                                                ? "Cancelando..."
+                                                : "Cancelar Plan"}
+                                        </span>
+                                    </button>
+                                </>
+                            )}
+
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <CreateTreatmentPlanDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
 
