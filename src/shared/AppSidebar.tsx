@@ -29,7 +29,7 @@ const navItems = [
   { id: "expedientes", label: "Expedientes", icon: FileText },
   { id: "odontograma", label: "Odontograma", icon: Stethoscope },
   { id: "treatments", label: "Tratamientos", icon: ClipboardList },
-  { id: "planes", label: "Planes de Tratamiento", icon: FileCheck },
+  { id: "treatment-plan", label: "Planes de Tratamiento", icon: FileCheck },
   { id: "facturacion", label: "Facturación", icon: Receipt },
   { id: "caja", label: "Caja", icon: Archive },
   { id: "products", label: "Productos", icon: ScanBarcode },
