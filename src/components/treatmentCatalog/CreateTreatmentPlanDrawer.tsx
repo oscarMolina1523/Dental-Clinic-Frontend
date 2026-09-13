@@ -618,13 +618,7 @@ const CreateTreatmentPlanDrawer: React.FC<
         // ============================================================
 
         return (
-
             <>
-
-                {/* =====================================================
-                TOAST
-            ===================================================== */}
-
                 {toast && (
 
                     <Toast
@@ -636,11 +630,6 @@ const CreateTreatmentPlanDrawer: React.FC<
                     />
 
                 )}
-
-
-                {/* =====================================================
-                OVERLAY
-            ===================================================== */}
 
                 <div
                     onClick={cleanForm}
@@ -655,14 +644,9 @@ const CreateTreatmentPlanDrawer: React.FC<
                 `}
                 />
 
-
-                {/* =====================================================
-                DRAWER
-            ===================================================== */}
-
                 <GenericDrawer
                     isOpen={isOpen}
-                    onHide={onHide}
+                    onHide={cleanForm}
                     title="Nuevo Plan de Tratamiento"
                     description="Registra un nuevo plan de tratamiento"
                     width="w-112.5"
