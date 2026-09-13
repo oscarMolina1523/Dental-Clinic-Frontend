@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Trash2, Menu, XCircle, Check, Play, CheckCircle2, Send, X } from "lucide-react";
+import { Plus, Trash2, Menu, XCircle, Check, Play, CheckCircle2, Send, X, Eye } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -11,6 +11,7 @@ import CreateTreatmentPlanDrawer from "../components/treatmentCatalog/CreateTrea
 import ConfirmModal from "../shared/ConfirmModal";
 import type { TreatmentPlanStatus } from "../utils/treatmentPlanStatus.enum";
 import { useAcceptTreatmentPlan, useCancelTreatmentPlan, useCompleteTreatmentPlan, useProposeTreatmentPlan, useStartTreatmentPlan } from "../hooks/useTreatmentPlan";
+import ShowTreatmentPlanDrawer from "../components/treatmentCatalog/ShowTreatmentPlanDrawer";
 
 const TreatmentPlanPage: React.FC = () => {
     const {
@@ -29,6 +30,7 @@ const TreatmentPlanPage: React.FC = () => {
         useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+    const [isShowModalOpen, setIsShowModalOpen] = useState(false);
 
     const [selectedTreatment, setSelectedTreatment] = useState<TreatmentPlanOrchestratorResponse | null>(null);
 
@@ -206,13 +208,14 @@ const TreatmentPlanPage: React.FC = () => {
     ];
 
     const actions: TableAction<typeof treatments[number]>[] = [
-        // {
-        //     label: "Ver plan de tratamiento",
-        //     icon: <Eye className="w-4 h-4" />,
-        //     onClick: (treatment) => {
-        //         console.log("Ver:", treatment);
-        //     },
-        // },
+        {
+            label: "Ver plan de tratamiento",
+            icon: <Eye className="w-4 h-4" />,
+            onClick: (treatment) => {
+                setSelectedTreatment(treatment);
+                setIsShowModalOpen(true);
+            },
+        },
 
         {
             label: "Cambios de estados",
@@ -474,6 +477,8 @@ const TreatmentPlanPage: React.FC = () => {
                     setSelectedTreatment(null);
                 }}
             />
+
+            <ShowTreatmentPlanDrawer isOpen={isShowModalOpen} onHide={()=> setIsShowModalOpen(false)} treatment={selectedTreatment} />
         </div>
     );
 }
