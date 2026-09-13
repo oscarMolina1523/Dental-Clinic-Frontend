@@ -150,6 +150,18 @@ const TreatmentPlanPage: React.FC = () => {
 
     const columns: TableColumn<typeof treatments[number]>[] = [
         {
+            key: "code",
+            header: "Código",
+            render: (treatment: TreatmentPlanOrchestratorResponse) => (
+                <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-slate-800">
+                        {treatment.treatmentPlan.code}
+                    </span>
+
+                </div>
+            ),
+        },
+        {
             key: "patientFullName",
             header: "Paciente",
             className: "pl-2 w-100",
