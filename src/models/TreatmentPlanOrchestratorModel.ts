@@ -20,9 +20,7 @@ export interface TreatmentPlanOrchestratorResponse {
 // CREATE TREATMENT PLAN REQUEST
 // ============================================================
 
-export interface CreateTreatmentPlanRequest {
-
-  data: TreatmentPlanDto;
+export interface CreateTreatmentPlanRequest extends TreatmentPlanDto{
 
   details: TreatmentPlanDetailDto[];
 

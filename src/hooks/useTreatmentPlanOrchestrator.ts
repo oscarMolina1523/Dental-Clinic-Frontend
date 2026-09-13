@@ -76,3 +76,31 @@ export function useCreateTreatmentPlanOrchestrator() {
     },
   });
 }
+
+export function useDeleteTreatmentPlanOrchestrator() {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    boolean,
+    Error,
+    string
+  >({
+    mutationKey: [
+      "deleteTreatmentPlanOrchestrator",
+    ],
+
+    mutationFn: (id) =>
+      treatmentPlanOrchestratorService
+        .deleteTreatmentPlanOrchestrator(id),
+
+    onSuccess: () => {
+
+      // Actualizar lista de recetas médicas
+      queryClient.invalidateQueries({
+        queryKey: [
+          "treatmentPlansOrchestrator",
+        ],
+      });
+    },
+  });
+}

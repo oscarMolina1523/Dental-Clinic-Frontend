@@ -59,4 +59,14 @@ export default class TreatmentPlanOrchestratorService
     return response || null;
   }
 
+  async deleteTreatmentPlanOrchestrator(
+    id: string
+  ): Promise<boolean> {
+
+    await super.delete(
+      `${this.path}/${id}`
+    );
+
+    return true;
+  }
 }
