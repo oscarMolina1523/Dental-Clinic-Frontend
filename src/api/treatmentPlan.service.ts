@@ -1,3 +1,4 @@
+import type TreatmentPlan from "../models/TreatmentPlanModel";
 import type { TreatmentPlanDto } from "../models/TreatmentPlanModel";
 import HTTPService from "./http-service";
 
@@ -12,21 +13,21 @@ export default class TreatmentPlanService extends HTTPService {
   /**
    * Obtiene la lista completa de planes de tratamiento.
    */
-  async getTreatmentPlans(): Promise<TreatmentPlanDto[]> {
-    const response = await super.get<TreatmentPlanDto[]>(this.path);
+  async getTreatmentPlans(): Promise<TreatmentPlan[]> {
+    const response = await super.get<TreatmentPlan[]>(this.path);
 
-    return response || [];
+    return response;
   }
 
   /**
    * Obtiene un plan de tratamiento por su ID.
    */
-  async getById(id: string): Promise<TreatmentPlanDto | null> {
-    const response = await super.get<TreatmentPlanDto | null>(
+  async getById(id: string): Promise<TreatmentPlan | null> {
+    const response = await super.get<TreatmentPlan | null>(
       `${this.path}/${id}`
     );
 
-    return response || null;
+    return response;
   }
 
   /**

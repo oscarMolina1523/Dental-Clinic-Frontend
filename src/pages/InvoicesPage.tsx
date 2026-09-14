@@ -7,6 +7,7 @@ import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
 import { useInvoices } from "../hooks/useInvoices";
 import type Invoice from "../models/InvoiceModel";
+import CreateInvoiceDrawer from "../components/invoices/CreateInvoiceDrawer";
 
 const InvoicesPage: React.FC = () => {
     const {
@@ -15,6 +16,9 @@ const InvoicesPage: React.FC = () => {
 
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
+
+    const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
+        useState(false);
 
     const searchFields: (keyof Invoice)[] = [
         "patientFullName",
@@ -180,7 +184,7 @@ const InvoicesPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar Factura..."
                     />
-                    <button className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+                    <button onClick={()=> setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
                         <Plus className="w-4 h-4" />
                         <span>Nueva Factura</span>
                     </button>
@@ -208,6 +212,7 @@ const InvoicesPage: React.FC = () => {
                     label="Facturas"
                 />
             </div>
+            <CreateInvoiceDrawer isOpen={isCreateDrawerOpen} onHide={()=> setIsCreateDrawerOpen(false)}/>
         </div>
     );
 }
