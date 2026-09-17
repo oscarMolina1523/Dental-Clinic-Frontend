@@ -1,24 +1,48 @@
 import React, { useMemo, useState } from "react";
-import { Plus } from "lucide-react";
+import { Ban, Plus } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
-import { useInvoices } from "../hooks/useInvoices";
+import { useCancelInvoice, useInvoices } from "../hooks/useInvoices";
 import type Invoice from "../models/InvoiceModel";
 import CreateInvoiceDrawer from "../components/invoices/CreateInvoiceDrawer";
+import ConfirmModal from "../shared/ConfirmModal";
+import Toast from "../shared/Toast";
 
 const InvoicesPage: React.FC = () => {
     const {
         data: invoices = []
     } = useInvoices();
 
+    const {
+        mutate: cancelInvoice,
+        isPending: isCanceling
+    } = useCancelInvoice();
+
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
 
     const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
         useState(false);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+    const [toast, setToast] = useState<{
+        type: "success" | "error";
+        message: string;
+    } | null>(null);
+
+    const showToast = (
+        type: "success" | "error",
+        message: string
+    ) => {
+        setToast({
+            type,
+            message,
+        });
+    };
 
     const searchFields: (keyof Invoice)[] = [
         "patientFullName",
@@ -70,7 +94,7 @@ const InvoicesPage: React.FC = () => {
             header: "Número de factura",
             render: (invoice: Invoice) => (
                 <span className="text-sm text-slate-500">
-                   {invoice.invoiceNumber}
+                    {invoice.invoiceNumber}
                 </span>
             ),
         },
@@ -135,14 +159,14 @@ const InvoicesPage: React.FC = () => {
     ];
 
     const actions: TableAction<typeof invoices[number]>[] = [
-        // {
-        //     label: "Editar Factura",
-        //     icon: <Pencil className="w-4 h-4" />,
-        //     onClick: (invoice) => {
-        //         setSelectedAppointment(invoice);
-        //         setIsEditDrawerOpen(true);
-        //     },
-        // },
+        {
+            label: "Cancelar Factura",
+            icon: <Ban className="w-4 h-4" />,
+            onClick: (invoice) => {
+                setSelectedInvoice(invoice);
+                setIsCancelModalOpen(true);
+            },
+        },
         // {
         //     label: "Cambios de estados",
         //     icon: <Menu className="w-4 h-4 text-amber-600" />,
@@ -173,8 +197,35 @@ const InvoicesPage: React.FC = () => {
         setCurrentPage(1);
     };
 
+    const handleCancelInvoiceConfirm = () => {
+        if (!selectedInvoice) return;
+        const invoiceId = selectedInvoice.id;
+
+        cancelInvoice(invoiceId, {
+            onSuccess: () => {
+                setSelectedInvoice(null);
+                setIsCancelModalOpen(false);
+            },
+
+            onError: (error) => {
+                showToast(
+                    "error",
+                    error.message ||
+                    "No se pudo actualizar el inventario."
+                );
+            },
+        });
+    };
+
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
+            {toast && (
+                <Toast
+                    type={toast.type}
+                    message={toast.message}
+                    onClose={() => setToast(null)}
+                />
+            )}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 {/* Encabezado */}
                 <div className="flex items-center justify-between pb-6 mb-2">
@@ -184,7 +235,7 @@ const InvoicesPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar Factura..."
                     />
-                    <button onClick={()=> setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+                    <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
                         <Plus className="w-4 h-4" />
                         <span>Nueva Factura</span>
                     </button>
@@ -212,7 +263,19 @@ const InvoicesPage: React.FC = () => {
                     label="Facturas"
                 />
             </div>
-            <CreateInvoiceDrawer isOpen={isCreateDrawerOpen} onHide={()=> setIsCreateDrawerOpen(false)}/>
+            <CreateInvoiceDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+            <ConfirmModal
+                isOpen={isCancelModalOpen}
+                title={`¿Estás seguro de cancelar a esta factura?`}
+                description="Esta acción no se puede deshacer. Todos los datos asociados a este paciente se perderán permanentemente."
+                confirmText={isCanceling ? "Ejecutando..." : "Confirmar"}
+                cancelText="Cancelar"
+                onConfirm={handleCancelInvoiceConfirm}
+                onCancel={() => {
+                    setIsCancelModalOpen(false);
+                    setSelectedInvoice(null);
+                }}
+            />
         </div>
     );
 }
