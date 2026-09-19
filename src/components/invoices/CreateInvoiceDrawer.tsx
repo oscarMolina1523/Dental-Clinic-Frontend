@@ -7,6 +7,9 @@ import { useCreateInvoiceWithPayment } from "../../hooks/useInvoicesPayment";
 import type { PaymentMethods } from "../../utils/paymentMethodsStatus.enum";
 import type { CreateInvoiceWithPaymentDto } from "../../models/InvoicePaymentModel";
 import { useCreatePaymentPlanOrchestrator } from "../../hooks/usePaymentPlanOrchestrator";
+import InvoiceInstallmentSection from "./InvoiceInstallmentSection";
+import InvoicePaymentSection from "./InvoicePaymentSection";
+import InvoiceTreatmentSection from "./InvoiceTreatmentSection";
 
 interface CreateInvoiceProps {
     isOpen: boolean;
@@ -672,375 +675,56 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
             >
                 <div className="space-y-5">
 
-                    {/* =================================================
-                        PLAN DE TRATAMIENTO
-                    ================================================= */}
+                    <InvoiceTreatmentSection
+                        treatmentPlanId={form.treatmentPlanId}
+                        patientFullName={form.patientFullName}
+                        totalAmount={form.totalAmount}
+                        treatments={treatments}
+                        isLoadingTreatments={isLoadingTreatments}
+                        onTreatmentPlanChange={
+                            handleTreatmentPlanChange
+                        }
+                    />
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Plan de tratamiento
-                        </label>
-
-                        <select
-                            name="treatmentPlanId"
-                            value={form.treatmentPlanId}
-                            onChange={handleTreatmentPlanChange}
-                            disabled={isLoadingTreatments}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                                disabled:bg-slate-50
-                                disabled:cursor-not-allowed
-                            "
-                        >
-                            <option value="">
-                                {isLoadingTreatments
-                                    ? "Cargando planes..."
-                                    : "Seleccione un plan"}
-                            </option>
-
-                            {treatments.map((treatment) => (
-                                <option
-                                    key={treatment.id}
-                                    value={treatment.id}
-                                >
-                                    {treatment.code ||
-                                        treatment.id}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* =================================================
-                        PACIENTE
-                    ================================================= */}
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Paciente
-                        </label>
-
-                        <input
-                            type="text"
-                            value={form.patientFullName}
-                            disabled
-                            placeholder="Seleccione un plan de tratamiento"
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                bg-slate-50
-                                text-slate-600
-                            "
-                        />
-                    </div>
-
-                    {/* =================================================
-                        TOTAL
-                    ================================================= */}
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Total a pagar
-                        </label>
-
-                        <input
-                            type="number"
-                            value={form.totalAmount}
-                            disabled
-                            placeholder="Seleccione un plan de tratamiento"
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                bg-slate-50
-                                text-slate-600
-                            "
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Método de pago
-                        </label>
-
-                        <select
-                            name="paymentMethod"
-                            value={form.paymentMethod}
-                            onChange={handlePaymentMethodChange}
-                            disabled={isPending}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#001D4A]"
-                        >
-                            <option value="CASH">Efectivo</option>
-                            <option value="CARD">Tarjeta</option>
-                            <option value="TRANSFER">
-                                Transferencia
-                            </option>
-                        </select>
-                    </div>
-
-                    {(form.paymentMethod == "TRANSFER") && (
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Referencia de transacción
-                            </label>
-
-                            <input
-                                type="text"
-                                name="transactionReference"
-                                value={form.transactionReference}
-                                onChange={handleChange}
-                                disabled={isPending}
-                                placeholder="Número de referencia"
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#001D4A]"
-                            />
-                        </div>
-                    )}
-
-                    {/* =================================================
-                        MONTO PAGADO
-                    ================================================= */}
-
-                    {!form.isInstallmentPayment && (
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Monto recibido
-                            </label>
-
-                            <input
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                name="paidAmount"
-                                value={form.paidAmount}
-                                onChange={handlePaidAmountChange}
-                                disabled={!form.treatmentPlanId}
-                                placeholder="Ingrese una cantidad"
-                                className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                                disabled:bg-slate-50
-                                disabled:cursor-not-allowed
-                            "
-                            />
-                        </div>
-                    )}
-
-                    {/* CHECKBOX */}
-                    <div className="flex items-center gap-3 py-2">
-                        <input
-                            id="isInstallmentPayment"
-                            type="checkbox"
-                            checked={form.isInstallmentPayment}
-                            onChange={handleInstallmentChange}
-                            disabled={isPending}
-                            className="h-4 w-4 rounded border-gray-300 text-[#001D4A] focus:ring-[#001D4A]"
-                        />
-
-                        <label
-                            htmlFor="isInstallmentPayment"
-                            className="text-sm font-medium text-gray-700 cursor-pointer"
-                        >
-                            Registrar pago en cuotas
-                        </label>
-                    </div>
+                    <InvoicePaymentSection
+                        paymentMethod={form.paymentMethod}
+                        transactionReference={
+                            form.transactionReference
+                        }
+                        paidAmount={form.paidAmount}
+                        isInstallmentPayment={
+                            form.isInstallmentPayment
+                        }
+                        isPending={isPending}
+                        hasTreatmentPlan={
+                            !!form.treatmentPlanId
+                        }
+                        onPaymentMethodChange={
+                            handlePaymentMethodChange
+                        }
+                        onChange={handleChange}
+                        onPaidAmountChange={
+                            handlePaidAmountChange
+                        }
+                        onInstallmentChange={
+                            handleInstallmentChange
+                        }
+                    />
 
                     {form.isInstallmentPayment && (
-                        <>
-                            {/* =================================================
-                                CANTIDAD DE CUOTAS
-                            ================================================= */}
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Cantidad de cuotas
-                                </label>
-
-                                <input
-                                    type="number"
-                                    min="2"
-                                    step="1"
-                                    name="numberOfInstallments"
-                                    value={form.numberOfInstallments}
-                                    onChange={handleChange}
-                                    disabled={isPending}
-                                    placeholder="Ej. 6"
-                                    className="
-                                        w-full
-                                        px-3 py-2.5
-                                        border border-slate-200
-                                        rounded-lg
-                                        text-sm
-                                        outline-none
-                                        focus:border-blue-500
-                                        focus:ring-2
-                                        focus:ring-blue-500/10
-                                        disabled:bg-slate-50
-                                    "
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Interés (%)
-                                </label>
-
-                                <input
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    name="interestRate"
-                                    value={form.interestRate}
-                                    onChange={handleChange}
-                                    disabled={isPending}
-                                    placeholder="Ej. 10"
-                                    className="
-                                        w-full
-                                        px-3 py-2.5
-                                        border border-slate-200
-                                        rounded-lg
-                                        text-sm
-                                        outline-none
-                                        focus:border-blue-500
-                                        focus:ring-2
-                                        focus:ring-blue-500/10
-                                        disabled:bg-slate-50
-                                    "
-                                />
-
-                                <p className="mt-1 text-xs text-slate-500">
-                                    Porcentaje de interés aplicado al plan de cuotas.
-                                </p>
-                            </div>
-
-                            {/* =================================================
-                                MÍNIMO A PAGAR
-                            ================================================= */}
-
-                            {/* <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Mínimo a pagar por cuota
-                                </label>
-
-                                <input
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    name="minimumPayment"
-                                    value={form.minimumPayment}
-                                    onChange={handleChange}
-                                    disabled={isPending}
-                                    placeholder="Ej. 500"
-                                    className="
-                                        w-full
-                                        px-3 py-2.5
-                                        border border-slate-200
-                                        rounded-lg
-                                        text-sm
-                                        outline-none
-                                        focus:border-blue-500
-                                        focus:ring-2
-                                        focus:ring-blue-500/10
-                                        disabled:bg-slate-50
-                                    "
-                                />
-
-                                <p className="mt-1 text-xs text-slate-500">
-                                    Monto mínimo que debe pagar el paciente en cada cuota.
-                                </p>
-                            </div> */}
-
-                            {/* =================================================
-                                PERÍODO DE GRACIA
-                            ================================================= */}
-
-                            {/* <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Período de gracia (días)
-                                </label>
-
-                                <input
-                                    type="number"
-                                    min="0"
-                                    step="1"
-                                    name="gracePeriodDays"
-                                    value={form.gracePeriodDays}
-                                    onChange={handleChange}
-                                    disabled={isPending}
-                                    placeholder="Ej. 2"
-                                    className="
-                                        w-full
-                                        px-3 py-2.5
-                                        border border-slate-200
-                                        rounded-lg
-                                        text-sm
-                                        outline-none
-                                        focus:border-blue-500
-                                        focus:ring-2
-                                        focus:ring-blue-500/10
-                                        disabled:bg-slate-50
-                                    "
-                                />
-
-                                <p className="mt-1 text-xs text-slate-500">
-                                    Días adicionales después del vencimiento para realizar el pago.
-                                </p>
-                            </div> */}
-
-                            {/* =================================================
-                                PRIMERA FECHA DE PAGO
-                            ================================================= */}
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Primera fecha de pago
-                                </label>
-
-                                <input
-                                    type="date"
-                                    name="firstDueDate"
-                                    value={form.firstDueDate}
-                                    onChange={handleChange}
-                                    disabled={isPending}
-                                    className="
-                                        w-full
-                                        px-3 py-2.5
-                                        border border-slate-200
-                                        rounded-lg
-                                        text-sm
-                                        outline-none
-                                        focus:border-blue-500
-                                        focus:ring-2
-                                        focus:ring-blue-500/10
-                                        disabled:bg-slate-50
-                                    "
-                                />
-
-                                <p className="mt-1 text-xs text-slate-500">
-                                    Cada cuota se calculará con 30 días de diferencia.
-                                </p>
-                            </div>
-                        </>
+                        <InvoiceInstallmentSection
+                            numberOfInstallments={
+                                form.numberOfInstallments
+                            }
+                            interestRate={
+                                form.interestRate
+                            }
+                            firstDueDate={
+                                form.firstDueDate
+                            }
+                            isPending={isPending}
+                            onChange={handleChange}
+                        />
                     )}
                 </div>
             </GenericDrawer>
