@@ -1,4 +1,4 @@
-import type { CreatePaymentPlanRequest, CreatePaymentPlanResponse, RegisterPaymentRequest, RegisterPaymentResponse } from "../models/PaymentPlanOrchestrator";
+import type { CreatePaymentPlanRequest, CreatePaymentPlanResponse, GetPaymentPlanByIdResponse, RegisterPaymentRequest, RegisterPaymentResponse } from "../models/PaymentPlanOrchestrator";
 import HTTPService from "./http-service";
 
 export default class PaymentPlanOrchestratorService
@@ -9,6 +9,18 @@ export default class PaymentPlanOrchestratorService
   constructor() {
     super();
     this.path = "paymentPlanOrchestrator";
+  }
+
+  async getPaymentPlanById(
+    id: string
+  ): Promise<GetPaymentPlanByIdResponse | null> {
+
+    const response =
+      await super.get<GetPaymentPlanByIdResponse>(
+        `${this.path}/${id}`
+      );
+
+    return response || null;
   }
 
   // ============================================================

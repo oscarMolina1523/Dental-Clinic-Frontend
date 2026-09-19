@@ -1,5 +1,6 @@
 import type { PaymentMethods } from "../utils/paymentMethodsStatus.enum";
 import type Installment from "./InstallmentModel";
+import type Invoice from "./InvoiceModel";
 import type Payment from "./PaymentModel";
 import type PaymentPlan from "./PaymentPlanModel";
 
@@ -30,4 +31,12 @@ export interface RegisterPaymentRequest {
 export interface RegisterPaymentResponse {
   payment: Payment;
   installment: Installment;
+}
+
+export interface GetPaymentPlanByIdResponse {
+  paymentPlan: PaymentPlan;
+  invoice: Invoice;
+  installments: Installment[];
+  payments: Payment[];
+
 }

@@ -1,11 +1,13 @@
 import {
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 
 import type {
   CreatePaymentPlanRequest,
   CreatePaymentPlanResponse,
+  GetPaymentPlanByIdResponse,
   RegisterPaymentRequest,
   RegisterPaymentResponse,
 } from "../models/PaymentPlanOrchestrator";
@@ -14,6 +16,36 @@ import PaymentPlanOrchestratorService from "../api/paymentPlanOrchestrator";
 
 const paymentPlanOrchestratorService = new PaymentPlanOrchestratorService();
 
+export function usePaymentPlanById(
+  id?: string
+) {
+
+  return useQuery<
+    GetPaymentPlanByIdResponse | null,
+    Error
+  >({
+
+    queryKey: [
+      "paymentPlanOrchestrator",
+      id,
+    ],
+
+    queryFn: () => {
+
+      if (!id) {
+        throw new Error(
+          "El ID del plan de pago es requerido"
+        );
+      }
+
+      return paymentPlanOrchestratorService
+        .getPaymentPlanById(id);
+    },
+
+    enabled: Boolean(id),
+
+  });
+}
 
 /* =========================================================
    CREATE PAYMENT PLAN
