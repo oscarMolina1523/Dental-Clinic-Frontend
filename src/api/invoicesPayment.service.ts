@@ -9,7 +9,7 @@ export default class InvoicePaymentService extends HTTPService {
 
   constructor() {
     super();
-    this.path = "invoicePayment";
+    this.path = "invoice-payments";
   }
 
 

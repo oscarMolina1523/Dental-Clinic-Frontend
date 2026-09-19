@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import { useTreatmentPlans } from "../../hooks/useTreatmentPlan";
-import { useAddInvoice } from "../../hooks/useInvoices";
 import type { InvoiceStatus } from "../../utils/invoiceStatus.enum";
+import { useCreateInvoiceWithPayment } from "../../hooks/useInvoicesPaymentOrchestrator";
+import type { PaymentMethods } from "../../utils/paymentMethodsStatus.enum";
+import type { CreateInvoiceWithPaymentDto } from "../../models/InvoicePaymentModel";
 
 interface CreateInvoiceProps {
     isOpen: boolean;
@@ -20,9 +22,9 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
     } = useTreatmentPlans();
 
     const {
-        mutate: addInvoice,
-        isPending: isLoadingInvoice
-    } = useAddInvoice();
+        mutate: createInvoiceWithPayment,
+        isPending: isLoadingInvoiceWithPayment,
+    } = useCreateInvoiceWithPayment();
 
     const [form, setForm] = useState<{
         patientId: string;
@@ -31,6 +33,13 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
         totalAmount: string;
         paidAmount: string;
         pendingAmount: string;
+
+        isInstallmentPayment: boolean;
+        paymentMethod: PaymentMethods;
+        transactionReference: string;
+        servedBy: string;
+        paymentDate: string;
+        installmentId: string;
     }>({
         patientId: "",
         patientFullName: "",
@@ -38,6 +47,13 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
         totalAmount: "",
         paidAmount: "",
         pendingAmount: "",
+
+        isInstallmentPayment: false,
+        paymentMethod: "CASH",
+        transactionReference: "",
+        servedBy: "b0459bf8f4656468",
+        paymentDate: new Date().toISOString().split("T")[0],
+        installmentId: "",
     });
 
     const [toast, setToast] = useState<{
@@ -63,11 +79,50 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
             totalAmount: "",
             paidAmount: "",
             pendingAmount: "",
+
+            isInstallmentPayment: false,
+            paymentMethod: "CASH",
+            transactionReference: "",
+            servedBy: "b0459bf8f4656468",
+            paymentDate: new Date().toISOString().split("T")[0],
+            installmentId: "",
         });
 
         setToast(null);
         onHide();
     };
+
+    const handleChange = (
+        e: React.ChangeEvent<
+            HTMLInputElement | HTMLSelectElement
+        >
+    ) => {
+        const { name, value } = e.target;
+
+        setForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handlePaymentMethodChange = (
+        e: React.ChangeEvent<HTMLSelectElement>
+    ) => {
+        const paymentMethod = e.target.value as PaymentMethods;
+
+        setForm((prev) => ({
+            ...prev,
+            paymentMethod,
+
+            // Si cambia de transferencia a otro método,
+            // limpiamos la referencia.
+            transactionReference:
+                paymentMethod === "TRANSFER"
+                    ? prev.transactionReference
+                    : "",
+        }));
+    };
+
 
     /*
      * =========================================================
@@ -89,6 +144,13 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
                 totalAmount: "",
                 paidAmount: "",
                 pendingAmount: "",
+
+                isInstallmentPayment: false,
+                paymentMethod: "CASH",
+                transactionReference: "",
+                servedBy: "b0459bf8f4656468",
+                paymentDate: new Date().toISOString().split("T")[0],
+                installmentId: "",
             });
 
             return;
@@ -148,6 +210,28 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
             pendingAmount: String(pendingAmount),
         }));
     };
+
+    const handleInstallmentChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const checked = e.target.checked;
+
+        setForm((prev) => ({
+            ...prev,
+            isInstallmentPayment: checked,
+
+            // Limpiar datos de pago cuando se desactiva
+            ...(checked
+                ? {}
+                : {
+                    paymentMethod: "CASH",
+                    transactionReference: "",
+                    servedBy: "b0459bf8f4656468",
+                    installmentId: "",
+                }),
+        }));
+    };
+
 
     /*
      * =========================================================
@@ -229,40 +313,145 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
             return;
         }
 
-        addInvoice(
-            {
-                patientId,
-                patientFullName,
-                treatmentPlanId,
-                totalAmount,
-                paidAmount,
-                pendingAmount,
-                status,
+        /*
+     * =========================================================
+     * PAGO PARCIAL SIN CUOTAS
+     * =========================================================
+     *
+     * Si paga menos del total y no seleccionó cuotas,
+     * no permitimos crear.
+     */
+
+        if (
+            paidAmount < totalAmount &&
+            !form.isInstallmentPayment
+        ) {
+            showToast(
+                "error",
+                "El monto a pagar es menor que el total. Puede pagar el total de una vez o seleccionar 'Registrar pago en cuotas' para realizar el pago en planes."
+            );
+
+            return;
+        }
+
+        /*
+         * =========================================================
+         * PAGO EN CUOTAS
+         * =========================================================
+         *
+         * Si seleccionó cuotas, el monto debe ser menor al total.
+         */
+
+        if (
+            form.isInstallmentPayment &&
+            paidAmount >= totalAmount
+        ) {
+            showToast(
+                "error",
+                "Si desea pagar el total de una vez, desmarque 'Registrar pago en cuotas'."
+            );
+
+            return;
+        }
+
+        /*
+         * =========================================================
+         * DATOS DEL PAGO
+         * =========================================================
+         */
+
+        if (!form.servedBy.trim()) {
+            showToast(
+                "error",
+                "Debe indicar quién atendió el pago."
+            );
+            return;
+        }
+
+        if (!form.paymentDate) {
+            showToast(
+                "error",
+                "Debe indicar la fecha del pago."
+            );
+            return;
+        }
+
+        /*
+         * =========================================================
+         * TRANSFERENCIA
+         * =========================================================
+         */
+
+        if (
+            form.paymentMethod === "TRANSFER" &&
+            !form.transactionReference.trim()
+        ) {
+            showToast(
+                "error",
+                "Debe ingresar la referencia de la transferencia."
+            );
+
+            return;
+        }
+
+        const invoice = {
+            patientId,
+            patientFullName,
+            treatmentPlanId,
+            totalAmount,
+            paidAmount,
+            pendingAmount,
+            status,
+        };
+
+        // ==========================================
+        // CON PAGO / CUOTAS
+        // ==========================================
+        const data: CreateInvoiceWithPaymentDto = {
+            invoice,
+            payment: {
+                amount: paidAmount,
+                payment_method: form.paymentMethod,
+                transaction_reference:
+                    form.transactionReference.trim() || undefined,
+                served_by: form.servedBy.trim(),
+                payment_date: form.paymentDate,
+                installment_id:
+                    form.installmentId.trim() || undefined,
             },
-            {
-                onSuccess: () => {
-                    showToast(
-                        "success",
-                        "La factura se creó correctamente."
-                    );
+        };
 
-                    cleanForm();
-                },
+        createInvoiceWithPayment(data, {
+            onSuccess: () => {
+                setToast({
+                    type: "success",
+                    message:
+                        "Factura y pago creados correctamente.",
+                });
 
-                onError: (error) => {
-                    showToast(
-                        "error",
+                setTimeout(() => {
+                    onHide();
+                }, 1000);
+
+                cleanForm();
+            },
+            onError: (error) => {
+                setToast({
+                    type: "error",
+                    message:
                         error.message ||
-                        "No se pudo crear la factura."
-                    );
-                },
-            }
-        );
+                        "No se pudo crear la factura y el pago.",
+                });
+            },
+        });
+
+        return;
+
     };
 
     const isPending =
-        isLoadingInvoice ||
-        isLoadingTreatments;
+        isLoadingTreatments ||
+        isLoadingInvoiceWithPayment;
 
     return (
         <>
@@ -438,13 +627,51 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
                         />
                     </div>
 
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Método de pago
+                        </label>
+
+                        <select
+                            name="paymentMethod"
+                            value={form.paymentMethod}
+                            onChange={handlePaymentMethodChange}
+                            disabled={isPending}
+                            className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#001D4A]"
+                        >
+                            <option value="CASH">Efectivo</option>
+                            <option value="CARD">Tarjeta</option>
+                            <option value="TRANSFER">
+                                Transferencia
+                            </option>
+                        </select>
+                    </div>
+
+                    {(form.paymentMethod == "TRANSFER") && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Referencia de transacción
+                            </label>
+
+                            <input
+                                type="text"
+                                name="transactionReference"
+                                value={form.transactionReference}
+                                onChange={handleChange}
+                                disabled={isPending}
+                                placeholder="Número de referencia"
+                                className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#001D4A]"
+                            />
+                        </div>
+                    )}
+
                     {/* =================================================
                         MONTO PAGADO
                     ================================================= */}
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Monto a pagar
+                            Monto recibido
                         </label>
 
                         <input
@@ -472,22 +699,59 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
                         />
                     </div>
 
+                    {/* CHECKBOX */}
+                    <div className="flex items-center gap-3 py-2">
+                        <input
+                            id="isInstallmentPayment"
+                            type="checkbox"
+                            checked={form.isInstallmentPayment}
+                            onChange={handleInstallmentChange}
+                            disabled={isPending}
+                            className="h-4 w-4 rounded border-gray-300 text-[#001D4A] focus:ring-[#001D4A]"
+                        />
+
+                        <label
+                            htmlFor="isInstallmentPayment"
+                            className="text-sm font-medium text-gray-700 cursor-pointer"
+                        >
+                            Registrar pago en cuotas
+                        </label>
+                    </div>
+
+
+                    {/* CUOTA */}
+                    {/* <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Referencia de cuota
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="installmentId"
+                                    value={form.installmentId}
+                                    onChange={handleChange}
+                                    disabled={isPending}
+                                    placeholder="ID de la cuota"
+                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#001D4A]"
+                                />
+                            </div> */}
+
                     {/* =================================================
                         MONTO PENDIENTE
                     ================================================= */}
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Monto pendiente
-                        </label>
+                    {/* <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Monto pendiente
+                                </label>
 
-                        <input
-                            type="number"
-                            name="pendingAmount"
-                            value={form.pendingAmount}
-                            disabled
-                            placeholder="0.00"
-                            className="
+                                <input
+                                    type="number"
+                                    name="pendingAmount"
+                                    value={form.pendingAmount}
+                                    disabled
+                                    placeholder="0.00"
+                                    className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -497,9 +761,8 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
                                 bg-slate-50
                                 text-slate-600
                             "
-                        />
-                    </div>
-
+                                />
+                            </div> */}
                 </div>
             </GenericDrawer>
         </>
