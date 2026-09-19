@@ -43,6 +43,11 @@ export function useCreatePaymentPlanOrchestrator() {
           "paymentPlansOrchestrator",
         ],
       });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "invoices",
+        ],
+      });
     },
   });
 }

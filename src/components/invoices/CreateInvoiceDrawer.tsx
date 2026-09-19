@@ -550,7 +550,7 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
                         invoiceId: String(invoiceId),
                         numberOfInstallments,
                         frequencyDays: 30,
-                        interestRate: 0,
+                        interestRate: Number(form.interestRate || 0),
                         lateFreePercentage: 0,
                         gracePeriodDays: 0,
                         firstDueDate: form.firstDueDate,
