@@ -6,6 +6,7 @@ import type { InvoiceStatus } from "../../utils/invoiceStatus.enum";
 import { useCreateInvoiceWithPayment } from "../../hooks/useInvoicesPayment";
 import type { PaymentMethods } from "../../utils/paymentMethodsStatus.enum";
 import type { CreateInvoiceWithPaymentDto } from "../../models/InvoicePaymentModel";
+import { useCreatePaymentPlanOrchestrator } from "../../hooks/usePaymentPlanOrchestrator";
 
 interface CreateInvoiceProps {
     isOpen: boolean;
@@ -26,6 +27,11 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
         isPending: isLoadingInvoiceWithPayment,
     } = useCreateInvoiceWithPayment();
 
+    const {
+        mutate: createPaymentPlan,
+        isPending: isLoadingPaymentPlan,
+    } = useCreatePaymentPlanOrchestrator();
+
     const [form, setForm] = useState<{
         patientId: string;
         patientFullName: string;
@@ -40,6 +46,10 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
         servedBy: string;
         paymentDate: string;
         installmentId: string;
+
+        numberOfInstallments: number;
+        interestRate: string;
+        firstDueDate: string;
     }>({
         patientId: "",
         patientFullName: "",
@@ -54,6 +64,10 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
         servedBy: "b0459bf8f4656468",
         paymentDate: new Date().toISOString().split("T")[0],
         installmentId: "",
+
+        numberOfInstallments: 0,
+        interestRate: "",
+        firstDueDate: new Date().toISOString().split("T")[0],
     });
 
     const [toast, setToast] = useState<{
@@ -86,6 +100,10 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
             servedBy: "b0459bf8f4656468",
             paymentDate: new Date().toISOString().split("T")[0],
             installmentId: "",
+
+            numberOfInstallments: 0,
+            interestRate: "",
+            firstDueDate: new Date().toISOString().split("T")[0],
         });
 
         setToast(null);
@@ -151,6 +169,10 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
                 servedBy: "b0459bf8f4656468",
                 paymentDate: new Date().toISOString().split("T")[0],
                 installmentId: "",
+
+                numberOfInstallments: 0,
+                interestRate: "",
+                firstDueDate: new Date().toISOString().split("T")[0],
             });
 
             return;
@@ -220,15 +242,23 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
             ...prev,
             isInstallmentPayment: checked,
 
-            // Limpiar datos de pago cuando se desactiva
+            // Si se activa el plan de cuotas,
+            // no se registra ningún pago inicial.
+            paidAmount: checked ? "0" : "",
+
+            // Todo el total queda pendiente.
+            pendingAmount: checked
+                ? prev.totalAmount
+                : prev.pendingAmount,
+
+            // Limpiar datos de pago inicial.
             ...(checked
-                ? {}
-                : {
+                ? {
                     paymentMethod: "CASH",
                     transactionReference: "",
-                    servedBy: "b0459bf8f4656468",
                     installmentId: "",
-                }),
+                }
+                : {}),
         }));
     };
 
@@ -334,25 +364,6 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
             return;
         }
 
-        /*
-         * =========================================================
-         * PAGO EN CUOTAS
-         * =========================================================
-         *
-         * Si seleccionó cuotas, el monto debe ser menor al total.
-         */
-
-        if (
-            form.isInstallmentPayment &&
-            paidAmount >= totalAmount
-        ) {
-            showToast(
-                "error",
-                "Si desea pagar el total de una vez, desmarque 'Registrar pago en cuotas'."
-            );
-
-            return;
-        }
 
         /*
          * =========================================================
@@ -394,6 +405,46 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
             return;
         }
 
+        if (form.isInstallmentPayment) {
+            const numberOfInstallments =
+                Number(form.numberOfInstallments || 0);
+
+            const interestRate =
+                Number(form.interestRate || 0);
+
+            if (numberOfInstallments < 2) {
+                showToast(
+                    "error",
+                    "Debe indicar al menos 2 cuotas."
+                );
+                return;
+            }
+
+            if (interestRate < 0) {
+                showToast(
+                    "error",
+                    "El porcentaje de interés no puede ser negativo."
+                );
+                return;
+            }
+
+            if (interestRate > 100) {
+                showToast(
+                    "error",
+                    "El porcentaje de interés no puede ser mayor al 100%."
+                );
+                return;
+            }
+
+            if (!form.firstDueDate) {
+                showToast(
+                    "error",
+                    "Debe seleccionar la primera fecha de pago."
+                );
+                return;
+            }
+        }
+
         const invoice = {
             patientId,
             patientFullName,
@@ -422,18 +473,111 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
         };
 
         createInvoiceWithPayment(data, {
-            onSuccess: () => {
-                setToast({
-                    type: "success",
-                    message:
-                        "Factura y pago creados correctamente.",
-                });
+            onSuccess: (response) => {
+                // setToast({
+                //     type: "success",
+                //     message:
+                //         "Factura y pago creados correctamente.",
+                // });
 
-                setTimeout(() => {
-                    onHide();
-                }, 1000);
+                // setTimeout(() => {
+                //     onHide();
+                // }, 1000);
 
-                cleanForm();
+                // cleanForm();
+
+                // =====================================================
+                // PAGO NORMAL
+                // =====================================================
+
+                if (!form.isInstallmentPayment) {
+                    setToast({
+                        type: "success",
+                        message:
+                            "Factura y pago creados correctamente.",
+                    });
+
+                    setTimeout(() => {
+                        cleanForm();
+                    }, 1000);
+
+                    return;
+                }
+
+                // =====================================================
+                // VALIDAR DATOS DEL PLAN
+                // =====================================================
+
+                const numberOfInstallments =
+                    Number(form.numberOfInstallments || 0);
+
+                if (numberOfInstallments < 2) {
+                    showToast(
+                        "error",
+                        "Debe indicar al menos 2 cuotas."
+                    );
+                    return;
+                }
+
+                if (!form.firstDueDate) {
+                    showToast(
+                        "error",
+                        "Debe seleccionar la primera fecha de pago."
+                    );
+                    return;
+                }
+
+                // =====================================================
+                // OBTENER ID DE FACTURA
+                // =====================================================
+
+                const invoiceId = response?.invoice.id;
+
+                if (!invoiceId) {
+                    showToast(
+                        "error",
+                        "La factura fue creada, pero no se pudo obtener su ID para crear el plan de cuotas."
+                    );
+                    return;
+                }
+
+                // =====================================================
+                // CREAR PLAN DE PAGOS
+                // =====================================================
+
+                createPaymentPlan(
+                    {
+                        invoiceId: String(invoiceId),
+                        numberOfInstallments,
+                        frequencyDays: 30,
+                        interestRate: 0,
+                        lateFreePercentage: 0,
+                        gracePeriodDays: 0,
+                        firstDueDate: form.firstDueDate,
+                    },
+                    {
+                        onSuccess: () => {
+                            setToast({
+                                type: "success",
+                                message:
+                                    "Factura, pago y plan de cuotas creados correctamente.",
+                            });
+
+                            setTimeout(() => {
+                                cleanForm();
+                            }, 1000);
+                        },
+
+                        onError: (error) => {
+                            setToast({
+                                type: "error",
+                                message:
+                                    error.message ||
+                                    "La factura fue creada, pero no se pudo crear el plan de cuotas.",
+                            });
+                        },
+                    }
+                );
             },
             onError: (error) => {
                 setToast({
@@ -451,6 +595,7 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
 
     const isPending =
         isLoadingTreatments ||
+        isLoadingPaymentPlan ||
         isLoadingInvoiceWithPayment;
 
     return (
@@ -669,21 +814,22 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
                         MONTO PAGADO
                     ================================================= */}
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Monto recibido
-                        </label>
+                    {!form.isInstallmentPayment && (
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Monto recibido
+                            </label>
 
-                        <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            name="paidAmount"
-                            value={form.paidAmount}
-                            onChange={handlePaidAmountChange}
-                            disabled={!form.treatmentPlanId}
-                            placeholder="Ingrese una cantidad"
-                            className="
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                name="paidAmount"
+                                value={form.paidAmount}
+                                onChange={handlePaidAmountChange}
+                                disabled={!form.treatmentPlanId}
+                                placeholder="Ingrese una cantidad"
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -696,8 +842,9 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
                                 disabled:bg-slate-50
                                 disabled:cursor-not-allowed
                             "
-                        />
-                    </div>
+                            />
+                        </div>
+                    )}
 
                     {/* CHECKBOX */}
                     <div className="flex items-center gap-3 py-2">
@@ -718,51 +865,183 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
                         </label>
                     </div>
 
+                    {form.isInstallmentPayment && (
+                        <>
+                            {/* =================================================
+                                CANTIDAD DE CUOTAS
+                            ================================================= */}
 
-                    {/* CUOTA */}
-                    {/* <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Referencia de cuota
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="installmentId"
-                                    value={form.installmentId}
-                                    onChange={handleChange}
-                                    disabled={isPending}
-                                    placeholder="ID de la cuota"
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#001D4A]"
-                                />
-                            </div> */}
-
-                    {/* =================================================
-                        MONTO PENDIENTE
-                    ================================================= */}
-
-                    {/* <div>
+                            <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Monto pendiente
+                                    Cantidad de cuotas
                                 </label>
 
                                 <input
                                     type="number"
-                                    name="pendingAmount"
-                                    value={form.pendingAmount}
-                                    disabled
-                                    placeholder="0.00"
+                                    min="2"
+                                    step="1"
+                                    name="numberOfInstallments"
+                                    value={form.numberOfInstallments}
+                                    onChange={handleChange}
+                                    disabled={isPending}
+                                    placeholder="Ej. 6"
                                     className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                bg-slate-50
-                                text-slate-600
-                            "
+                                        w-full
+                                        px-3 py-2.5
+                                        border border-slate-200
+                                        rounded-lg
+                                        text-sm
+                                        outline-none
+                                        focus:border-blue-500
+                                        focus:ring-2
+                                        focus:ring-blue-500/10
+                                        disabled:bg-slate-50
+                                    "
                                 />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Interés (%)
+                                </label>
+
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    name="interestRate"
+                                    value={form.interestRate}
+                                    onChange={handleChange}
+                                    disabled={isPending}
+                                    placeholder="Ej. 10"
+                                    className="
+                                        w-full
+                                        px-3 py-2.5
+                                        border border-slate-200
+                                        rounded-lg
+                                        text-sm
+                                        outline-none
+                                        focus:border-blue-500
+                                        focus:ring-2
+                                        focus:ring-blue-500/10
+                                        disabled:bg-slate-50
+                                    "
+                                />
+
+                                <p className="mt-1 text-xs text-slate-500">
+                                    Porcentaje de interés aplicado al plan de cuotas.
+                                </p>
+                            </div>
+
+                            {/* =================================================
+                                MÍNIMO A PAGAR
+                            ================================================= */}
+
+                            {/* <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Mínimo a pagar por cuota
+                                </label>
+
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    name="minimumPayment"
+                                    value={form.minimumPayment}
+                                    onChange={handleChange}
+                                    disabled={isPending}
+                                    placeholder="Ej. 500"
+                                    className="
+                                        w-full
+                                        px-3 py-2.5
+                                        border border-slate-200
+                                        rounded-lg
+                                        text-sm
+                                        outline-none
+                                        focus:border-blue-500
+                                        focus:ring-2
+                                        focus:ring-blue-500/10
+                                        disabled:bg-slate-50
+                                    "
+                                />
+
+                                <p className="mt-1 text-xs text-slate-500">
+                                    Monto mínimo que debe pagar el paciente en cada cuota.
+                                </p>
                             </div> */}
+
+                            {/* =================================================
+                                PERÍODO DE GRACIA
+                            ================================================= */}
+
+                            {/* <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Período de gracia (días)
+                                </label>
+
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="1"
+                                    name="gracePeriodDays"
+                                    value={form.gracePeriodDays}
+                                    onChange={handleChange}
+                                    disabled={isPending}
+                                    placeholder="Ej. 2"
+                                    className="
+                                        w-full
+                                        px-3 py-2.5
+                                        border border-slate-200
+                                        rounded-lg
+                                        text-sm
+                                        outline-none
+                                        focus:border-blue-500
+                                        focus:ring-2
+                                        focus:ring-blue-500/10
+                                        disabled:bg-slate-50
+                                    "
+                                />
+
+                                <p className="mt-1 text-xs text-slate-500">
+                                    Días adicionales después del vencimiento para realizar el pago.
+                                </p>
+                            </div> */}
+
+                            {/* =================================================
+                                PRIMERA FECHA DE PAGO
+                            ================================================= */}
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Primera fecha de pago
+                                </label>
+
+                                <input
+                                    type="date"
+                                    name="firstDueDate"
+                                    value={form.firstDueDate}
+                                    onChange={handleChange}
+                                    disabled={isPending}
+                                    className="
+                                        w-full
+                                        px-3 py-2.5
+                                        border border-slate-200
+                                        rounded-lg
+                                        text-sm
+                                        outline-none
+                                        focus:border-blue-500
+                                        focus:ring-2
+                                        focus:ring-blue-500/10
+                                        disabled:bg-slate-50
+                                    "
+                                />
+
+                                <p className="mt-1 text-xs text-slate-500">
+                                    Cada cuota se calculará con 30 días de diferencia.
+                                </p>
+                            </div>
+                        </>
+                    )}
                 </div>
             </GenericDrawer>
         </>
