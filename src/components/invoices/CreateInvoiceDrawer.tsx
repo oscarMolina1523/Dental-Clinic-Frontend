@@ -3,7 +3,7 @@ import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import { useTreatmentPlans } from "../../hooks/useTreatmentPlan";
 import type { InvoiceStatus } from "../../utils/invoiceStatus.enum";
-import { useCreateInvoiceWithPayment } from "../../hooks/useInvoicesPaymentOrchestrator";
+import { useCreateInvoiceWithPayment } from "../../hooks/useInvoicesPayment";
 import type { PaymentMethods } from "../../utils/paymentMethodsStatus.enum";
 import type { CreateInvoiceWithPaymentDto } from "../../models/InvoicePaymentModel";
 
