@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Ban, Plus } from "lucide-react";
+import { Ban, Eye, Plus } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -10,6 +10,7 @@ import type Invoice from "../models/InvoiceModel";
 import CreateInvoiceDrawer from "../components/invoices/CreateInvoiceDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
 import Toast from "../shared/Toast";
+import ShowDetailsInvoiceDrawer from "../components/invoices/ShowDetailsInvoiceDrawer";
 
 const InvoicesPage: React.FC = () => {
     const {
@@ -27,6 +28,9 @@ const InvoicesPage: React.FC = () => {
     const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
         useState(false);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] =
+        useState(false);
+
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
     const [toast, setToast] = useState<{
@@ -160,6 +164,14 @@ const InvoicesPage: React.FC = () => {
 
     const actions: TableAction<typeof invoices[number]>[] = [
         {
+            label: "Ver Factura",
+            icon: <Eye className="w-4 h-4" />,
+            onClick: (invoice) => {
+                setSelectedInvoice(invoice);
+                setIsDetailsDrawerOpen(true);
+            },
+        },
+        {
             label: "Cancelar Factura",
             icon: <Ban className="w-4 h-4" />,
             onClick: (invoice) => {
@@ -167,24 +179,6 @@ const InvoicesPage: React.FC = () => {
                 setIsCancelModalOpen(true);
             },
         },
-        // {
-        //     label: "Cambios de estados",
-        //     icon: <Menu className="w-4 h-4 text-amber-600" />,
-        //     onClick: (invoice) => {
-        //         setSelectedAppointment(invoice);
-        //         setIsStatusModalOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
-        //     },
-        //     hidden: (invoice) => {
-        //         /*
-        //          * El menú aparece para Facturas que todavía
-        //          * permiten cambios de estado.
-        //          *
-        //          * También aparece para COMPLETED porque
-        //          * desde ahí podemos crear la receta.
-        //          */
-        //         return !canChangeStatus(invoice.status);
-        //     },
-        // },
     ];
 
     const handleSearch = (value: string) => {
@@ -276,6 +270,7 @@ const InvoicesPage: React.FC = () => {
                     setSelectedInvoice(null);
                 }}
             />
+            <ShowDetailsInvoiceDrawer isOpen={isDetailsDrawerOpen} onHide={()=> setIsDetailsDrawerOpen(false)} invoice={selectedInvoice} />
         </div>
     );
 }

@@ -34,7 +34,7 @@ export function usePaymentPlanById(
 
       if (!id) {
         throw new Error(
-          "El ID del plan de pago es requerido"
+          "El ID del plan de la fatcura es requerida"
         );
       }
 
