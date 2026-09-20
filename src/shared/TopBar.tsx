@@ -12,7 +12,6 @@ const sections: Record<string, string> = {
     "/treatments": "Tratamientos",
     "/treatment-plan": "Planes de Tratamiento",
     "/invoices": "Facturación",
-    "/caja": "Caja",
     "/products": "Productos",
     "/inventories": "Inventario",
     "/inventory-lotes": "Administrador de Lotes",
