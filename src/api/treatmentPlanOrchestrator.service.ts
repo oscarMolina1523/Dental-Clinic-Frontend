@@ -8,18 +8,12 @@ import HTTPService from "./http-service";
 
 export default class TreatmentPlanOrchestratorService
   extends HTTPService {
-
   private path: string;
 
-
   constructor() {
-
     super();
-
     this.path = "treatmentPlanOrchestrator";
-
   }
-
 
   // ============================================================
   // GET ALL COMPLETE TREATMENT PLANS

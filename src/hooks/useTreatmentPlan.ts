@@ -5,7 +5,8 @@ import {
 } from "@tanstack/react-query";
 
 import type { TreatmentPlanDto } from "../models/TreatmentPlanModel";
-import TreatmentPlanService from "../api/treatmentPLan.service";
+import TreatmentPlanService from "../api/treatmentPlan.service";
+import type TreatmentPlan from "../models/TreatmentPlanModel";
 
 const treatmentPlanService = new TreatmentPlanService();
 
@@ -14,7 +15,7 @@ const treatmentPlanService = new TreatmentPlanService();
 ========================================================= */
 
 export function useTreatmentPlans() {
-  return useQuery<TreatmentPlanDto[], Error>({
+  return useQuery<TreatmentPlan[], Error>({
     queryKey: ["treatmentPlans"],
     queryFn: () => treatmentPlanService.getTreatmentPlans(),
   });
