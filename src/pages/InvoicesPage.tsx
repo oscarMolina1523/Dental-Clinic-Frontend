@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Ban, Eye, Plus } from "lucide-react";
+import { Ban, Eye, Pencil, Plus } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -11,6 +11,7 @@ import CreateInvoiceDrawer from "../components/invoices/CreateInvoiceDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
 import Toast from "../shared/Toast";
 import ShowDetailsInvoiceDrawer from "../components/invoices/ShowDetailsInvoiceDrawer";
+import RegisterPaymentDrawer from "../components/invoices/RegisterPaymentDrawer";
 
 const InvoicesPage: React.FC = () => {
     const {
@@ -28,6 +29,8 @@ const InvoicesPage: React.FC = () => {
     const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
         useState(false);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [isRegisterPaymentOpen, setIsRegisterPaymentOpen] =
+        useState(false);
     const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] =
         useState(false);
 
@@ -179,6 +182,14 @@ const InvoicesPage: React.FC = () => {
                 setIsCancelModalOpen(true);
             },
         },
+        {
+            label: "Editar inventario",
+            icon: <Pencil className="w-4 h-4" />,
+            onClick: (invoice) => {
+                setSelectedInvoice(invoice);
+                setIsRegisterPaymentOpen(true);
+            },
+        },
     ];
 
     const handleSearch = (value: string) => {
@@ -270,7 +281,8 @@ const InvoicesPage: React.FC = () => {
                     setSelectedInvoice(null);
                 }}
             />
-            <ShowDetailsInvoiceDrawer isOpen={isDetailsDrawerOpen} onHide={()=> setIsDetailsDrawerOpen(false)} invoice={selectedInvoice} />
+            <ShowDetailsInvoiceDrawer isOpen={isDetailsDrawerOpen} onHide={() => setIsDetailsDrawerOpen(false)} invoice={selectedInvoice} />
+            <RegisterPaymentDrawer  isOpen={isRegisterPaymentOpen}  onHide={()=> setIsRegisterPaymentOpen(false)} invoice={selectedInvoice}/>
         </div>
     );
 }

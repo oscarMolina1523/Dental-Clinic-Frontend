@@ -57,7 +57,7 @@ export default class PaymentPlanOrchestratorService
         RegisterPaymentResponse,
         RegisterPaymentRequest
       >(
-        `${this.path}/register-payment`,
+        `${this.path}/payment`,
         data
       );
 

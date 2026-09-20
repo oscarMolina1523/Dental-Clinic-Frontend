@@ -89,7 +89,7 @@ export function useCreatePaymentPlanOrchestrator() {
    REGISTER PAYMENT
 ========================================================= */
 
-export function useRegisterPayment() {
+export function useRegisterPayment(invoiceId?: string) {
   const queryClient = useQueryClient();
 
   return useMutation<
@@ -107,10 +107,25 @@ export function useRegisterPayment() {
 
     onSuccess: () => {
 
+      if (invoiceId) {
+        queryClient.invalidateQueries({
+          queryKey: [
+            "paymentPlanOrchestrator",
+            invoiceId,
+          ],
+        });
+      }
+
       // Actualizar información relacionada con pagos
       queryClient.invalidateQueries({
         queryKey: [
           "paymentPlansOrchestrator",
+        ],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "invoices",
         ],
       });
 
