@@ -1,4 +1,4 @@
-import type { CreatePaymentPlanRequest, CreatePaymentPlanResponse, GetPaymentPlanByIdResponse, RegisterPaymentRequest, RegisterPaymentResponse } from "../models/PaymentPlanOrchestrator";
+import type { CancelPaymentPlanResponse, CreatePaymentPlanRequest, CreatePaymentPlanResponse, GetPaymentPlanByIdResponse, RegisterPaymentRequest, RegisterPaymentResponse } from "../models/PaymentPlanOrchestrator";
 import HTTPService from "./http-service";
 
 export default class PaymentPlanOrchestratorService
@@ -59,6 +59,18 @@ export default class PaymentPlanOrchestratorService
       >(
         `${this.path}/payment`,
         data
+      );
+
+    return response || null;
+  }
+
+  async cancelPaymentPlan(
+    invoiceId: string
+  ): Promise<CancelPaymentPlanResponse | null> {
+
+    const response =
+      await super.delete<CancelPaymentPlanResponse>(
+        `${this.path}/cancel/${invoiceId}`
       );
 
     return response || null;

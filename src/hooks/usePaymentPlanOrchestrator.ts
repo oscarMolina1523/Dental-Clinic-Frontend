@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 
 import type {
+  CancelPaymentPlanResponse,
   CreatePaymentPlanRequest,
   CreatePaymentPlanResponse,
   GetPaymentPlanByIdResponse,
@@ -129,6 +130,72 @@ export function useRegisterPayment(invoiceId?: string) {
         ],
       });
 
+      queryClient.invalidateQueries({
+        queryKey: [
+          "payments",
+        ],
+      });
+    },
+  });
+}
+
+export function useCancelPaymentPlan(
+  invoiceId?: string
+) {
+
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    CancelPaymentPlanResponse | null,
+    Error,
+    void
+  >({
+
+    mutationKey: [
+      "cancelPaymentPlan",
+      invoiceId,
+    ],
+
+    mutationFn: () => {
+
+      if (!invoiceId) {
+        throw new Error(
+          "El ID de la factura es requerido"
+        );
+      }
+
+      return paymentPlanOrchestratorService
+        .cancelPaymentPlan(invoiceId);
+    },
+
+    onSuccess: () => {
+
+      if (invoiceId) {
+
+        // Actualizar detalle del plan
+        queryClient.invalidateQueries({
+          queryKey: [
+            "paymentPlanOrchestrator",
+            invoiceId,
+          ],
+        });
+      }
+
+      // Actualizar listado de planes
+      queryClient.invalidateQueries({
+        queryKey: [
+          "paymentPlansOrchestrator",
+        ],
+      });
+
+      // Actualizar factura
+      queryClient.invalidateQueries({
+        queryKey: [
+          "invoices",
+        ],
+      });
+
+      // Actualizar pagos
       queryClient.invalidateQueries({
         queryKey: [
           "payments",

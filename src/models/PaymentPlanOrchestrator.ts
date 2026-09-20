@@ -40,3 +40,9 @@ export interface GetPaymentPlanByIdResponse {
   payments: Payment[];
 
 }
+
+export interface CancelPaymentPlanResponse {
+  invoice: Invoice;
+  paymentPlan: PaymentPlan;
+  installments: Installment[];
+}

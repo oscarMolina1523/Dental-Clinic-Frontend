@@ -96,8 +96,12 @@ export default class HTTPService {
     }
   }
 
-  async delete(path: string): Promise<void> {
+  async delete<T = void>(
+    path: string
+  ): Promise<T | null> {
+
     try {
+
       const token = await this.getToken();
       const url = `${this.baseUrl}/${path}`;
 
@@ -110,12 +114,15 @@ export default class HTTPService {
       });
 
       if (!response.ok) {
+
         const text = await response.text();
 
         let message = "Error en la eliminación";
 
         if (text) {
+
           try {
+
             const json = JSON.parse(text);
 
             if (
@@ -127,6 +134,7 @@ export default class HTTPService {
                 (json as { message: unknown }).message
               );
             }
+
           } catch {
             // La respuesta no era JSON
           }
@@ -135,12 +143,33 @@ export default class HTTPService {
         throw new Error(message);
       }
 
-      // El backend no devuelve contenido.
-      // Puede ser 204 No Content o 200 sin body.
-      return;
+      // ----------------------------------------------------------
+      // No Content
+      // ----------------------------------------------------------
+
+      if (response.status === 204) {
+        return null;
+      }
+
+      // ----------------------------------------------------------
+      // Intentar obtener JSON
+      // ----------------------------------------------------------
+
+      const text = await response.text();
+
+      if (!text) {
+        return null;
+      }
+
+      return JSON.parse(text) as T;
 
     } catch (error: unknown) {
-      console.error("Error deleting data:", error);
+
+      console.error(
+        "Error deleting data:",
+        error
+      );
+
       throw error;
     }
   }

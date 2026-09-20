@@ -5,23 +5,20 @@ import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
-import { useCancelInvoice, useInvoices } from "../hooks/useInvoices";
+import { useInvoices } from "../hooks/useInvoices";
 import type Invoice from "../models/InvoiceModel";
 import CreateInvoiceDrawer from "../components/invoices/CreateInvoiceDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
 import Toast from "../shared/Toast";
 import ShowDetailsInvoiceDrawer from "../components/invoices/ShowDetailsInvoiceDrawer";
 import RegisterPaymentDrawer from "../components/invoices/RegisterPaymentDrawer";
+import { useCancelPaymentPlan } from "../hooks/usePaymentPlanOrchestrator";
 
 const InvoicesPage: React.FC = () => {
     const {
         data: invoices = []
     } = useInvoices();
 
-    const {
-        mutate: cancelInvoice,
-        isPending: isCanceling
-    } = useCancelInvoice();
 
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -35,6 +32,11 @@ const InvoicesPage: React.FC = () => {
         useState(false);
 
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+    const {
+        mutate: cancelPaymentPlan,
+        isPending: isCanceling
+    } = useCancelPaymentPlan(selectedInvoice?.id);
 
     const [toast, setToast] = useState<{
         type: "success" | "error";
@@ -176,6 +178,9 @@ const InvoicesPage: React.FC = () => {
         },
         {
             label: "Cancelar Factura",
+            hidden: (invoice) =>
+                invoice.status == "PAID" ||
+                invoice.status == "CANCELLED",
             icon: <Ban className="w-4 h-4" />,
             onClick: (invoice) => {
                 setSelectedInvoice(invoice);
@@ -204,19 +209,22 @@ const InvoicesPage: React.FC = () => {
 
     const handleCancelInvoiceConfirm = () => {
         if (!selectedInvoice) return;
-        const invoiceId = selectedInvoice.id;
 
-        cancelInvoice(invoiceId, {
+        cancelPaymentPlan(undefined, {
             onSuccess: () => {
                 setSelectedInvoice(null);
                 setIsCancelModalOpen(false);
+
+                showToast(
+                    "success",
+                    "El plan de pago, sus cuotas y la factura fueron cancelados correctamente."
+                );
             },
 
             onError: (error) => {
                 showToast(
                     "error",
-                    error.message ||
-                    "No se pudo actualizar el inventario."
+                    error.message || "No se pudo cancelar el plan de pago."
                 );
             },
         });
@@ -282,7 +290,7 @@ const InvoicesPage: React.FC = () => {
                 }}
             />
             <ShowDetailsInvoiceDrawer isOpen={isDetailsDrawerOpen} onHide={() => setIsDetailsDrawerOpen(false)} invoice={selectedInvoice} />
-            <RegisterPaymentDrawer  isOpen={isRegisterPaymentOpen}  onHide={()=> setIsRegisterPaymentOpen(false)} invoice={selectedInvoice}/>
+            <RegisterPaymentDrawer isOpen={isRegisterPaymentOpen} onHide={() => setIsRegisterPaymentOpen(false)} invoice={selectedInvoice} />
         </div>
     );
 }
