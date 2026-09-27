@@ -11,7 +11,7 @@ import CreateAppointmentDrawer from "../components/appointment/CreateAppointment
 import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawet";
 import Toast from "../shared/Toast";
 import useAppointmentPage from "../components/appointment/useAppointmentPage";
-import CreateClinicalProgressDrawer from "../components/medicalPrescription/CreateClinicalProgressDrawer";
+import CreateClinicalProgressDrawer from "../components/medical/CreateClinicalProgressDrawer";
 
 const AppointmentPage: React.FC = () => {
     const {
@@ -328,7 +328,7 @@ const AppointmentPage: React.FC = () => {
                                 >
                                     <Plus className="w-4 h-4 text-emerald-600" />
 
-                                    <span>Crear Receta</span>
+                                    <span>Registrar progreso en expediente</span>
                                 </button>
                             )}
 
