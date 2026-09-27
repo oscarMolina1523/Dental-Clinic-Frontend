@@ -21,25 +21,10 @@ import type {
     PatientAttachmentDto,
 } from "../../models/PatientAttachmentModel";
 
-import {
-    useAddClinicalProgress,
-} from "../../hooks/useClinicalProgress";
-
-import {
-    useCreateMedicalPrescriptionOrchestrator,
-} from "../../hooks/useMedicalPrescriptionOrchestrator";
-
-import {
-    useCreateDentalChartOrchestrator,
-} from "../../hooks/useDentalChartOrchestrator";
-
-import {
-    useAddPatientAttachment,
-} from "../../hooks/usePatientAttachment";
-
 import MedicalPrescriptionSection from "./MedicalPrescriptionSection";
 import DentalChartSection from "./DentalChartSection";
 import PatientAttachmentSection from "./PatientAttachmentSection";
+import { useAddClinicalProgressOrchestrator } from "../../hooks/useClinicalProgressOrchestrator";
 
 interface CreateClinicalProgressDrawerProps {
     isOpen: boolean;
@@ -54,6 +39,11 @@ const CreateClinicalProgressDrawer: React.FC<
     onHide,
     appointment,
 }) => {
+        const {
+            mutateAsync: addClinicalProgressOrchestrator,
+            isPending,
+        } = useAddClinicalProgressOrchestrator();
+
         const [toast, setToast] = useState<{
             type: "success" | "error";
             message: string;
@@ -122,33 +112,27 @@ const CreateClinicalProgressDrawer: React.FC<
          * =========================================================
          */
 
-        const {
-            mutateAsync: addClinicalProgress,
-            isPending: isCreatingClinicalProgress,
-        } = useAddClinicalProgress();
+        // const {
+        //     mutateAsync: addClinicalProgress,
+        //     isPending: isCreatingClinicalProgress,
+        // } = useAddClinicalProgress();
 
-        const {
-            mutateAsync: createMedicalPrescription,
-            isPending: isCreatingPrescription,
-        } =
-            useCreateMedicalPrescriptionOrchestrator();
+        // const {
+        //     mutateAsync: createMedicalPrescription,
+        //     isPending: isCreatingPrescription,
+        // } =
+        //     useCreateMedicalPrescriptionOrchestrator();
 
-        const {
-            mutateAsync: createDentalChart,
-            isPending: isCreatingDentalChart,
-        } =
-            useCreateDentalChartOrchestrator();
+        // const {
+        //     mutateAsync: createDentalChart,
+        //     isPending: isCreatingDentalChart,
+        // } =
+        //     useCreateDentalChartOrchestrator();
 
-        const {
-            mutateAsync: addPatientAttachment,
-            isPending: isCreatingAttachment,
-        } = useAddPatientAttachment();
-
-        const isPending =
-            isCreatingClinicalProgress ||
-            isCreatingPrescription ||
-            isCreatingDentalChart ||
-            isCreatingAttachment;
+        // const {
+        //     mutateAsync: addPatientAttachment,
+        //     isPending: isCreatingAttachment,
+        // } = useAddPatientAttachment();
 
 
 
@@ -386,6 +370,131 @@ const CreateClinicalProgressDrawer: React.FC<
          * =========================================================
          */
 
+        // const handleSubmit = async () => {
+        //     if (!validateClinicalProgress()) {
+        //         return;
+        //     }
+
+        //     if (!validateOptionalSections()) {
+        //         return;
+        //     }
+
+        //     try {
+        //         /*
+        //          * =====================================================
+        //          * PASO 1
+        //          * CREAR CLINICAL PROGRESS
+        //          * =====================================================
+        //          */
+
+        //         const createdClinicalProgress =
+        //             await addClinicalProgress({
+        //                 patientId: clinicalProgress.patientId,
+        //                 dateId: clinicalProgress.dateId,
+        //                 dentistId: clinicalProgress.dentistId,
+        //                 diagnosis:
+        //                     clinicalProgress.diagnosis.trim(),
+        //                 treatmentId:
+        //                     clinicalProgress.treatmentId.trim(),
+        //                 observations:
+        //                     clinicalProgress.observations.trim(),
+        //                 registrationDate:
+        //                     clinicalProgress.registrationDate,
+        //             });
+
+        //         if (!createdClinicalProgress?.id) {
+        //             throw new Error(
+        //                 "No se obtuvo el ID del progreso clínico."
+        //             );
+        //         }
+
+        //         const newClinicalProgressId =
+        //             createdClinicalProgress.id;
+
+        //         setClinicalProgressId(newClinicalProgressId);
+        //         /*
+        //          * =====================================================
+        //          * PASO 2
+        //          * CREAR SOLAMENTE LAS SECCIONES QUE TENGAN DATOS
+        //          * =====================================================
+        //          */
+
+        //         const promises: Promise<unknown>[] = [];
+
+        //         /*
+        //          * RECETA
+        //          */
+
+        //         if (medicalPrescription) {
+        //             promises.push(
+        //                 createMedicalPrescription({
+        //                     ...medicalPrescription,
+
+        //                     data: {
+        //                         ...medicalPrescription.data,
+        //                         clinicalProgressId: newClinicalProgressId,
+        //                     },
+        //                 })
+        //             );
+        //         }
+
+        //         /*
+        //          * ODONTOGRAMA
+        //          */
+
+        //         if (dentalChart) {
+        //             promises.push(
+        //                 createDentalChart({
+        //                     ...dentalChart,
+        //                     dentalChart: {
+        //                         ...dentalChart.dentalChart,
+        //                         clinicalProgressId: newClinicalProgressId,
+        //                     },
+        //                 })
+        //             );
+        //         }
+
+        //         /*
+        //          * ADJUNTO
+        //          */
+
+        //         if (patientAttachment) {
+        //             promises.push(
+        //                 addPatientAttachment({
+        //                     ...patientAttachment,
+        //                     clinicalProgressId,
+        //                 })
+        //             );
+        //         }
+
+        //         /*
+        //          * =====================================================
+        //          * ESPERAR TODAS LAS SECCIONES OPCIONALES
+        //          * =====================================================
+        //          */
+
+        //         if (promises.length > 0) {
+        //             await Promise.all(promises);
+        //         }
+
+        //         showToast(
+        //             "success",
+        //             "El progreso clínico se creó correctamente."
+        //         );
+
+        //         cleanForm();
+
+        //     } catch (error) {
+        //         showToast(
+        //             "error",
+        //             error instanceof Error
+        //                 ? error.message
+        //                 : "No se pudo crear el progreso clínico."
+        //         );
+        //     }
+        // };
+
+
         const handleSubmit = async () => {
             if (!validateClinicalProgress()) {
                 return;
@@ -398,100 +507,100 @@ const CreateClinicalProgressDrawer: React.FC<
             try {
                 /*
                  * =====================================================
-                 * PASO 1
-                 * CREAR CLINICAL PROGRESS
+                 * CREAR TODO MEDIANTE EL ORCHESTRATOR
                  * =====================================================
                  */
 
-                const createdClinicalProgress =
-                    await addClinicalProgress({
-                        patientId: clinicalProgress.patientId,
-                        dateId: clinicalProgress.dateId,
-                        dentistId: clinicalProgress.dentistId,
-                        diagnosis:
-                            clinicalProgress.diagnosis.trim(),
-                        treatmentId:
-                            clinicalProgress.treatmentId.trim(),
-                        observations:
-                            clinicalProgress.observations.trim(),
-                        registrationDate:
-                            clinicalProgress.registrationDate,
+                const result =
+                    await addClinicalProgressOrchestrator({
+                        clinicalProgress: {
+                            patientId:
+                                clinicalProgress.patientId,
+
+                            dateId:
+                                clinicalProgress.dateId,
+
+                            dentistId:
+                                clinicalProgress.dentistId,
+
+                            diagnosis:
+                                clinicalProgress.diagnosis.trim(),
+
+                            treatmentId:
+                                clinicalProgress.treatmentId.trim(),
+
+                            observations:
+                                clinicalProgress.observations.trim(),
+
+                            registrationDate:
+                                clinicalProgress.registrationDate,
+                        },
+
+                        /*
+                         * RECETA
+                         *
+                         * No se envía clinicalProgressId.
+                         * El backend lo asigna.
+                         */
+
+                        ...(medicalPrescription && {
+                            medicalPrescription: {
+                                data: {
+                                    ...medicalPrescription.data,
+                                },
+                                details:
+                                    medicalPrescription.details,
+                            },
+                        }),
+
+                        /*
+                         * ODONTOGRAMA
+                         *
+                         * No se envía clinicalProgressId.
+                         * El backend lo asigna.
+                         */
+
+                        ...(dentalChart && {
+                            dentalChart: {
+                                dentalChart: {
+                                    ...dentalChart.dentalChart,
+                                },
+                                details:
+                                    dentalChart.details,
+                            },
+                        }),
+
+                        /*
+                         * ADJUNTO
+                         *
+                         * No se envía clinicalProgressId.
+                         * El backend lo asigna.
+                         */
+
+                        ...(patientAttachment && {
+                            patientAttachment: {
+                                ...patientAttachment,
+                            },
+                        }),
                     });
 
-                if (!createdClinicalProgress?.id) {
-                    throw new Error(
-                        "No se obtuvo el ID del progreso clínico."
-                    );
-                }
-
-                const newClinicalProgressId =
-                    createdClinicalProgress.id;
-
-                setClinicalProgressId(newClinicalProgressId);
                 /*
                  * =====================================================
-                 * PASO 2
-                 * CREAR SOLAMENTE LAS SECCIONES QUE TENGAN DATOS
+                 * GUARDAR ID OBTENIDO
                  * =====================================================
                  */
 
-                const promises: Promise<unknown>[] = [];
-
-                /*
-                 * RECETA
-                 */
-
-                if (medicalPrescription) {
-                    promises.push(
-                        createMedicalPrescription({
-                            ...medicalPrescription,
-
-                            data: {
-                                ...medicalPrescription.data,
-                                clinicalProgressId: newClinicalProgressId,
-                            },
-                        })
-                    );
-                }
-
-                /*
-                 * ODONTOGRAMA
-                 */
-
-                if (dentalChart) {
-                    promises.push(
-                        createDentalChart({
-                            ...dentalChart,
-                            dentalChart: {
-                                ...dentalChart.dentalChart,
-                                clinicalProgressId: newClinicalProgressId,
-                            },
-                        })
-                    );
-                }
-
-                /*
-                 * ADJUNTO
-                 */
-
-                if (patientAttachment) {
-                    promises.push(
-                        addPatientAttachment({
-                            ...patientAttachment,
-                            clinicalProgressId,
-                        })
+                if (result?.clinicalProgress?.id) {
+                    setClinicalProgressId(
+                        result.clinicalProgress.id
                     );
                 }
 
                 /*
                  * =====================================================
-                 * ESPERAR TODAS LAS SECCIONES OPCIONALES
+                 * ÉXITO
                  * =====================================================
                  */
-
-                if (promises.length > 0) {
-                    await Promise.all(promises);
-                }
 
                 showToast(
                     "success",
@@ -509,7 +618,6 @@ const CreateClinicalProgressDrawer: React.FC<
                 );
             }
         };
-
         return (
             <>
                 {toast && (
@@ -527,9 +635,9 @@ const CreateClinicalProgressDrawer: React.FC<
                             bg-black/30
                             transition-opacity duration-300
                             ${isOpen
-                                                ? "opacity-100 pointer-events-auto"
-                                                : "opacity-0 pointer-events-none"
-                                            }
+                            ? "opacity-100 pointer-events-auto"
+                            : "opacity-0 pointer-events-none"
+                        }
                             `}
                 />
 
