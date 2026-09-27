@@ -51,9 +51,9 @@ export default class PatientAttachmentService extends HTTPService {
   }
 
   /**
-   * Actualiza una cita
+   * Actualiza un registro
    */
-  async updateAppointment(
+  async updatePatientAttachment(
     id: string,
     patientAttachment: PatientAttachmentDto
   ): Promise<PatientAttachment | null> {
@@ -66,7 +66,7 @@ export default class PatientAttachmentService extends HTTPService {
   }
 
   /**
-   * Elimina una cita por su ID
+   * Elimina un registro por su ID
    */
   async deletePatientAttachment(id: string): Promise<void> {
     await super.delete(`${this.path}/${id}`);
