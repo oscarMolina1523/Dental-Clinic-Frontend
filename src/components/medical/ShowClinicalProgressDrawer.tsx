@@ -474,11 +474,8 @@ const ShowClinicalProgressDrawer: React.FC<
                                   </h4>
                                 </div>
 
-                                <div className="rounded-lg border border-slate-200 p-4">
-                                  <p className="text-sm text-slate-600">
-                                    {item.patientAttachment.fileName ??
-                                      "Archivo adjunto"}
-                                  </p>
+                                <div className="rounded-lg border border-slate-200 overflow-hidden">
+                                  <img src={item.patientAttachment.fileUrl} alt={item.patientAttachment.fileName} className="w-full h-full object-cover"/>
                                 </div>
                               </section>
                             )}
