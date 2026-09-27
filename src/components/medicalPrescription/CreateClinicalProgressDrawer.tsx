@@ -28,7 +28,7 @@ interface CreateMedicalPrescriptionDrawerProps {
    COMPONENTE
    ========================================================= */
 
-const CreateMedicalPrescriptionDrawer: React.FC<
+const CreateClinicalProgressDrawer: React.FC<
     CreateMedicalPrescriptionDrawerProps
 > = ({
     isOpen,
@@ -53,6 +53,7 @@ const CreateMedicalPrescriptionDrawer: React.FC<
 
         const [form, setForm] =
             useState<MedicalPrescriptionDto>({
+                clinicalProgressId: "",
                 patientId: "",
                 patientFullName: "",
                 dentistId: "",
@@ -123,6 +124,7 @@ const CreateMedicalPrescriptionDrawer: React.FC<
         if (appointment !== prevAppointment) {
             setPrevAppointment(appointment);
             setForm({
+                clinicalProgressId: appointment?.id || "",
                 patientId: appointment?.patientId || "",
                 patientFullName: appointment?.patientFullName || "",
                 dentistId: appointment?.dentistId || "",
@@ -141,6 +143,7 @@ const CreateMedicalPrescriptionDrawer: React.FC<
         const cleanForm = () => {
 
             setForm({
+                clinicalProgressId: "",
                 patientId: "",
                 patientFullName: "",
                 dentistId: "",
@@ -326,6 +329,7 @@ const CreateMedicalPrescriptionDrawer: React.FC<
             const request: CreateMedicalPrescriptionRequest = {
 
                 data: {
+                    clinicalProgressId: appointment?.id || "",
                     patientId: form.patientId,
 
                     patientFullName:
@@ -959,4 +963,4 @@ const CreateMedicalPrescriptionDrawer: React.FC<
     };
 
 
-export default CreateMedicalPrescriptionDrawer;
+export default CreateClinicalProgressDrawer;

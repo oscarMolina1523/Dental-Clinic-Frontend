@@ -20,7 +20,7 @@ export default function useAppointmentPage() {
   const [isCancelModalOpen, setIsCancelModalOpen] =
     useState(false);
 
-  const [isPrescriptionDrawerOpen, setIsPrescriptionDrawerOpen] =
+  const [isClinicalProgressDrawerOpen, setIsClinicalProgressDrawerOpen] =
     useState(false);
 
 
@@ -220,7 +220,7 @@ export default function useAppointmentPage() {
     );
   };
 
-  const handleCreatePrescription = (
+  const handleCreateClinicalProgress = (
     appointment: AppointmentModel
   ) => {
 
@@ -228,7 +228,7 @@ export default function useAppointmentPage() {
 
     setIsStatusModalOpen(false);
 
-    setIsPrescriptionDrawerOpen(true);
+    setIsClinicalProgressDrawerOpen(true);
   };
 
 
@@ -314,8 +314,8 @@ export default function useAppointmentPage() {
     isCancelModalOpen,
     setIsCancelModalOpen,
 
-    isPrescriptionDrawerOpen,
-    setIsPrescriptionDrawerOpen,
+    isClinicalProgressDrawerOpen,
+    setIsClinicalProgressDrawerOpen,
 
 
     /* Cita seleccionada */
@@ -348,7 +348,7 @@ export default function useAppointmentPage() {
     handleComplete,
     handleNoShow,
     handleCancelSubmit,
-    handleCreatePrescription,
+    handleCreateClinicalProgress,
 
 
     /* Validaciones */
