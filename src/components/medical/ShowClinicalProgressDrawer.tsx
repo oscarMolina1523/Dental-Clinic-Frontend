@@ -118,21 +118,23 @@ const ShowClinicalProgressDrawer: React.FC<
             border-b
             border-slate-200
             shrink-0
+            bg-[#001D4A]
+            text-white
           "
         >
           <div>
-            <h2 className="text-lg font-bold text-[#001D4A]">
+            <h2 className="text-lg font-bold">
               Expediente clínico
             </h2>
 
             {patient && (
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm mt-1">
                 {getFullName()}
               </p>
             )}
 
             {patient?.idCard && (
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs mt-0.5">
                 Cédula: {patient.idCard}
               </p>
             )}

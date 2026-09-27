@@ -106,35 +106,6 @@ const CreateClinicalProgressDrawer: React.FC<
                     }
             );
         }
-        /*
-         * =========================================================
-         * MUTATIONS
-         * =========================================================
-         */
-
-        // const {
-        //     mutateAsync: addClinicalProgress,
-        //     isPending: isCreatingClinicalProgress,
-        // } = useAddClinicalProgress();
-
-        // const {
-        //     mutateAsync: createMedicalPrescription,
-        //     isPending: isCreatingPrescription,
-        // } =
-        //     useCreateMedicalPrescriptionOrchestrator();
-
-        // const {
-        //     mutateAsync: createDentalChart,
-        //     isPending: isCreatingDentalChart,
-        // } =
-        //     useCreateDentalChartOrchestrator();
-
-        // const {
-        //     mutateAsync: addPatientAttachment,
-        //     isPending: isCreatingAttachment,
-        // } = useAddPatientAttachment();
-
-
 
         /*
          * =========================================================
@@ -363,138 +334,7 @@ const CreateClinicalProgressDrawer: React.FC<
 
             return true;
         };
-
-        /*
-         * =========================================================
-         * CREAR TODO
-         * =========================================================
-         */
-
-        // const handleSubmit = async () => {
-        //     if (!validateClinicalProgress()) {
-        //         return;
-        //     }
-
-        //     if (!validateOptionalSections()) {
-        //         return;
-        //     }
-
-        //     try {
-        //         /*
-        //          * =====================================================
-        //          * PASO 1
-        //          * CREAR CLINICAL PROGRESS
-        //          * =====================================================
-        //          */
-
-        //         const createdClinicalProgress =
-        //             await addClinicalProgress({
-        //                 patientId: clinicalProgress.patientId,
-        //                 dateId: clinicalProgress.dateId,
-        //                 dentistId: clinicalProgress.dentistId,
-        //                 diagnosis:
-        //                     clinicalProgress.diagnosis.trim(),
-        //                 treatmentId:
-        //                     clinicalProgress.treatmentId.trim(),
-        //                 observations:
-        //                     clinicalProgress.observations.trim(),
-        //                 registrationDate:
-        //                     clinicalProgress.registrationDate,
-        //             });
-
-        //         if (!createdClinicalProgress?.id) {
-        //             throw new Error(
-        //                 "No se obtuvo el ID del progreso clínico."
-        //             );
-        //         }
-
-        //         const newClinicalProgressId =
-        //             createdClinicalProgress.id;
-
-        //         setClinicalProgressId(newClinicalProgressId);
-        //         /*
-        //          * =====================================================
-        //          * PASO 2
-        //          * CREAR SOLAMENTE LAS SECCIONES QUE TENGAN DATOS
-        //          * =====================================================
-        //          */
-
-        //         const promises: Promise<unknown>[] = [];
-
-        //         /*
-        //          * RECETA
-        //          */
-
-        //         if (medicalPrescription) {
-        //             promises.push(
-        //                 createMedicalPrescription({
-        //                     ...medicalPrescription,
-
-        //                     data: {
-        //                         ...medicalPrescription.data,
-        //                         clinicalProgressId: newClinicalProgressId,
-        //                     },
-        //                 })
-        //             );
-        //         }
-
-        //         /*
-        //          * ODONTOGRAMA
-        //          */
-
-        //         if (dentalChart) {
-        //             promises.push(
-        //                 createDentalChart({
-        //                     ...dentalChart,
-        //                     dentalChart: {
-        //                         ...dentalChart.dentalChart,
-        //                         clinicalProgressId: newClinicalProgressId,
-        //                     },
-        //                 })
-        //             );
-        //         }
-
-        //         /*
-        //          * ADJUNTO
-        //          */
-
-        //         if (patientAttachment) {
-        //             promises.push(
-        //                 addPatientAttachment({
-        //                     ...patientAttachment,
-        //                     clinicalProgressId,
-        //                 })
-        //             );
-        //         }
-
-        //         /*
-        //          * =====================================================
-        //          * ESPERAR TODAS LAS SECCIONES OPCIONALES
-        //          * =====================================================
-        //          */
-
-        //         if (promises.length > 0) {
-        //             await Promise.all(promises);
-        //         }
-
-        //         showToast(
-        //             "success",
-        //             "El progreso clínico se creó correctamente."
-        //         );
-
-        //         cleanForm();
-
-        //     } catch (error) {
-        //         showToast(
-        //             "error",
-        //             error instanceof Error
-        //                 ? error.message
-        //                 : "No se pudo crear el progreso clínico."
-        //         );
-        //     }
-        // };
-
-
+        
         const handleSubmit = async () => {
             if (!validateClinicalProgress()) {
                 return;
@@ -672,15 +512,15 @@ const CreateClinicalProgressDrawer: React.FC<
                                 onClick={handleSubmit}
                                 disabled={isPending}
                                 className="
-                px-4 py-2.5
-                text-sm font-medium
-                text-white
-                bg-[#001D4A]
-                rounded-lg
-                transition-colors
-                cursor-pointer
-                disabled:opacity-50
-              "
+                                    px-4 py-2.5
+                                    text-sm font-medium
+                                    text-white
+                                    bg-[#001D4A]
+                                    rounded-lg
+                                    transition-colors
+                                    cursor-pointer
+                                    disabled:opacity-50
+                                "
                             >
                                 {isPending
                                     ? "Guardando..."
