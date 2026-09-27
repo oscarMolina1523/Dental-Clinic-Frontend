@@ -12,6 +12,7 @@ import AppointmentPage from "../pages/AppointmentPage";
 import PrescriptionsPage from "../pages/PrescriptionsPage";
 import TreatmentPlanPage from "../pages/TreatmentPlanPage";
 import InvoicesPage from "../pages/InvoicesPage";
+import MedicalProgressPage from "../pages/MedicalProgressPage";
 
 const router = createBrowserRouter([
   {
@@ -67,6 +68,10 @@ const router = createBrowserRouter([
       {
         path: "invoices",
         element: <InvoicesPage />,
+      },
+      {
+        path: "medical-progress",
+        element: <MedicalProgressPage />,
       },
     ],
   },

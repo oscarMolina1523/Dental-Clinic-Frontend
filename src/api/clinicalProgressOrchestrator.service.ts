@@ -27,6 +27,21 @@ export default class ClinicalProgressOrchestratorService extends HTTPService {
   }
 
   /**
+   * Obtiene todos los progresos clínicos
+   * de un paciente junto con sus datos relacionados.
+   */
+  async getClinicalProgressesByPatientId(
+    patientId: string
+  ): Promise<ClinicalProgressOrchestratorResult[]> {
+    const response =
+      await super.get<ClinicalProgressOrchestratorResult[]>(
+        `${this.path}/patient/${patientId}`
+      );
+
+    return response || [];
+  }
+
+  /**
    * Crea un progreso clínico junto con
    * sus datos relacionados opcionales.
    */

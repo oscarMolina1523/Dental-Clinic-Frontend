@@ -30,6 +30,31 @@ export function useClinicalProgressOrchestrator() {
 }
 
 /* =========================================================
+   GET CLINICAL PROGRESSES BY PATIENT
+========================================================= */
+
+export function useClinicalProgressOrchestratorByPatientId(
+  patientId: string
+) {
+  return useQuery<
+    ClinicalProgressOrchestratorResult[],
+    Error
+  >({
+    queryKey: [
+      "clinicalProgressOrchestrator",
+      "patient",
+      patientId,
+    ],
+
+    queryFn: () =>
+      clinicalProgressOrchestratorService
+        .getClinicalProgressesByPatientId(patientId),
+
+    enabled: !!patientId,
+  });
+}
+
+/* =========================================================
    CREATE CLINICAL PROGRESS
 ========================================================= */
 
