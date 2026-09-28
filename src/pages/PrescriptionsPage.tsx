@@ -8,7 +8,7 @@ import SearchInput from "../shared/Table/SearchInput";
 // import ConfirmModal from "../shared/ConfirmModal";
 import { useMedicalPrescriptionsOrchestrator } from "../hooks/useMedicalPrescriptionOrchestrator";
 import type { MedicalPrescriptionOrchestratorResponse } from "../models/MedicalPrescriptionOrchestratorModel";
-import ShowDetailsMedicalPrescriptionDrawer from "../components/medicalPrescription/ShowDetailsMedicalPrescriptionDrawer";
+import ShowDetailsMedicalPrescriptionDrawer from "../components/medical/ShowDetailsMedicalPrescriptionDrawer";
 
 const PrescriptionsPage: React.FC = () => {
     const {

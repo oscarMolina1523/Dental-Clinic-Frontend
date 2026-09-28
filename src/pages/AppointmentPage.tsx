@@ -11,7 +11,7 @@ import CreateAppointmentDrawer from "../components/appointment/CreateAppointment
 import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawet";
 import Toast from "../shared/Toast";
 import useAppointmentPage from "../components/appointment/useAppointmentPage";
-import CreateMedicalPrescriptionDrawer from "../components/medicalPrescription/CreateMedicalPrescriptionDrawer";
+import CreateClinicalProgressDrawer from "../components/medical/CreateClinicalProgressDrawer";
 
 const AppointmentPage: React.FC = () => {
     const {
@@ -56,9 +56,9 @@ const AppointmentPage: React.FC = () => {
 
         isPendingAny,
 
-        isPrescriptionDrawerOpen,
-        setIsPrescriptionDrawerOpen,
-        handleCreatePrescription
+        isClinicalProgressDrawerOpen,
+        setIsClinicalProgressDrawerOpen,
+        handleCreateClinicalProgress
     } = useAppointmentPage();
 
     const ITEMS_PER_PAGE = 10;
@@ -320,7 +320,7 @@ const AppointmentPage: React.FC = () => {
                             {selectedAppointment.status === "COMPLETED" && (
                                 <button
                                     onClick={() =>
-                                        handleCreatePrescription(
+                                        handleCreateClinicalProgress(
                                             selectedAppointment
                                         )
                                     }
@@ -328,7 +328,7 @@ const AppointmentPage: React.FC = () => {
                                 >
                                     <Plus className="w-4 h-4 text-emerald-600" />
 
-                                    <span>Crear Receta</span>
+                                    <span>Registrar progreso en expediente</span>
                                 </button>
                             )}
 
@@ -450,10 +450,10 @@ const AppointmentPage: React.FC = () => {
                 </div>
             )}
 
-            <CreateMedicalPrescriptionDrawer
-                isOpen={isPrescriptionDrawerOpen}
+            <CreateClinicalProgressDrawer
+                isOpen={isClinicalProgressDrawerOpen}
                 onHide={() => {
-                    setIsPrescriptionDrawerOpen(false);
+                    setIsClinicalProgressDrawerOpen(false);
                     setSelectedAppointment(null);
                 }}
                 appointment={selectedAppointment}
