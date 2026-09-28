@@ -2,7 +2,6 @@ import React from "react";
 import logo from "../assets/logo.webp";
 import { NavLink } from "react-router-dom";
 import {
-  LayoutDashboard,
   Users,
   Calendar,
   FileText,
@@ -20,7 +19,6 @@ import {
 
 // Lista de elementos de navegación con sus íconos
 const navItems = [
-  { id: "home", label: "Dashboard", icon: LayoutDashboard },
   { id: "patients", label: "Pacientes", icon: Users },
   { id: "agenda", label: "Agenda", icon: Calendar },
   { id: "prescriptions", label: "Recetas", icon: Pill },
@@ -31,7 +29,7 @@ const navItems = [
   { id: "products", label: "Productos", icon: ScanBarcode },
   { id: "inventories", label: "Inventario", icon: Package },
   { id: "inventory-lotes", label: "Lotes", icon: Package },
-  { id: "reportes", label: "Reportes", icon: BarChart3 },
+  { id: "reports", label: "Reportes", icon: BarChart3 },
   { id: "users", label: "Usuarios", icon: UserCheck },
   { id: "configuracion", label: "Configuración", icon: Settings },
 ];

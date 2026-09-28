@@ -3,7 +3,6 @@ import { Bell, CalendarDays, Mail } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 const sections: Record<string, string> = {
-    "/home": "Dashboard",
     "/patients": "Pacientes",
     "/agenda": "Citas y Agenda",
     "/prescriptions": "Administrador de recetas",
@@ -14,7 +13,7 @@ const sections: Record<string, string> = {
     "/products": "Productos",
     "/inventories": "Inventario",
     "/inventory-lotes": "Administrador de Lotes",
-    "/reportes": "Reportes",
+    "/reports": "Reportes",
     "/users": "Usuarios",
     "/configuracion": "Configuración",
 };

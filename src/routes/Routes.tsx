@@ -1,7 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";
 import ErrorPage from "../pages/ErrorPage";
-import HomePage from "../pages/Home";
 import PatientsPage from "../pages/Patients";
 import UsersPage from "../pages/Users";
 import TreatmentCatalogPage from "../pages/TreatmentCatalogPage";
@@ -13,6 +12,7 @@ import PrescriptionsPage from "../pages/PrescriptionsPage";
 import TreatmentPlanPage from "../pages/TreatmentPlanPage";
 import InvoicesPage from "../pages/InvoicesPage";
 import MedicalProgressPage from "../pages/MedicalProgressPage";
+import ReportsPage from "../pages/ReportsPage";
 
 const router = createBrowserRouter([
   {
@@ -23,11 +23,11 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/home"/>
+        element: <Navigate to="/patients"/>
       },
       {
-        path: "home",
-        element: <HomePage />,
+        path: "reports",
+        element: <ReportsPage />,
       },
       {
         path: "patients",
