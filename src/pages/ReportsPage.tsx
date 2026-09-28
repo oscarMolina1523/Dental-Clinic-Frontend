@@ -1,6 +1,6 @@
 import React from "react";
 
-const HomePage: React.FC=()=>{
+const ReportsPage: React.FC=()=>{
   return (
     <div className="h-full w-full bg-slate-100 p-10">
       <h1 className="text-3xl font-bold">
@@ -14,4 +14,4 @@ const HomePage: React.FC=()=>{
   )
 }
 
-export default HomePage
+export default ReportsPage
