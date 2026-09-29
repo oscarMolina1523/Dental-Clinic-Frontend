@@ -9,10 +9,12 @@ import { useInventories } from "../hooks/useInventory";
 import type InventoryModel from "../models/InventoryModel";
 import CreateInventoryDrawer from "../components/inventory/CreateInventoryDrawer";
 import EditInventoryDrawer from "../components/inventory/EditInventoryDrawer";
+import TableSkeleton from "../components/skeleton/TableSkeleton";
 
 const InventoryPage: React.FC = () => {
   const {
-    data: inventories = []
+    data: inventories = [],
+    isLoading
   } = useInventories();
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
@@ -144,13 +146,21 @@ const InventoryPage: React.FC = () => {
 
         {/* Tabla de Inventarios */}
         <div className="overflow-x-auto">
-          <DataTable
-            data={currentProducts}
-            columns={columns}
-            actions={actions}
-            getRowId={(inventory) => inventory.id}
-            emptyMessage="No hay Inventarios registrados."
-          />
+          {isLoading ? (
+            <TableSkeleton
+              columns={columns}
+              rows={10}
+              actions
+            />
+          ) : (
+            <DataTable
+              data={currentProducts}
+              columns={columns}
+              actions={actions}
+              getRowId={(inventory) => inventory.id}
+              emptyMessage="No hay Inventarios registrados."
+            />
+          )}
         </div>
       </div>
 

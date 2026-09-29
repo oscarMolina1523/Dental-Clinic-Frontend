@@ -20,6 +20,7 @@ import {
     useUsers
 } from "../../hooks/useUsers";
 import type { CreateTreatmentPlanRequest } from "../../models/TreatmentPlanOrchestratorModel";
+import { roleNames, UserRole } from "../../hooks/useRolePermitions";
 
 
 interface CreateTreatmentPlanDrawerProps {
@@ -52,6 +53,10 @@ const CreateTreatmentPlanDrawer: React.FC<
             isLoading: isLoadingUsers
         } = useUsers();
 
+
+        const dentists = users.filter(
+            (user) => roleNames[user.roleId] === UserRole.Dentist //hace referencia al rol de dentista
+        );
 
         // ============================================================
         // MUTATION
@@ -812,7 +817,7 @@ const CreateTreatmentPlanDrawer: React.FC<
                                 </option>
 
 
-                                {users.map((dentist) => (
+                                {dentists.map((dentist) => (
 
                                     <option
                                         key={dentist.id}

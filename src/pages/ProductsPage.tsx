@@ -12,10 +12,12 @@ import { useMeasurementUnites } from "../hooks/useMeasurementUnit";
 import { useCategories } from "../hooks/useCategories";
 import EditProductDrawer from "../components/product/EditProductDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
+import TableSkeleton from "../components/skeleton/TableSkeleton";
 
 const ProductsPage: React.FC = () => {
   const {
-    data: products = []
+    data: products = [],
+    isLoading
   } = useProducts(1, 10);
   const { data: measurementUnites = [] } = useMeasurementUnites();
   const { data: categories = [] } = useCategories();
@@ -216,13 +218,21 @@ const ProductsPage: React.FC = () => {
 
         {/* Tabla de Productos */}
         <div className="overflow-x-auto">
-          <DataTable
-            data={currentProducts}
-            columns={columns}
-            actions={actions}
-            getRowId={(product) => product.id}
-            emptyMessage="No hay Productos registrados."
-          />
+          {isLoading ? (
+            <TableSkeleton
+              columns={columns}
+              rows={10}
+              actions
+            />
+          ) : (
+            <DataTable
+              data={currentProducts}
+              columns={columns}
+              actions={actions}
+              getRowId={(product) => product.id}
+              emptyMessage="No hay Productos registrados."
+            />
+          )}
         </div>
       </div>
 

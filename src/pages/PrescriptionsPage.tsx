@@ -9,10 +9,12 @@ import SearchInput from "../shared/Table/SearchInput";
 import { useMedicalPrescriptionsOrchestrator } from "../hooks/useMedicalPrescriptionOrchestrator";
 import type { MedicalPrescriptionOrchestratorResponse } from "../models/MedicalPrescriptionOrchestratorModel";
 import ShowDetailsMedicalPrescriptionDrawer from "../components/medical/ShowDetailsMedicalPrescriptionDrawer";
+import TableSkeleton from "../components/skeleton/TableSkeleton";
 
 const PrescriptionsPage: React.FC = () => {
     const {
-        data: prescriptions = []
+        data: prescriptions = [],
+        isLoading
     } = useMedicalPrescriptionsOrchestrator();
 
     const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] =
@@ -105,7 +107,7 @@ const PrescriptionsPage: React.FC = () => {
                 </span>
             ),
         },
-         {
+        {
             key: "medicine",
             header: "Cantidad de productos recetados",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
@@ -118,12 +120,12 @@ const PrescriptionsPage: React.FC = () => {
 
     const actions: TableAction<typeof prescriptions[number]>[] = [
         {
-          label: "Ver receta",
-          icon: <Eye className="w-4 h-4" />,
-          onClick: (prescription) => {
-            setSelectedPrescription(prescription);
-            setIsDetailsDrawerOpen(true);
-          },
+            label: "Ver receta",
+            icon: <Eye className="w-4 h-4" />,
+            onClick: (prescription) => {
+                setSelectedPrescription(prescription);
+                setIsDetailsDrawerOpen(true);
+            },
         },
     ];
 
@@ -152,13 +154,21 @@ const PrescriptionsPage: React.FC = () => {
 
                 {/* Tabla de Productos */}
                 <div className="overflow-x-auto">
-                    <DataTable
-                        data={currentProducts}
-                        columns={columns}
-                        actions={actions}
-                        getRowId={(prescription) => prescription.medicalPrescription.id}
-                        emptyMessage="No hay Productos registrados."
-                    />
+                    {isLoading ? (
+                        <TableSkeleton
+                            columns={columns}
+                            rows={10}
+                            actions
+                        />
+                    ) : (
+                        <DataTable
+                            data={currentProducts}
+                            columns={columns}
+                            actions={actions}
+                            getRowId={(prescription) => prescription.medicalPrescription.id}
+                            emptyMessage="No hay Productos registrados."
+                        />
+                    )}
                 </div>
             </div>
 
@@ -173,7 +183,7 @@ const PrescriptionsPage: React.FC = () => {
                 />
             </div>
 
-            <ShowDetailsMedicalPrescriptionDrawer isOpen={isDetailsDrawerOpen} onHide={()=> setIsDetailsDrawerOpen(false)} prescription={selectedPrescription} />
+            <ShowDetailsMedicalPrescriptionDrawer isOpen={isDetailsDrawerOpen} onHide={() => setIsDetailsDrawerOpen(false)} prescription={selectedPrescription} />
         </div>
     );
 }

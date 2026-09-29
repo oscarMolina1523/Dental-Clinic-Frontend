@@ -11,10 +11,12 @@ import CreateTreatmentCatalogDrawer from "../components/treatmentCatalog/CreateT
 import EditTreatmentCatalogDrawer from "../components/treatmentCatalog/EditTreatmentCatalogDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
 import SecurityTreatmentCatalogDrawer from "../components/treatmentCatalog/SecurityTreatmentCatalogDrawer";
+import TableSkeleton from "../components/skeleton/TableSkeleton";
 
 const TreatmentCatalogPage: React.FC = () => {
     const {
-        data: treatments = []
+        data: treatments = [],
+        isLoading
     } = useTreatments();
     const {
         mutate: deleteTreatment,
@@ -140,14 +142,6 @@ const TreatmentCatalogPage: React.FC = () => {
     ];
 
     const actions: TableAction<typeof treatments[number]>[] = [
-        // {
-        //     label: "Ver tratamiento",
-        //     icon: <Eye className="w-4 h-4" />,
-        //     onClick: (treatment) => {
-        //         console.log("Ver:", treatment);
-        //     },
-        // },
-
         {
             label: "Credenciales y Seguridad",
             icon: <KeyRound className="w-4 h-4 text-amber-600" />,
@@ -224,13 +218,21 @@ const TreatmentCatalogPage: React.FC = () => {
 
                 {/* Tabla de Tratamientos */}
                 <div className="overflow-x-auto">
-                    <DataTable
-                        data={currentTreatments}
-                        columns={columns}
-                        actions={actions}
-                        getRowId={(treatment) => treatment.id}
-                        emptyMessage="No hay tratamientos registrados."
-                    />
+                    {isLoading ? (
+                        <TableSkeleton
+                            columns={columns}
+                            rows={10}
+                            actions
+                        />
+                    ) : (
+                        <DataTable
+                            data={currentTreatments}
+                            columns={columns}
+                            actions={actions}
+                            getRowId={(treatment) => treatment.id}
+                            emptyMessage="No hay tratamientos registrados."
+                        />
+                    )}
                 </div>
             </div>
 
