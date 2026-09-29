@@ -12,6 +12,7 @@ import EditAppointmentDrawer from "../components/appointment/EditAppointmentDraw
 import Toast from "../shared/Toast";
 import useAppointmentPage from "../components/appointment/useAppointmentPage";
 import CreateClinicalProgressDrawer from "../components/medical/CreateClinicalProgressDrawer";
+import type { AppointmentStatus } from "../utils/appointmentStatus.enum";
 
 const AppointmentPage: React.FC = () => {
     const {
@@ -109,6 +110,36 @@ const AppointmentPage: React.FC = () => {
         [startIndex, endIndex, filteredData]
     );
 
+    const appointmentStatusConfig: Record<
+        AppointmentStatus,
+        { label: string; className: string }
+    > = {
+        SCHEDULED: {
+            label: "Programada",
+            className: "text-indigo-600",
+        },
+        CONFIRMED: {
+            label: "Confirmada",
+            className: "text-blue-600",
+        },
+        IN_PROGRESS: {
+            label: "En progreso",
+            className: "text-amber-600",
+        },
+        COMPLETED: {
+            label: "Completada",
+            className: "text-emerald-600",
+        },
+        CANCELLED: {
+            label: "Cancelada",
+            className: "text-red-600",
+        },
+        NO_SHOW: {
+            label: "No asistió",
+            className: "text-slate-500",
+        },
+    };
+
     const columns: TableColumn<typeof appointments[number]>[] = [
         {
             key: "patientFullName",
@@ -171,14 +202,17 @@ const AppointmentPage: React.FC = () => {
         {
             key: "status",
             header: "Estado",
-            render: (appointment: AppointmentModel) => (
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-slate-800">
-                        {appointment.status}
-                    </span>
+            render: (appointment: AppointmentModel) => {
+                const status = appointmentStatusConfig[appointment.status];
 
-                </div>
-            ),
+                return (
+                    <div className="flex items-center gap-3">
+                        <span className={`text-sm font-semibold ${status.className}`}>
+                            {status.label}
+                        </span>
+                    </div>
+                );
+            },
         },
         {
             key: "reminderSent",
@@ -303,7 +337,7 @@ const AppointmentPage: React.FC = () => {
                                 <p className="text-xs text-slate-500 mt-0.5">
                                     Estado actual:{" "}
                                     <span className="font-medium text-slate-700">
-                                        {selectedAppointment.status}
+                                        {appointmentStatusConfig[selectedAppointment.status].label}
                                     </span>
                                 </p>
                             </div>
