@@ -11,12 +11,18 @@ import CreateInventoryLoteDrawer from "../components/inventory/CreateInventoryLo
 import EditInventoryLoteDrawer from "../components/inventory/EditInventoryLoteDrawer";
 import ExpiredLoteDrawer from "../components/inventory/ExpiredLoteDrawer";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
+import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 
 const LotesPage: React.FC = () => {
   const {
     data: inventoryLotes = [],
     isLoading
   } = useInventoryLotes();
+
+  const { role } = useRolePermissions();
+
+  const isViewer = role === UserRole.Viewer;
+  const canWrite = !isViewer;
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
@@ -148,6 +154,7 @@ const LotesPage: React.FC = () => {
         setSelectedLote(lote);
         setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
       },
+      hidden: () => !canWrite,
     },
     {
       label: "Editar Lote",
@@ -156,6 +163,7 @@ const LotesPage: React.FC = () => {
         setSelectedLote(lote);
         setIsEditDrawerOpen(true);
       },
+      hidden: () => !canWrite,
     },
   ];
 
@@ -180,7 +188,10 @@ const LotesPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar lote..."
           />
-          <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+          <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                            : "bg-slate-300 cursor-not-allowed opacity-70"
+                        }`}>
             <Plus className="w-4 h-4" />
             <span>Nuevo Lote</span>
           </button>

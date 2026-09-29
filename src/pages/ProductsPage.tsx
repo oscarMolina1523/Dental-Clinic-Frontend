@@ -13,6 +13,7 @@ import { useCategories } from "../hooks/useCategories";
 import EditProductDrawer from "../components/product/EditProductDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
+import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 
 const ProductsPage: React.FC = () => {
   const {
@@ -25,6 +26,11 @@ const ProductsPage: React.FC = () => {
     mutate: deleteProduct,
     isPending: isDeleting
   } = useDeleteProduct();
+
+  const { role } = useRolePermissions();
+
+  const isViewer = role === UserRole.Viewer;
+  const canWrite = !isViewer;
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
@@ -143,14 +149,6 @@ const ProductsPage: React.FC = () => {
   ];
 
   const actions: TableAction<typeof products[number]>[] = [
-    // {
-    //   label: "Ver producto",
-    //   icon: <Eye className="w-4 h-4" />,
-    //   onClick: (product) => {
-    //     console.log("Ver:", product);
-    //   },
-    // },
-
     {
       label: "Editar producto",
       icon: <Pencil className="w-4 h-4" />,
@@ -158,6 +156,7 @@ const ProductsPage: React.FC = () => {
         setSelectedProduct(product);
         setIsEditDrawerOpen(true);
       },
+      hidden: () => !canWrite,
     },
 
     {
@@ -167,6 +166,7 @@ const ProductsPage: React.FC = () => {
         setSelectedProduct(product);
         setIsDeleteModalOpen(true);
       },
+      hidden: () => !canWrite,
     },
   ];
 
@@ -210,7 +210,10 @@ const ProductsPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar producto..."
           />
-          <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+          <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                            : "bg-slate-300 cursor-not-allowed opacity-70"
+                        }`}>
             <Plus className="w-4 h-4" />
             <span>Nuevo Producto</span>
           </button>

@@ -12,6 +12,7 @@ import EditPatientDrawer from "../components/patient/EditPatientDrawer";
 import SecurityPatientDrawer from "../components/patient/SecurityPatientDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
+import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 
 const PatientsPage: React.FC = () => {
   const {
@@ -23,6 +24,11 @@ const PatientsPage: React.FC = () => {
     mutate: deletePatient,
     isPending: isDeleting
   } = useDeletePatient();
+
+  const { role } = useRolePermissions();
+
+  const isViewer = role === UserRole.Viewer;
+  const canWrite = !isViewer;
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
@@ -185,6 +191,7 @@ const PatientsPage: React.FC = () => {
         setSelectedPatient(patient);
         setIsEditDrawerOpen(true);
       },
+      hidden: () => !canWrite,
     },
     {
       label: "Credenciales y Seguridad",
@@ -193,6 +200,7 @@ const PatientsPage: React.FC = () => {
         setSelectedPatient(user);
         setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
       },
+      hidden: () => !canWrite,
     },
     {
       label: "Eliminar paciente",
@@ -201,6 +209,7 @@ const PatientsPage: React.FC = () => {
         setSelectedPatient(patient);
         setIsDeleteModalOpen(true);
       },
+      hidden: () => !canWrite,
     },
   ];
 
@@ -245,7 +254,10 @@ const PatientsPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar paciente..."
           />
-          <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+          <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+            : "bg-slate-300 cursor-not-allowed opacity-70"
+            }`}>
             <Plus className="w-4 h-4" />
             <span>Nuevo Paciente</span>
           </button>

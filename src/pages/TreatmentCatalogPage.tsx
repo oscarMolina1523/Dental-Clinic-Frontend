@@ -12,6 +12,7 @@ import EditTreatmentCatalogDrawer from "../components/treatmentCatalog/EditTreat
 import ConfirmModal from "../shared/ConfirmModal";
 import SecurityTreatmentCatalogDrawer from "../components/treatmentCatalog/SecurityTreatmentCatalogDrawer";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
+import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 
 const TreatmentCatalogPage: React.FC = () => {
     const {
@@ -22,6 +23,11 @@ const TreatmentCatalogPage: React.FC = () => {
         mutate: deleteTreatment,
         isPending: isDeleting
     } = useDeleteTreatment();
+
+    const { role } = useRolePermissions();
+
+    const isViewer = role === UserRole.Viewer;
+    const canWrite = !isViewer;
 
     const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
         useState(false);
@@ -149,6 +155,7 @@ const TreatmentCatalogPage: React.FC = () => {
                 setSelectedTreatment(treatment);
                 setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
             },
+            hidden: () => !canWrite,
         },
 
         {
@@ -158,6 +165,7 @@ const TreatmentCatalogPage: React.FC = () => {
                 setSelectedTreatment(treatment);
                 setIsEditDrawerOpen(true);
             },
+            hidden: () => !canWrite,
         },
 
         {
@@ -167,6 +175,7 @@ const TreatmentCatalogPage: React.FC = () => {
                 setSelectedTreatment(treatment);
                 setIsDeleteModalOpen(true);
             },
+            hidden: () => !canWrite,
         },
     ];
 
@@ -210,7 +219,10 @@ const TreatmentCatalogPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar tratamiento..."
                     />
-                    <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+                    <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                            : "bg-slate-300 cursor-not-allowed opacity-70"
+                        }`}>
                         <Plus className="w-4 h-4" />
                         <span>Nuevo Tratamiento</span>
                     </button>
