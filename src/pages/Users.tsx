@@ -13,6 +13,7 @@ import SecurityUserDrawer from "../components/user/SecurityUserDrawer";
 import { useRoles } from "../hooks/useRoles";
 import ConfirmModal from "../shared/ConfirmModal";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
+import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 
 const UsersPage: React.FC = () => {
   const {
@@ -26,6 +27,11 @@ const UsersPage: React.FC = () => {
   } = useDeleteUser();
 
   const { data: roles = [] } = useRoles();
+
+  const { role: permiso } = useRolePermissions();
+
+  const isViewer = permiso === UserRole.Viewer;
+  const canWrite = !isViewer;
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
     useState(false);
@@ -171,6 +177,7 @@ const UsersPage: React.FC = () => {
 
         setIsEditDrawerOpen(true);
       },
+      hidden: () => !canWrite,
     },
     {
       label: "Credenciales y Seguridad",
@@ -179,6 +186,7 @@ const UsersPage: React.FC = () => {
         setSelectedUser(user);
         setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
       },
+      hidden: () => !canWrite,
     },
     {
       label: "Eliminar Usuario",
@@ -187,6 +195,7 @@ const UsersPage: React.FC = () => {
         setSelectedUser(user);
         setIsDeleteModalOpen(true);
       },
+      hidden: () => !canWrite,
     },
   ];
 
@@ -230,11 +239,14 @@ const UsersPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar usuario..."
           />
-          <button
+          <button disabled={!canWrite}
             onClick={() =>
               setIsCreateDrawerOpen(true)
             }
-            className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+            className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                            : "bg-slate-300 cursor-not-allowed opacity-70"
+                        }`}>
             <Plus className="w-4 h-4" />
             <span>Nuevo Usuario</span>
           </button>

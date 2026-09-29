@@ -15,13 +15,17 @@ import RegisterPaymentDrawer from "../components/invoices/RegisterPaymentDrawer"
 import { useCancelPaymentPlan } from "../hooks/usePaymentPlanOrchestrator";
 import { invoiceStatusColors, invoiceStatusSpanishOptions } from "../utils/invoiceStatus.enum";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
+import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 
 const InvoicesPage: React.FC = () => {
     const {
         data: invoices = [],
         isLoading
     } = useInvoices();
+    const { role } = useRolePermissions();
 
+    const isViewer = role === UserRole.Viewer;
+    const canWrite = !isViewer;
 
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -187,12 +191,13 @@ const InvoicesPage: React.FC = () => {
                 setSelectedInvoice(invoice);
                 setIsDetailsDrawerOpen(true);
             },
+            hidden: () => !canWrite,
         },
         {
             label: "Cancelar Factura",
             hidden: (invoice) =>
                 invoice.status == "PAID" ||
-                invoice.status == "CANCELLED",
+                invoice.status == "CANCELLED" || !canWrite,
             icon: <Ban className="w-4 h-4" />,
             onClick: (invoice) => {
                 setSelectedInvoice(invoice);
@@ -206,6 +211,7 @@ const InvoicesPage: React.FC = () => {
                 setSelectedInvoice(invoice);
                 setIsRegisterPaymentOpen(true);
             },
+            hidden: () => !canWrite,
         },
     ];
 
@@ -260,7 +266,10 @@ const InvoicesPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar Factura..."
                     />
-                    <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+                    <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                            : "bg-slate-300 cursor-not-allowed opacity-70"
+                        }`}>
                         <Plus className="w-4 h-4" />
                         <span>Nueva Factura</span>
                     </button>

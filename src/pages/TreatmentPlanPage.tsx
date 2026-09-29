@@ -13,12 +13,18 @@ import { treatmentPlanStatusColors, treatmentPlanStatusSpanishOptions, type Trea
 import { useAcceptTreatmentPlan, useCancelTreatmentPlan, useCompleteTreatmentPlan, useProposeTreatmentPlan, useStartTreatmentPlan } from "../hooks/useTreatmentPlan";
 import ShowTreatmentPlanDrawer from "../components/treatmentCatalog/ShowTreatmentPlanDrawer";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
+import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 
 const TreatmentPlanPage: React.FC = () => {
     const {
         data: treatments = [],
         isLoading
     } = useTreatmentPlansOrchestrator();
+
+    const { role } = useRolePermissions();
+
+    const isViewer = role === UserRole.Viewer;
+    const canWrite = !isViewer;
 
     const proposeMutation = useProposeTreatmentPlan();
     const acceptMutation = useAcceptTreatmentPlan();
@@ -241,6 +247,7 @@ const TreatmentPlanPage: React.FC = () => {
                 setSelectedTreatment(treatment);
                 setIsShowModalOpen(true);
             },
+            hidden: () => !canWrite,
         },
 
         {
@@ -255,7 +262,7 @@ const TreatmentPlanPage: React.FC = () => {
 
                 return (
                     status === "COMPLETED" ||
-                    status === "CANCELLED"
+                    status === "CANCELLED" || !canWrite
                 );
             },
         },
@@ -266,6 +273,7 @@ const TreatmentPlanPage: React.FC = () => {
                 setSelectedTreatment(treatment);
                 setIsDeleteModalOpen(true);
             },
+            hidden: () => !canWrite,
         },
     ];
 
@@ -316,7 +324,10 @@ const TreatmentPlanPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar plan de tratamiento..."
                     />
-                    <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+                    <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                            : "bg-slate-300 cursor-not-allowed opacity-70"
+                        }`}>
                         <Plus className="w-4 h-4" />
                         <span>Nuevo plan de tratamiento</span>
                     </button>
