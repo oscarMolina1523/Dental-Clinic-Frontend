@@ -14,6 +14,7 @@ import useAppointmentPage from "../components/appointment/useAppointmentPage";
 import CreateClinicalProgressDrawer from "../components/medical/CreateClinicalProgressDrawer";
 import type { AppointmentStatus } from "../utils/appointmentStatus.enum";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
+import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 
 const AppointmentPage: React.FC = () => {
     const {
@@ -63,6 +64,11 @@ const AppointmentPage: React.FC = () => {
         setIsClinicalProgressDrawerOpen,
         handleCreateClinicalProgress
     } = useAppointmentPage();
+
+    const { role } = useRolePermissions();
+
+    const isViewer = role === UserRole.Viewer;
+    const canWrite = !isViewer;
 
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
@@ -238,6 +244,7 @@ const AppointmentPage: React.FC = () => {
                 setSelectedAppointment(appointment);
                 setIsEditDrawerOpen(true);
             },
+            hidden: () => !canWrite,
         },
         {
             label: "Cambios de estados",
@@ -254,7 +261,7 @@ const AppointmentPage: React.FC = () => {
                  * También aparece para COMPLETED porque
                  * desde ahí podemos crear la receta.
                  */
-                return !canChangeStatus(appointment.status);
+                return !canWrite || !canChangeStatus(appointment.status);
             },
         },
     ];
@@ -287,7 +294,10 @@ const AppointmentPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar cita..."
                     />
-                    <button onClick={() => setIsCreateDrawerOpen(true)} className="flex items-center gap-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 cursor-pointer">
+                    <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                            : "bg-slate-300 cursor-not-allowed opacity-70"
+                        }`}>
                         <Plus className="w-4 h-4" />
                         <span>Nueva Cita</span>
                     </button>
