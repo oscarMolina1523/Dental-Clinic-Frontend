@@ -1,5 +1,5 @@
 import React from "react";
-import { Bell, CalendarDays, Mail } from "lucide-react";
+import { CalendarDays} from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 const sections: Record<string, string> = {
@@ -47,20 +47,20 @@ const TopBar: React.FC = () => {
             {/* Lado derecho: Notificaciones, Mensajes y Fecha */}
             <div className="flex items-center gap-6 text-[#001D4A]">
                 {/* Ícono de Notificaciones */}
-                <button className="relative p-1.5 hover:bg-slate-100 rounded-full transition-colors cursor-pointer">
+                {/* <button className="relative p-1.5 hover:bg-slate-100 rounded-full transition-colors cursor-pointer">
                     <Bell className="w-5 h-5" />
                     <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full">
                         3
                     </span>
-                </button>
+                </button> */}
 
                 {/* Ícono de Mensajes / Correo */}
-                <button className="relative p-1.5 hover:bg-slate-100 rounded-full transition-colors cursor-pointer">
+                {/* <button className="relative p-1.5 hover:bg-slate-100 rounded-full transition-colors cursor-pointer">
                     <Mail className="w-5 h-5" />
                     <span className="absolute top-0 right-0 flex items-center justify-center w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full">
                         1
                     </span>
-                </button>
+                </button> */}
 
                 {/* Sección de Fecha y Calendario */}
                 <div className="flex items-center gap-2 text-slate-500">
