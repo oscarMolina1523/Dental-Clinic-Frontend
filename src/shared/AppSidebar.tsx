@@ -17,6 +17,7 @@ import {
   LogOut,
 } from "lucide-react";
 import useAuthContext from "../hooks/useAuthContext";
+import { useRolePermissions } from "../hooks/useRolePermitions";
 
 // Lista de elementos de navegación con sus íconos
 const navItems = [
@@ -39,14 +40,22 @@ const AppSidebar: React.FC = () => {
   const { user, logoutUser } = useAuthContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { permissions } = useRolePermissions();
 
-  console.log("user data", user);
   const roleName =
     user?.roleId === "70ef9d9c7fb961b2"
       ? "Administrador"
       : user?.roleId === "946adffd1a8d8931"
         ? "Demo"
+      : user?.roleId === "2f67c45e35ff526b"
+        ? "Dentista"
+      : user?.roleId === "5e3add1ef884e4e7"
+        ? "Recepcionista"
         : "Usuario";
+
+  const filteredNavItems = navItems.filter((item) =>
+    permissions.includes(`/${item.id}`)
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -82,7 +91,7 @@ const AppSidebar: React.FC = () => {
 
         {/* 2. Menú de Navegación */}
         <nav className="flex flex-col gap-1 overflow-y-auto max-h-[calc(100vh-220px)] scrollbar-none">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const Icon = item.icon;
 
             return (

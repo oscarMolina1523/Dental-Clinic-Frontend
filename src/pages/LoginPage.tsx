@@ -92,8 +92,13 @@ const LoginPage: React.FC = () => {
                     )}
 
                     <button
+                    disabled={
+                            loginMutation.isPending ||
+                            !email.trim() ||
+                            !password.trim()
+                        }
                         type="submit"
-                        className="w-full rounded-lg bg-[#2563eb] py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 active:scale-[0.99]"
+                        className="w-full rounded-lg bg-[#2563eb] py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         Acceder
                     </button>
