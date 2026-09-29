@@ -1,8 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
 import { Mail, Lock } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useLogin } from "../hooks/useAuth";
 
 const LoginPage: React.FC = () => {
+    const navigate = useNavigate();
+
+    const loginMutation = useLogin();
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSubmit = (
+        event: React.FormEvent<HTMLFormElement>
+    ) => {
+        event.preventDefault();
+
+        if (!email.trim() || !password.trim()) {
+            return;
+        }
+
+        loginMutation.mutate(
+            {
+                email: email.trim(),
+                password,
+            },
+            {
+                onSuccess: (data) => {
+                    if (!data?.user || !data.token) {
+                        return;
+                    }
+
+                    navigate("/");
+                },
+            }
+        );
+    };
+
     return (
         <div className="flex h-full w-full items-center justify-center bg-[#f4f7fc] p-4">
             <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm">
@@ -17,13 +51,18 @@ const LoginPage: React.FC = () => {
                 </div>
 
                 {/* Formulario */}
-                <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                <form className="space-y-4" onSubmit={handleSubmit}>
                     <div>
                         <div className="relative flex items-center">
                             <Mail className="absolute left-3 h-5 w-5 text-gray-400" />
                             <input
                                 type="email"
                                 placeholder="Email"
+                                value={email}
+                                onChange={(event) =>
+                                    setEmail(event.target.value)
+                                }
+                                disabled={loginMutation.isPending}
                                 className="w-full rounded-lg border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm text-gray-800 transition focus:border-blue-500 focus:bg-white focus:outline-none"
                             />
                         </div>
@@ -35,10 +74,22 @@ const LoginPage: React.FC = () => {
                             <input
                                 type="password"
                                 placeholder="Contraseña"
+                                value={password}
+                                onChange={(event) =>
+                                    setPassword(event.target.value)
+                                }
+                                disabled={loginMutation.isPending}
                                 className="w-full rounded-lg border border-gray-200 bg-gray-50 py-3 pl-10 pr-4 text-sm text-gray-800 transition focus:border-blue-500 focus:bg-white focus:outline-none"
                             />
                         </div>
                     </div>
+                    
+                    {loginMutation.isError && (
+                        <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+                            {loginMutation.error.message ||
+                                "No se pudo iniciar sesión"}
+                        </div>
+                    )}
 
                     <button
                         type="submit"
