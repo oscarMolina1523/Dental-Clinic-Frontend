@@ -3,6 +3,7 @@ import Toast from "../../shared/Toast";
 import { useUpdateUser } from "../../hooks/useUsers";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import User from "../../models/UserModel";
+import useImageUpload from "../../hooks/useImageUpload";
 
 interface EditUserDrawerProps {
     isOpen: boolean;
@@ -15,6 +16,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
     onHide,
     user,
 }) => {
+    const { uploadImage} = useImageUpload();
     const {
         mutate: updateUser,
         isPending,
@@ -22,6 +24,8 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
 
     const [prevUser, setPrevUser] = useState<User | null>(user);
     const [form, setForm] = useState<User | null>(user);
+
+    const [imageFile, setImageFile] = useState<File | null>(null);
 
     const [toast, setToast] = useState<{
         type: "success" | "error";
@@ -59,7 +63,15 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
         });
     };
 
-    const handleSubmit = () => {
+    const handleFileChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const file = e.target.files?.[0] || null;
+
+        setImageFile(file);
+    };
+
+    const handleSubmit = async () => {
         if (!user || !form) {
             return;
         }
@@ -80,35 +92,66 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
             return;
         }
 
-        updateUser(
-            {
-                id: user.id,
-                user: {
-                    fullName: form.fullName.trim(),
-                    phoneNumber: form.phoneNumber.trim(),
-                    image: form.image,
-                    membershipNumber: form.membershipNumber
-                }
-            },
-            {
-                onSuccess: () => {
-                    showToast(
-                        "success",
-                        "El usuario se actualizó correctamente."
-                    );
+        try {
 
-                    onHide();
-                },
+            let imageUrl = form.image;
 
-                onError: (error) => {
+            /*
+             * Si el usuario seleccionó una nueva imagen,
+             * primero la subimos y obtenemos la URL pública.
+             */
+            if (imageFile) {
+                const uploadedImageUrl = await uploadImage(imageFile);
+
+                if (!uploadedImageUrl) {
                     showToast(
                         "error",
-                        error.message ||
-                        "No se pudo actualizar el usuario."
+                        "No se pudo subir la imagen."
                     );
-                },
+                    return;
+                }
+
+                imageUrl = uploadedImageUrl;
             }
-        );
+
+            console.log("image Url", imageUrl);
+
+
+            updateUser(
+                {
+                    id: user.id,
+                    user: {
+                        fullName: form.fullName.trim(),
+                        phoneNumber: form.phoneNumber.trim(),
+                        image: imageUrl,
+                        membershipNumber: form.membershipNumber
+                    }
+                },
+                {
+                    onSuccess: () => {
+                        showToast(
+                            "success",
+                            "El usuario se actualizó correctamente."
+                        );
+
+                        onHide();
+                    },
+
+                    onError: (error) => {
+                        showToast(
+                            "error",
+                            error.message ||
+                            "No se pudo actualizar el usuario."
+                        );
+                    },
+                }
+            );
+        } catch {
+            showToast(
+                "error",
+                "No se pudo subir la imagen."
+            );
+        }
     };
 
     return (
@@ -236,22 +279,84 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                         </label>
 
                         <input
-                            type="text"
-                            name="image"
-                            value={form?.image || ""}
-                            onChange={handleChange}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
+                            type="file"
+                            id="userImage"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleFileChange}
                         />
+
+                        <label
+                            htmlFor="userImage"
+                            className="
+                                    inline-flex
+                                    items-center
+                                    justify-center
+                                    px-4
+                                    py-2.5
+                                    text-sm
+                                    font-medium
+                                    text-slate-700
+                                    bg-slate-100
+                                    border
+                                    border-slate-200
+                                    rounded-lg
+                                    cursor-pointer
+                                    hover:bg-slate-200
+                                "
+                        >
+                            Seleccionar imagen
+                        </label>
+
+                        <span className=" ml-1 text-sm text-slate-500 truncate">
+                            {imageFile
+                                ? imageFile.name
+                                : "No se ha seleccionado una imagen"}
+                        </span>
+                        {/* Imagen actual */}
+                        {form?.image && !imageFile && (
+                            <div className="mt-3">
+                                <p className="text-xs text-slate-500 mb-2">
+                                    Imagen actual
+                                </p>
+
+                                <img
+                                    src={form.image}
+                                    alt="Imagen actual"
+                                    className="
+                                        w-20
+                                        h-20
+                                        rounded-lg
+                                        object-cover
+                                        border
+                                        border-slate-200
+                                    "
+                                />
+                            </div>
+                        )}
+
+                        {/* Preview de nueva imagen */}
+                        {imageFile && (
+                            <div className="mt-3">
+                                <p className="text-xs text-slate-500 mb-2">
+                                    Nueva imagen
+                                </p>
+
+                                <img
+                                    src={URL.createObjectURL(imageFile)}
+                                    alt="Nueva imagen"
+                                    className="
+                                        w-20
+                                        h-20
+                                        rounded-lg
+                                        object-cover
+                                        border
+                                        border-slate-200
+                                    "
+                                />
+                            </div>
+                        )}
+
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -277,7 +382,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                         />
                     </div>
                 </div>
-            </GenericDrawer>
+            </GenericDrawer >
         </>
     );
 };
