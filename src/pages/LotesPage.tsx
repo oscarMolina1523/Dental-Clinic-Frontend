@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil, Watch } from "lucide-react";
+import { Plus, Pencil, Watch } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -139,13 +139,6 @@ const LotesPage: React.FC = () => {
   ];
 
   const actions: TableAction<typeof inventoryLotes[number]>[] = [
-    {
-      label: "Ver Lote",
-      icon: <Eye className="w-4 h-4" />,
-      onClick: (lote) => {
-        console.log("Ver:", lote);
-      },
-    },
     {
       label: "Credenciales y Seguridad",
       icon: <Watch className="w-4 h-4 text-amber-600" />,

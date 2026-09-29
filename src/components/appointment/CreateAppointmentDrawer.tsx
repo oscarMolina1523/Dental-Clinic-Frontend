@@ -5,6 +5,7 @@ import { useAddAppointment } from "../../hooks/useAppointment";
 import type { AppointmentStatus } from "../../utils/appointmentStatus.enum";
 import { usePatients } from "../../hooks/usePatients";
 import { useUsers } from "../../hooks/useUsers";
+import { roleNames, UserRole } from "../../hooks/useRolePermitions";
 
 interface CreateAppointmentProps {
     isOpen: boolean;
@@ -22,6 +23,10 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         data: users = [],
         isLoading: isLoadingUsers,
     } = useUsers();
+
+    const dentists = users.filter(
+         (user) => roleNames[user.roleId] === UserRole.Dentist //hace referencia al rol de dentista
+    );
 
     const [form, setForm] = useState<{
         patientId: string;
@@ -86,9 +91,9 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         setForm((prev) => ({
             ...prev,
             patientId: selectedId,
-             patientFullName: selectedPatient
-            ? `${selectedPatient.name} ${selectedPatient.lastName}`
-            : "",
+            patientFullName: selectedPatient
+                ? `${selectedPatient.name} ${selectedPatient.lastName}`
+                : "",
         }));
     };
 
@@ -306,7 +311,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                 {isLoadingUsers ? "Cargando dentistas..." : "Seleccione un dentista"}
                             </option>
                             {/* 3. Mapeo dinámico de los dentistas devueltos por la API */}
-                            {users.map((dentist) => (
+                            {dentists.map((dentist) => (
                                 <option key={dentist.id} value={dentist.id}>
                                     {dentist.fullName}
                                 </option>

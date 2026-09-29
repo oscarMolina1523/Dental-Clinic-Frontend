@@ -6,6 +6,7 @@ import { useUpdateAppointment } from "../../hooks/useAppointment";
 import type { UpdateAppointmentDTO } from "../../models/AppointmentModel";
 import { usePatients } from "../../hooks/usePatients";
 import { useUsers } from "../../hooks/useUsers";
+import { roleNames, UserRole } from "../../hooks/useRolePermitions";
 
 interface EditAppointmentDrawerProps {
     isOpen: boolean;
@@ -31,6 +32,10 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         data: users = [],
         isLoading: isLoadingUsers,
     } = useUsers();
+
+    const dentists = users.filter(
+        (user) => roleNames[user.roleId] === UserRole.Dentist //hace referencia al rol de dentista
+    );
 
     const [prevAppointment, setPrevAppointment] = useState<Appointment | null>(appointment);
     const [form, setForm] = useState<UpdateAppointmentDTO | null>();
@@ -310,7 +315,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                 {isLoadingUsers ? "Cargando dentistas..." : "Seleccione un dentista"}
                             </option>
                             {/* 3. Mapeo dinámico de los dentistas devueltos por la API */}
-                            {users.map((dentist) => (
+                            {dentists.map((dentist) => (
                                 <option key={dentist.id} value={dentist.id}>
                                     {dentist.fullName}
                                 </option>

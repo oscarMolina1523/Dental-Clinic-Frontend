@@ -13,6 +13,7 @@ import Toast from "../shared/Toast";
 import ShowDetailsInvoiceDrawer from "../components/invoices/ShowDetailsInvoiceDrawer";
 import RegisterPaymentDrawer from "../components/invoices/RegisterPaymentDrawer";
 import { useCancelPaymentPlan } from "../hooks/usePaymentPlanOrchestrator";
+import { invoiceStatusColors, invoiceStatusSpanishOptions } from "../utils/invoiceStatus.enum";
 
 const InvoicesPage: React.FC = () => {
     const {
@@ -156,14 +157,23 @@ const InvoicesPage: React.FC = () => {
         {
             key: "status",
             header: "Estado",
-            render: (invoice: Invoice) => (
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-slate-800">
-                        {invoice.status}
-                    </span>
+            render: (invoice: Invoice) => {
+                const status = invoice.status;
 
-                </div>
-            ),
+                const label = invoiceStatusSpanishOptions.find(
+                    (option) => option.value === status
+                )?.label;
+
+                const colors = invoiceStatusColors[status];
+
+                return (
+                    <span
+                        className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${colors.bg} ${colors.text} ${colors.border}`}
+                    >
+                        {label}
+                    </span>
+                );
+            },
         },
     ];
 

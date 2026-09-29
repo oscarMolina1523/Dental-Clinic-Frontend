@@ -13,12 +13,36 @@ import TreatmentPlanPage from "../pages/TreatmentPlanPage";
 import InvoicesPage from "../pages/InvoicesPage";
 import MedicalProgressPage from "../pages/MedicalProgressPage";
 import ReportsPage from "../pages/ReportsPage";
+import AuthLayout from "../layout/AuthLayout";
+import LoginPage from "../pages/LoginPage";
+import RegisterPage from "../pages/RegisterPage";
+import ProtectedRoute from "./ProtectedRoutes";
 
 const router = createBrowserRouter([
   {
+    path: "/auth",
+    element: <AuthLayout />,
+    children: [
+      {
+        index: true, // Esta propiedad indica que esta es la ruta por defecto
+        element: <Navigate to="login" />,
+      },
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "register",
+        element: <RegisterPage />,
+      },
+    ],
+  },
+  {
     path: "/",
     element: (
-        <MainLayout />
+       <ProtectedRoute>
+         <MainLayout />
+       </ProtectedRoute>
     ),
     children: [
       {

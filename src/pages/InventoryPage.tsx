@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Eye, Pencil } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -105,13 +105,6 @@ const InventoryPage: React.FC = () => {
   ];
 
   const actions: TableAction<typeof inventories[number]>[] = [
-    {
-      label: "Ver inventario",
-      icon: <Eye className="w-4 h-4" />,
-      onClick: (inventory) => {
-        console.log("Ver:", inventory);
-      },
-    },
     {
       label: "Editar inventario",
       icon: <Pencil className="w-4 h-4" />,

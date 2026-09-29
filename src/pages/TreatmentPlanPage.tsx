@@ -9,7 +9,7 @@ import { useDeleteTreatmentPlanOrchestrator, useTreatmentPlansOrchestrator } fro
 import type { TreatmentPlanOrchestratorResponse } from "../models/TreatmentPlanOrchestratorModel";
 import CreateTreatmentPlanDrawer from "../components/treatmentCatalog/CreateTreatmentPlanDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
-import type { TreatmentPlanStatus } from "../utils/treatmentPlanStatus.enum";
+import { treatmentPlanStatusColors, treatmentPlanStatusSpanishOptions, type TreatmentPlanStatus } from "../utils/treatmentPlanStatus.enum";
 import { useAcceptTreatmentPlan, useCancelTreatmentPlan, useCompleteTreatmentPlan, useProposeTreatmentPlan, useStartTreatmentPlan } from "../hooks/useTreatmentPlan";
 import ShowTreatmentPlanDrawer from "../components/treatmentCatalog/ShowTreatmentPlanDrawer";
 
@@ -187,11 +187,23 @@ const TreatmentPlanPage: React.FC = () => {
         {
             key: "status",
             header: "Estado",
-            render: (treatment: TreatmentPlanOrchestratorResponse) => (
-                <span className="text-sm text-slate-500">
-                    {treatment.treatmentPlan.status}
-                </span>
-            ),
+            render: (treatment: TreatmentPlanOrchestratorResponse) => {
+                const status = treatment.treatmentPlan.status;
+
+                const label = treatmentPlanStatusSpanishOptions.find(
+                    (option) => option.value === status
+                )?.label;
+
+                const colors = treatmentPlanStatusColors[status];
+
+                return (
+                    <div className="flex items-center gap-3">
+                        <span className={`text-sm font-semibold ${colors.text}`}>
+                            {label}
+                        </span>
+                    </div>
+                );
+            },
         },
         {
             key: "totalAmount",
@@ -345,7 +357,11 @@ const TreatmentPlanPage: React.FC = () => {
                                 <p className="text-xs text-slate-500 mt-0.5">
                                     Estado actual:{" "}
                                     <span className="font-medium text-slate-700">
-                                        {selectedTreatment.treatmentPlan.status}
+                                        {
+                                            treatmentPlanStatusSpanishOptions.find(
+                                                (option) => option.value === selectedTreatment.treatmentPlan.status
+                                            )?.label
+                                        }
                                     </span>
                                 </p>
                             </div>
@@ -490,7 +506,7 @@ const TreatmentPlanPage: React.FC = () => {
                 }}
             />
 
-            <ShowTreatmentPlanDrawer isOpen={isShowModalOpen} onHide={()=> setIsShowModalOpen(false)} treatment={selectedTreatment} />
+            <ShowTreatmentPlanDrawer isOpen={isShowModalOpen} onHide={() => setIsShowModalOpen(false)} treatment={selectedTreatment} />
         </div>
     );
 }

@@ -8,40 +8,40 @@ import type {
 } from "../../models/DentalChartOrchestratorModel";
 
 import type { DentalChartDto } from "../../models/DentalChartModel";
-import type { DentalChartDetailsStatus } from "../../utils/dentalChartStatus.enum";
+import { dentalChartStatusSpanishOptions, type DentalChartDetailsStatus } from "../../utils/dentalChartStatus.enum";
 
-const dentalChartStatusOptions: {
-  value: DentalChartDetailsStatus;
-  label: string;
-}[] = [
-    { value: "HEALTHY", label: "Sano" },
-    { value: "CARIES", label: "Caries" },
-    { value: "FILLED", label: "Obturado" },
-    { value: "FRACTURED", label: "Fracturado" },
-    { value: "WORN", label: "Desgastado" },
-    { value: "MISSING", label: "Ausente" },
-    { value: "EXTRACTED", label: "Extraído" },
-    { value: "ROOT_CANAL_TREATED", label: "Tratamiento de conducto" },
-    { value: "CROWN", label: "Corona" },
-    { value: "IMPLANT", label: "Implante" },
-    { value: "BRIDGE", label: "Puente" },
-    { value: "PROSTHETIC", label: "Prótesis" },
-    { value: "IMPACTED", label: "Impactado" },
-    { value: "MOBILE", label: "Móvil" },
-    { value: "INFECTED", label: "Infectado" },
-    { value: "ABSCESS", label: "Absceso" },
-    {
-      value: "PERIODONTAL_AFFECTATION",
-      label: "Afectación periodontal",
-    },
-    { value: "SENSITIVITY", label: "Sensibilidad" },
-    { value: "DISCOLORATION", label: "Decoloración" },
-    {
-      value: "DEVELOPMENTAL_ANOMALY",
-      label: "Anomalía del desarrollo",
-    },
-    { value: "OTHER", label: "Otro" },
-  ];
+// const dentalChartStatusOptions: {
+//   value: DentalChartDetailsStatus;
+//   label: string;
+// }[] = [
+//     { value: "HEALTHY", label: "Sano" },
+//     { value: "CARIES", label: "Caries" },
+//     { value: "FILLED", label: "Obturado" },
+//     { value: "FRACTURED", label: "Fracturado" },
+//     { value: "WORN", label: "Desgastado" },
+//     { value: "MISSING", label: "Ausente" },
+//     { value: "EXTRACTED", label: "Extraído" },
+//     { value: "ROOT_CANAL_TREATED", label: "Tratamiento de conducto" },
+//     { value: "CROWN", label: "Corona" },
+//     { value: "IMPLANT", label: "Implante" },
+//     { value: "BRIDGE", label: "Puente" },
+//     { value: "PROSTHETIC", label: "Prótesis" },
+//     { value: "IMPACTED", label: "Impactado" },
+//     { value: "MOBILE", label: "Móvil" },
+//     { value: "INFECTED", label: "Infectado" },
+//     { value: "ABSCESS", label: "Absceso" },
+//     {
+//       value: "PERIODONTAL_AFFECTATION",
+//       label: "Afectación periodontal",
+//     },
+//     { value: "SENSITIVITY", label: "Sensibilidad" },
+//     { value: "DISCOLORATION", label: "Decoloración" },
+//     {
+//       value: "DEVELOPMENTAL_ANOMALY",
+//       label: "Anomalía del desarrollo",
+//     },
+//     { value: "OTHER", label: "Otro" },
+//   ];
 
 interface DentalChartSectionProps {
   appointment: Appointment | null;
@@ -413,23 +413,23 @@ const DentalChartSection: React.FC<
                       )
                     }
                     className="
-    w-full
-    px-3 py-2.5
-    border border-slate-200
-    rounded-lg
-    text-sm
-    outline-none
-    bg-white
-    focus:border-blue-500
-    focus:ring-2
-    focus:ring-blue-500/10
-  "
+                      w-full
+                      px-3 py-2.5
+                      border border-slate-200
+                      rounded-lg
+                      text-sm
+                      outline-none
+                      bg-white
+                      focus:border-blue-500
+                      focus:ring-2
+                      focus:ring-blue-500/10
+                    "
                   >
                     <option value="">
                       Seleccione un estado
                     </option>
 
-                    {dentalChartStatusOptions.map((status) => (
+                    {dentalChartStatusSpanishOptions.map((status) => (
                       <option
                         key={status.value}
                         value={status.value}

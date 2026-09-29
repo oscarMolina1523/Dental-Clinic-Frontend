@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import logo from "../assets/logo.webp";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   Users,
   Calendar,
@@ -11,11 +11,13 @@ import {
   Package,
   BarChart3,
   UserCheck,
-  Settings,
   ChevronDown,
   ScanBarcode,
-  Pill
+  Pill,
+  LogOut,
 } from "lucide-react";
+import useAuthContext from "../hooks/useAuthContext";
+import { useRolePermissions } from "../hooks/useRolePermitions";
 
 // Lista de elementos de navegación con sus íconos
 const navItems = [
@@ -31,10 +33,42 @@ const navItems = [
   { id: "inventory-lotes", label: "Lotes", icon: Package },
   { id: "reports", label: "Reportes", icon: BarChart3 },
   { id: "users", label: "Usuarios", icon: UserCheck },
-  { id: "configuracion", label: "Configuración", icon: Settings },
 ];
 
 const AppSidebar: React.FC = () => {
+  const navigate = useNavigate();
+  const { user, logoutUser } = useAuthContext();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const { permissions } = useRolePermissions();
+
+  const roleName =
+    user?.roleId === "70ef9d9c7fb961b2"
+      ? "Administrador"
+      : user?.roleId === "946adffd1a8d8931"
+        ? "Demo"
+      : user?.roleId === "2f67c45e35ff526b"
+        ? "Dentista"
+      : user?.roleId === "5e3add1ef884e4e7"
+        ? "Recepcionista"
+        : "Usuario";
+
+  const filteredNavItems = navItems.filter((item) =>
+    permissions.includes(`/${item.id}`)
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <aside className="flex flex-col h-screen w-64 bg-[#001D4A] text-white px-4 py-6 justify-between select-none">
@@ -57,7 +91,7 @@ const AppSidebar: React.FC = () => {
 
         {/* 2. Menú de Navegación */}
         <nav className="flex flex-col gap-1 overflow-y-auto max-h-[calc(100vh-220px)] scrollbar-none">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const Icon = item.icon;
 
             return (
@@ -65,10 +99,9 @@ const AppSidebar: React.FC = () => {
                 key={item.id}
                 to={`/${item.id}`}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-2.5 rounded-sm text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? "bg-[#1E69FF] text-white"
-                      : "text-blue-100 hover:bg-white/10 hover:text-white"
+                  `flex items-center gap-3 px-4 py-2.5 rounded-sm text-sm font-medium transition-all duration-200 ${isActive
+                    ? "bg-[#1E69FF] text-white"
+                    : "text-blue-100 hover:bg-white/10 hover:text-white"
                   }`
                 }
               >
@@ -80,26 +113,44 @@ const AppSidebar: React.FC = () => {
         </nav>
       </div>
 
-      {/* 3. Footer: Perfil de Usuario */}
-      <div className="border border-blue-400/30 bg-[#00163A]/60 rounded-2xl p-3 flex items-center justify-between mt-auto">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?q=80&w=150&auto=format&fit=crop"
-              alt="Dra. López"
-              className="w-10 h-10 rounded-full object-cover border border-blue-400"
-            />
+      {/* 3. Footer: Perfil de Usuario con Menú Estilo Windows */}
+      <div className="relative mt-auto" ref={menuRef}>
+        {/* Menú Contextual Flotante estilo Windows 11 */}
+        {isMenuOpen && (
+          <div className="absolute bottom-full left-0 mb-2 w-full bg-[#1c2430]/95 backdrop-blur-md border border-white/10 rounded-xl p-1.5 shadow-2xl z-50 text-xs font-medium animate-in fade-in zoom-in-95 duration-150">
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                if (logoutUser) {
+                  logoutUser();
+                  navigate("/auth/login", { replace: true });
+                }
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-300 hover:bg-red-500/20 hover:text-red-200 transition-colors text-left"
+            >
+              <LogOut className="h-4 w-4 text-red-400" />
+              <span>Cerrar sesión</span>
+            </button>
           </div>
-          <div className="flex flex-col text-left">
-            <span className="text-xs font-semibold leading-tight">Dra. López</span>
-            <span className="text-[10px] text-blue-300 leading-tight">Administradora</span>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-[9px] text-emerald-400 font-medium leading-none">En línea</span>
+        )}
+
+        {/* Tarjeta del Usuario */}
+        <div
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="border border-blue-400/30 bg-[#00163A]/60 rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-[#00163A] transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col text-left">
+              <span className="text-xs font-semibold leading-tight">{user?.username || "Usuario"}</span>
+              <span className="text-[10px] text-blue-300 leading-tight">{roleName}</span>
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-[9px] text-emerald-400 font-medium leading-none">En línea</span>
+              </div>
             </div>
           </div>
+          <ChevronDown className={`h-4 w-4 text-blue-300 hover:text-white transition-transform duration-200 ${isMenuOpen ? "rotate-180" : ""}`} />
         </div>
-        <ChevronDown className="h-4 w-4 text-blue-300 cursor-pointer hover:text-white transition-colors" />
       </div>
     </aside>
   );
