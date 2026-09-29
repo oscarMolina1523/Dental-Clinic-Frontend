@@ -2,6 +2,7 @@
 import React from "react";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import type { TreatmentPlanOrchestratorResponse } from "../../models/TreatmentPlanOrchestratorModel";
+import { treatmentPlanDetailStatusSpanishOptions, treatmentPlanStatusSpanishOptions } from "../../utils/treatmentPlanStatus.enum";
 
 interface ShowTreatmentPlanDrawerProps {
     isOpen: boolean;
@@ -16,7 +17,7 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
 }) => {
     const treatmentPlan = treatment?.treatmentPlan;
 
-     const subtotal =
+    const subtotal =
         treatment?.details?.reduce(
             (total, detail) => total + Number(detail.subtotal || 0),
             0
@@ -34,10 +35,9 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                     fixed inset-0 z-40
                     bg-black/30
                     transition-opacity duration-300
-                    ${
-                        isOpen
-                            ? "opacity-100 pointer-events-auto"
-                            : "opacity-0 pointer-events-none"
+                    ${isOpen
+                        ? "opacity-100 pointer-events-auto"
+                        : "opacity-0 pointer-events-none"
                     }
                 `}
             />
@@ -176,7 +176,9 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
 
                             <input
                                 type="text"
-                                value={treatmentPlan.status || "N/A"}
+                                value={treatmentPlanStatusSpanishOptions.find(
+                                    (option) => option.value === treatmentPlan.status
+                                )?.label || "N/A"}
                                 disabled
                                 className="
                                     w-full
@@ -414,7 +416,7 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                             <div className="space-y-5">
 
                                 {treatment.details &&
-                                treatment.details.length > 0 ? (
+                                    treatment.details.length > 0 ? (
                                     treatment.details.map(
                                         (detail, index) => (
                                             <div
@@ -643,7 +645,9 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                                     <input
                                                         type="text"
                                                         value={
-                                                            detail.status || "N/A"
+                                                            treatmentPlanDetailStatusSpanishOptions.find(
+                                                                (option) => option.value === detail.status
+                                                            )?.label || "N/A"
                                                         }
                                                         disabled
                                                         className="
