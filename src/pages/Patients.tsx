@@ -11,9 +11,11 @@ import CreatePatientDrawer from "../components/patient/CreatePatientDrawer";
 import EditPatientDrawer from "../components/patient/EditPatientDrawer";
 import SecurityPatientDrawer from "../components/patient/SecurityPatientDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
+import TableSkeleton from "../components/skeleton/TableSkeleton";
 
 const PatientsPage: React.FC = () => {
   const {
+    isLoading,
     data: patients = [],
   } = usePatients();
 
@@ -251,13 +253,22 @@ const PatientsPage: React.FC = () => {
 
         {/* Tabla de Pacientes */}
         <div className="overflow-x-auto">
-          <DataTable
-            data={currentPatients}
-            columns={columns}
-            actions={actions}
-            getRowId={(patient) => patient.id}
-            emptyMessage="No hay pacientes registrados."
-          />
+          {isLoading ? (
+            <TableSkeleton
+              columns={columns}
+              rows={10}
+              actions
+            />
+          ) : (
+            <DataTable
+              data={currentPatients}
+              columns={columns}
+              actions={actions}
+              getRowId={(patient) => patient.id}
+              emptyMessage="No hay pacientes registrados."
+            />
+          )}
+
         </div>
       </div>
 

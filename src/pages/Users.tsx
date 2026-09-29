@@ -12,10 +12,12 @@ import EditUserDrawer from "../components/user/EditUserDrawer";
 import SecurityUserDrawer from "../components/user/SecurityUserDrawer";
 import { useRoles } from "../hooks/useRoles";
 import ConfirmModal from "../shared/ConfirmModal";
+import TableSkeleton from "../components/skeleton/TableSkeleton";
 
 const UsersPage: React.FC = () => {
   const {
     data: users = [],
+    isLoading
   } = useUsers();
 
   const {
@@ -126,7 +128,7 @@ const UsersPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
-      className:"w-105",
+      className: "w-105",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {user.email}
@@ -240,13 +242,21 @@ const UsersPage: React.FC = () => {
 
         {/* Tabla de Usuarios */}
         <div className="overflow-x-auto">
-          <DataTable
-            data={currentUsers}
-            columns={columns}
-            actions={actions}
-            getRowId={(user) => user.id}
-            emptyMessage="No hay usuarios registrados."
-          />
+          {isLoading ? (
+            <TableSkeleton
+              columns={columns}
+              rows={10}
+              actions
+            />
+          ) : (
+            <DataTable
+              data={currentUsers}
+              columns={columns}
+              actions={actions}
+              getRowId={(user) => user.id}
+              emptyMessage="No hay usuarios registrados."
+            />
+          )}
         </div>
       </div>
 

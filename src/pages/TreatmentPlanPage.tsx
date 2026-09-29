@@ -12,10 +12,12 @@ import ConfirmModal from "../shared/ConfirmModal";
 import { treatmentPlanStatusColors, treatmentPlanStatusSpanishOptions, type TreatmentPlanStatus } from "../utils/treatmentPlanStatus.enum";
 import { useAcceptTreatmentPlan, useCancelTreatmentPlan, useCompleteTreatmentPlan, useProposeTreatmentPlan, useStartTreatmentPlan } from "../hooks/useTreatmentPlan";
 import ShowTreatmentPlanDrawer from "../components/treatmentCatalog/ShowTreatmentPlanDrawer";
+import TableSkeleton from "../components/skeleton/TableSkeleton";
 
 const TreatmentPlanPage: React.FC = () => {
     const {
-        data: treatments = []
+        data: treatments = [],
+        isLoading
     } = useTreatmentPlansOrchestrator();
 
     const proposeMutation = useProposeTreatmentPlan();
@@ -322,13 +324,21 @@ const TreatmentPlanPage: React.FC = () => {
 
                 {/* Tabla de plan de tratamientos */}
                 <div className="overflow-x-auto">
-                    <DataTable
-                        data={currentTreatments}
-                        columns={columns}
-                        actions={actions}
-                        getRowId={(treatment) => treatment.treatmentPlan.id}
-                        emptyMessage="No hay plan de tratamientos registrados."
-                    />
+                    {isLoading ? (
+                        <TableSkeleton
+                            columns={columns}
+                            rows={10}
+                            actions
+                        />
+                    ) : (
+                        <DataTable
+                            data={currentTreatments}
+                            columns={columns}
+                            actions={actions}
+                            getRowId={(treatment) => treatment.treatmentPlan.id}
+                            emptyMessage="No hay plan de tratamientos registrados."
+                        />
+                    )}
                 </div>
             </div>
 

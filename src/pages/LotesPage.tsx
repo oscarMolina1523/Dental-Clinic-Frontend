@@ -10,10 +10,12 @@ import type InventoryLoteModel from "../models/InventoryLote";
 import CreateInventoryLoteDrawer from "../components/inventory/CreateInventoryLoteDrawer";
 import EditInventoryLoteDrawer from "../components/inventory/EditInventoryLoteDrawer";
 import ExpiredLoteDrawer from "../components/inventory/ExpiredLoteDrawer";
+import TableSkeleton from "../components/skeleton/TableSkeleton";
 
 const LotesPage: React.FC = () => {
   const {
-    data: inventoryLotes = []
+    data: inventoryLotes = [],
+    isLoading
   } = useInventoryLotes();
 
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
@@ -186,13 +188,21 @@ const LotesPage: React.FC = () => {
 
         {/* Tabla de Lotes */}
         <div className="overflow-x-auto">
-          <DataTable
-            data={currentProducts}
-            columns={columns}
-            actions={actions}
-            getRowId={(lote) => lote.id}
-            emptyMessage="No hay Lotes registrados."
-          />
+          {isLoading ? (
+            <TableSkeleton
+              columns={columns}
+              rows={10}
+              actions
+            />
+          ) : (
+            <DataTable
+              data={currentProducts}
+              columns={columns}
+              actions={actions}
+              getRowId={(lote) => lote.id}
+              emptyMessage="No hay Lotes registrados."
+            />
+          )}
         </div>
       </div>
 

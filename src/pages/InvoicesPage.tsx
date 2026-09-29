@@ -14,10 +14,12 @@ import ShowDetailsInvoiceDrawer from "../components/invoices/ShowDetailsInvoiceD
 import RegisterPaymentDrawer from "../components/invoices/RegisterPaymentDrawer";
 import { useCancelPaymentPlan } from "../hooks/usePaymentPlanOrchestrator";
 import { invoiceStatusColors, invoiceStatusSpanishOptions } from "../utils/invoiceStatus.enum";
+import TableSkeleton from "../components/skeleton/TableSkeleton";
 
 const InvoicesPage: React.FC = () => {
     const {
-        data: invoices = []
+        data: invoices = [],
+        isLoading
     } = useInvoices();
 
 
@@ -266,13 +268,21 @@ const InvoicesPage: React.FC = () => {
 
                 {/* Tabla de Facturas */}
                 <div className="overflow-x-auto">
-                    <DataTable
-                        data={currentInvoices}
-                        columns={columns}
-                        actions={actions}
-                        getRowId={(invoice) => invoice.id}
-                        emptyMessage="No hay Facturas registradas."
-                    />
+                    {isLoading ? (
+                        <TableSkeleton
+                            columns={columns}
+                            rows={10}
+                            actions
+                        />
+                    ) : (
+                        <DataTable
+                            data={currentInvoices}
+                            columns={columns}
+                            actions={actions}
+                            getRowId={(invoice) => invoice.id}
+                            emptyMessage="No hay Facturas registradas."
+                        />
+                    )}
                 </div>
             </div>
 

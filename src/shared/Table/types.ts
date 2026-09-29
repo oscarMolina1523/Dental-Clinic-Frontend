@@ -13,6 +13,7 @@ export interface TableColumn<T> {
      * Clases adicionales para la columna.
      */
     className?: string;
+    skeletonClassName?: string;
 }
 
 export interface TableAction<T> {

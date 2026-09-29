@@ -13,10 +13,12 @@ import Toast from "../shared/Toast";
 import useAppointmentPage from "../components/appointment/useAppointmentPage";
 import CreateClinicalProgressDrawer from "../components/medical/CreateClinicalProgressDrawer";
 import type { AppointmentStatus } from "../utils/appointmentStatus.enum";
+import TableSkeleton from "../components/skeleton/TableSkeleton";
 
 const AppointmentPage: React.FC = () => {
     const {
-        data: appointments = []
+        data: appointments = [],
+        isLoading
     } = useAppointments();
 
     const {
@@ -293,13 +295,21 @@ const AppointmentPage: React.FC = () => {
 
                 {/* Tabla de Citas */}
                 <div className="overflow-x-auto">
-                    <DataTable
-                        data={currentProducts}
-                        columns={columns}
-                        actions={actions}
-                        getRowId={(appointment) => appointment.id}
-                        emptyMessage="No hay Citas registradas."
-                    />
+                    {isLoading ? (
+                        <TableSkeleton
+                            columns={columns}
+                            rows={10}
+                            actions
+                        />
+                    ) : (
+                        <DataTable
+                            data={currentProducts}
+                            columns={columns}
+                            actions={actions}
+                            getRowId={(appointment) => appointment.id}
+                            emptyMessage="No hay Citas registradas."
+                        />
+                    )}
                 </div>
             </div>
 
