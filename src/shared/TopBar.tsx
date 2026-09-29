@@ -15,7 +15,6 @@ const sections: Record<string, string> = {
     "/inventory-lotes": "Administrador de Lotes",
     "/reports": "Reportes",
     "/users": "Usuarios",
-    "/configuracion": "Configuración",
 };
 
 const TopBar: React.FC = () => {

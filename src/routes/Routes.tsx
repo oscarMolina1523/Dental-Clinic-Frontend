@@ -16,6 +16,7 @@ import ReportsPage from "../pages/ReportsPage";
 import AuthLayout from "../layout/AuthLayout";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
+import ProtectedRoute from "./ProtectedRoutes";
 
 const router = createBrowserRouter([
   {
@@ -39,7 +40,9 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-        <MainLayout />
+       <ProtectedRoute>
+         <MainLayout />
+       </ProtectedRoute>
     ),
     children: [
       {

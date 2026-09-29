@@ -1,10 +1,5 @@
-import {
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import AuthService from "../api/auth.service";
-
 import type {
   LoginRequest,
   LoginResponse,
@@ -12,75 +7,52 @@ import type {
   RegisterResponse,
   LogoutResponse,
 } from "../models/AuthModel";
+import useAuthContext from "./useAuthContext";
 
 const authService = new AuthService();
 
 export function useLogin() {
   const queryClient = useQueryClient();
+  const { setUser } = useAuthContext();
 
-  return useMutation<
-    LoginResponse | null,
-    Error,
-    LoginRequest
-  >({
+  return useMutation<LoginResponse | null, Error, LoginRequest>({
     mutationKey: ["login"],
 
-    mutationFn: (credentials) =>
-      authService.login(credentials),
+    mutationFn: (credentials) => authService.login(credentials),
 
     onSuccess: (data) => {
       if (!data?.user || !data.token) {
         return;
       }
 
-      localStorage.setItem(
-        "authToken",
-        data.token
-      );
+      localStorage.setItem("authToken", data.token);
 
-      localStorage.setItem(
-        "authUser",
-        JSON.stringify(data.user)
-      );
+      // Actualiza React Context inmediatamente
+      setUser(data.user);
 
-      queryClient.setQueryData(
-        ["authUser"],
-        data.user
-      );
+      queryClient.setQueryData(["authUser"], data.user);
     },
   });
 }
 
 export function useRegister() {
-  return useMutation<
-    RegisterResponse | null,
-    Error,
-    RegisterRequest
-  >({
+  return useMutation<RegisterResponse | null, Error, RegisterRequest>({
     mutationKey: ["register"],
-
-    mutationFn: (user) =>
-      authService.register(user),
+    mutationFn: (user) => authService.register(user),
   });
 }
 
 export function useLogout() {
   const queryClient = useQueryClient();
+  const { logoutUser } = useAuthContext();
 
-  return useMutation<
-    LogoutResponse | null,
-    Error,
-    void
-  >({
+  return useMutation<LogoutResponse | null, Error, void>({
     mutationKey: ["logout"],
 
-    mutationFn: () =>
-      authService.logout(),
+    mutationFn: () => authService.logout(),
 
     onSuccess: () => {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("authUser");
-
+      logoutUser();
       queryClient.clear();
     },
   });
