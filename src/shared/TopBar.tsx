@@ -74,7 +74,7 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
                 </button> */}
 
                 {/* Sección de Fecha y Calendario */}
-                <div className="flex items-center gap-2 text-slate-500">
+                <div className="hidden md:flex items-center gap-2 text-slate-500">
                     <span className="text-xs font-medium ">
                         {date}
                     </span>
