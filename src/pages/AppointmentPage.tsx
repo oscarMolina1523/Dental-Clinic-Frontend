@@ -152,7 +152,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "patientFullName",
             header: "Paciente",
-            className: "pl-2 w-80",
+            className: "pl-2 w-40 md:w-80",
             render: (appointment: AppointmentModel) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -165,7 +165,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "dentistFullName",
             header: "Dentista",
-            className: "pl-2 w-80",
+            className: "pl-2 w-40 md:w-80",
             render: (appointment: AppointmentModel) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -178,6 +178,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "startAppointmentTime",
             header: "Fecha de inicio",
+            className: "w-24",
             render: (appointment: AppointmentModel) => (
                 <span className="text-sm text-slate-500">
                     {appointment.startAppointmentTime ? new Date(appointment.startAppointmentTime).toLocaleString("es-NI", {
@@ -193,6 +194,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "endAppointmentTime",
             header: "Fecha de finalización",
+            className: "w-24",
             render: (appointment: AppointmentModel) => (
                 <span className="text-sm text-slate-500">
                     {appointment.endAppointmentTime ? new Date(
@@ -210,6 +212,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "status",
             header: "Estado",
+            className: "w-24",
             render: (appointment: AppointmentModel) => {
                 const status = appointmentStatusConfig[appointment.status];
 
@@ -224,6 +227,7 @@ const AppointmentPage: React.FC = () => {
         },
         {
             key: "reminderSent",
+            className: "w-20",
             header: "Recordatorio Enviado",
             render: (appointment: AppointmentModel) => (
                 <div className="flex items-center gap-3">
@@ -287,7 +291,7 @@ const AppointmentPage: React.FC = () => {
             )}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 {/* Encabezado */}
-                <div className="flex items-center justify-between pb-6 mb-2">
+                <div className="flex flex-col md:flex-row gap-2 items-end md:items-center justify-between pb-6 mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
                     <SearchInput
                         value={search}

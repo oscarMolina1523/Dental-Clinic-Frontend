@@ -181,13 +181,6 @@ const PatientsPage: React.FC = () => {
   ];
 
   const actions: TableAction<typeof patients[number]>[] = [
-    // {
-    //   label: "Ver paciente",
-    //   icon: <Eye className="w-4 h-4" />,
-    //   onClick: (patient) => {
-    //     console.log("Ver:", patient);
-    //   },
-    // },
     {
       label: "Editar paciente",
       icon: <Pencil className="w-4 h-4" />,
