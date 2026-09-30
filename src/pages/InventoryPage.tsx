@@ -79,7 +79,7 @@ const InventoryPage: React.FC = () => {
     {
       key: "productName",
       header: "Nombre del inventario",
-      className: "pl-2 w-100",
+      className: "pl-2 w-40 md:w-100",
       render: (inventory: InventoryModel) => (
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-slate-800">
@@ -93,7 +93,7 @@ const InventoryPage: React.FC = () => {
     {
       key: "currentStock",
       header: "Stock actual",
-      className: "w-100",
+      className: "w-30 md:w-100",
       render: (inventory: InventoryModel) => (
         <span className="text-sm text-slate-500">
           {inventory.currentStock}
@@ -103,7 +103,7 @@ const InventoryPage: React.FC = () => {
     {
       key: "minimumStock",
       header: "Stock mínimo",
-      className: "w-100",
+      className: "w-30 md:w-100",
       render: (inventory: InventoryModel) => (
         <span className="text-sm text-slate-500">
           {inventory.minimumStock}
@@ -139,7 +139,7 @@ const InventoryPage: React.FC = () => {
     <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         {/* Encabezado */}
-        <div className="flex items-center justify-between pb-6 mb-2">
+        <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
           {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
           <SearchInput
             value={search}
