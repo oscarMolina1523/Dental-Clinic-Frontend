@@ -85,7 +85,7 @@ const LotesPage: React.FC = () => {
     {
       key: "productName",
       header: "Producto",
-      className: "pl-2 w-100",
+      className: "pl-2 w-40 md:w-100",
       render: (inventory: InventoryLoteModel) => (
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-slate-800">
@@ -99,6 +99,7 @@ const LotesPage: React.FC = () => {
     {
       key: "quantity",
       header: "Cantidad",
+      className: "w-20 md:w-50",
       render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
           {inventory.quantity}
@@ -108,6 +109,7 @@ const LotesPage: React.FC = () => {
     {
       key: "loteNumber",
       header: "Número de lote",
+      className: "w-20 md:w-50",
       render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
           {inventory.loteNumber}
@@ -117,6 +119,7 @@ const LotesPage: React.FC = () => {
     {
       key: "dueDate",
       header: "Fecha de vencimiento",
+      className: "w-40 md:w-80",
       render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
           {inventory.dueDate ? new Date(inventory.dueDate).toLocaleString("es-NI", {
@@ -132,6 +135,7 @@ const LotesPage: React.FC = () => {
     {
       key: "entryDate",
       header: "Fecha de entrada",
+      className: "w-40 md:w-80",
       render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
           {inventory.entryDate ? new Date(inventory.entryDate).toLocaleString("es-NI", {
@@ -181,7 +185,7 @@ const LotesPage: React.FC = () => {
     <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         {/* Encabezado */}
-        <div className="flex items-center justify-between pb-6 mb-2">
+        <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
           {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
           <SearchInput
             value={search}
@@ -218,7 +222,7 @@ const LotesPage: React.FC = () => {
       </div>
 
       {/* Paginación de la Tabla */}
-      <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
+      <div className="flex items-center justify-between py-4 px-2 text-xs text-slate-500">
         <Pagination
           currentPage={validPage}
           totalItems={totalItems}

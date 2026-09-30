@@ -562,7 +562,7 @@ const ReportsPage: React.FC = () => {
             APPOINTMENTS BY MONTH
         ==================================================== */}
 
-        <div className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="rounded-2xl bg-white p-2 md:p-6 shadow-sm">
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-slate-900">
               Citas por mes

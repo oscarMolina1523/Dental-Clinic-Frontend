@@ -10,10 +10,9 @@ import CreateUserDrawer from "../components/user/CreateUserDrawer";
 import { useDeleteUser, useUsers } from "../hooks/useUsers";
 import EditUserDrawer from "../components/user/EditUserDrawer";
 import SecurityUserDrawer from "../components/user/SecurityUserDrawer";
-import { useRoles } from "../hooks/useRoles";
 import ConfirmModal from "../shared/ConfirmModal";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
-import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
+import { getRoleName, useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 
 const UsersPage: React.FC = () => {
   const {
@@ -25,8 +24,6 @@ const UsersPage: React.FC = () => {
     mutate: deleteUser,
     isPending: isDeleting
   } = useDeleteUser();
-
-  const { data: roles = [] } = useRoles();
 
   const { role: permiso } = useRolePermissions();
 
@@ -94,16 +91,11 @@ const UsersPage: React.FC = () => {
     [startIndex, endIndex, filteredData]
   );
 
-  //Creamos un mapa/diccionario optimizado para búsqueda rápida (O(1))
-  const roleMap = useMemo(() => {
-    return new Map(roles.map((role) => [role.id, role.name]));
-  }, [roles]);
-
   const columns: TableColumn<typeof users[number]>[] = [
     {
       key: "name",
       header: "Nombre",
-      className: "pl-2 w-100",
+      className: "pl-2 w-50 md:w-100",
       render: (user: UserModel) => (
         <div className="flex items-center gap-3">
 
@@ -124,6 +116,7 @@ const UsersPage: React.FC = () => {
     {
       key: "phone",
       header: "Teléfono",
+      className: "w-40 md:w-50",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {user.phoneNumber}
@@ -134,7 +127,7 @@ const UsersPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
-      className: "w-105",
+      className: "w-50 md:w-105",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {user.email}
@@ -144,9 +137,10 @@ const UsersPage: React.FC = () => {
     {
       key: "roleId",
       header: "Role",
+      className: "w-40 md:w-50",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
-          {roleMap.get(user.roleId) ?? "Cargando..."}
+          {getRoleName(user.roleId) ?? "Cargando..."}
         </span>
       ),
     },
@@ -154,6 +148,7 @@ const UsersPage: React.FC = () => {
     {
       key: "status",
       header: "Estado",
+      className: "w-20 md:w-80",
       render: (user: UserModel) => (
         user.active ? (
           <span className="text-emerald-500 font-medium text-sm">
@@ -232,7 +227,7 @@ const UsersPage: React.FC = () => {
     <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         {/* Encabezado */}
-        <div className="flex items-center justify-between pb-6 mb-2">
+        <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
           {/* <h1 className="text-xl font-bold text-[#001D4A]">Usuarios</h1> */}
           <SearchInput
             value={search}

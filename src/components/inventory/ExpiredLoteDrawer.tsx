@@ -122,7 +122,7 @@ const ExpiredLoteDrawer: React.FC<ExpiredLoteDrawerProps> = ({
                 onHide={onHide}
                 title="Marcar como expirado"
                 description="Marca el inventario como expirado"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button

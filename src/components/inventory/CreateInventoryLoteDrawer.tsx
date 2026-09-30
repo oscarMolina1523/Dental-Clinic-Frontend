@@ -210,7 +210,7 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                 onHide={onHide}
                 title="Nuevo Lote de Inventario"
                 description="Registra un nuevo lote de inventario"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button
