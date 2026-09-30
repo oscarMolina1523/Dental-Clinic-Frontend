@@ -178,7 +178,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "startAppointmentTime",
             header: "Fecha de inicio",
-            className: "w-24",
+            className: "w-24 md:w-50",
             render: (appointment: AppointmentModel) => (
                 <span className="text-sm text-slate-500">
                     {appointment.startAppointmentTime ? new Date(appointment.startAppointmentTime).toLocaleString("es-NI", {
@@ -194,7 +194,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "endAppointmentTime",
             header: "Fecha de finalización",
-            className: "w-24",
+            className: "w-24 md:w-50",
             render: (appointment: AppointmentModel) => (
                 <span className="text-sm text-slate-500">
                     {appointment.endAppointmentTime ? new Date(
@@ -212,7 +212,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "status",
             header: "Estado",
-            className: "w-24",
+            className: "w-24 md:w-50",
             render: (appointment: AppointmentModel) => {
                 const status = appointmentStatusConfig[appointment.status];
 
