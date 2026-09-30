@@ -1,5 +1,5 @@
 import React from "react";
-import { CalendarDays} from "lucide-react";
+import { CalendarDays, Menu } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 const sections: Record<string, string> = {
@@ -17,7 +17,11 @@ const sections: Record<string, string> = {
     "/users": "Usuarios",
 };
 
-const TopBar: React.FC = () => {
+interface TopBarProps {
+    onMenuClick?: () => void;
+}
+
+const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
     const location = useLocation();
 
     const sectionName = sections[location.pathname] ?? "Dashboard";
@@ -38,6 +42,14 @@ const TopBar: React.FC = () => {
         <header className="w-full h-16 bg-white border-b border-gray-100 px-6 flex items-center justify-between select-none">
             {/* Lado izquierdo: Botón Menú Hamburger y Título */}
             <div className="flex items-center gap-4">
+                <button
+                    type="button"
+                    onClick={onMenuClick}
+                    className="md:hidden flex items-center justify-center p-2"
+                    aria-label="Open menu"
+                >
+                    <Menu size={20} />
+                </button>
                 <h1 className="text-base font-bold text-[#001D4A] ">
                     {sectionName}
                 </h1>
