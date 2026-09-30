@@ -231,7 +231,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                 onHide={onHide}
                 title="Editar Cita"
                 description="Modifica la información de la cita"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button

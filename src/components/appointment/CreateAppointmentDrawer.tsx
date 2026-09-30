@@ -226,7 +226,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                 onHide={onHide}
                 title="Nueva Cita"
                 description="Registra una nueva cita"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button

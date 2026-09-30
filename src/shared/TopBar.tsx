@@ -39,7 +39,7 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
     const date = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
 
     return (
-        <header className="w-full h-16 bg-white border-b border-gray-100 px-6 flex items-center justify-between select-none">
+        <header className="w-full min-h-16 bg-white border-b border-gray-100 px-6 flex items-center justify-between select-none">
             {/* Lado izquierdo: Botón Menú Hamburger y Título */}
             <div className="flex items-center gap-4">
                 <button

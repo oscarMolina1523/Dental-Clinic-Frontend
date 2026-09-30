@@ -486,7 +486,7 @@ const CreateClinicalProgressDrawer: React.FC<
                     onHide={onHide}
                     title="Nuevo Progreso Clínico"
                     description="Registra el progreso clínico de la cita"
-                    width="w-150"
+                    width="w-80 md:w-150"
                     footer={
                         <>
                             <button
