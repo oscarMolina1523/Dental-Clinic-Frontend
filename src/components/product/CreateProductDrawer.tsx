@@ -364,7 +364,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                 onHide={onHide}
                 title="Nuevo Producto"
                 description="Registra un nuevo producto"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button

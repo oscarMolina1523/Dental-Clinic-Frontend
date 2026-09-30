@@ -101,7 +101,7 @@ const ProductsPage: React.FC = () => {
     {
       key: "name",
       header: "Nombre",
-      className: "pl-2 w-100",
+      className: "pl-2 w-40 md:w-100",
       render: (product: ProductModel) => (
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-slate-800">
@@ -114,6 +114,7 @@ const ProductsPage: React.FC = () => {
 
     {
       key: "barcode",
+      className: "w-40 md:w-50",
       header: "Código de barra",
       render: (product: ProductModel) => (
         <span className="text-sm text-slate-500">
@@ -124,7 +125,7 @@ const ProductsPage: React.FC = () => {
     {
       key: "category_id",
       header: "Categoría",
-      className: "w-100",
+      className: "w-40 md:w-100",
       render: (product: ProductModel) => (
         <span className="text-sm text-slate-500">
           {categoryMap.get(product.category_id) ?? "Cargando..."}
@@ -134,6 +135,7 @@ const ProductsPage: React.FC = () => {
     {
       key: "measurement_unit_id",
       header: "Unidad de medida",
+      className: "pl-2 w-40 md:w-80",
       render: (product: ProductModel) => {
         const measurement = measurementMap.get(product.measurement_unit_id);
 
@@ -203,7 +205,7 @@ const ProductsPage: React.FC = () => {
     <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         {/* Encabezado */}
-        <div className="flex items-center justify-between pb-6 mb-2">
+        <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
           {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
           <SearchInput
             value={search}
@@ -240,7 +242,7 @@ const ProductsPage: React.FC = () => {
       </div>
 
       {/* Paginación de la Tabla */}
-      <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
+      <div className="flex items-center justify-between py-4 px-2 text-xs text-slate-500">
         <Pagination
           currentPage={validPage}
           totalItems={totalItems}
