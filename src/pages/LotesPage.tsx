@@ -85,7 +85,7 @@ const LotesPage: React.FC = () => {
     {
       key: "productName",
       header: "Producto",
-      className: "pl-2 w-40 md:w-100",
+      className: "pl-2 w-40 md:w-60",
       render: (inventory: InventoryLoteModel) => (
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-slate-800">
@@ -99,7 +99,7 @@ const LotesPage: React.FC = () => {
     {
       key: "quantity",
       header: "Cantidad",
-      className: "w-20 md:w-50",
+      className: "w-20",
       render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
           {inventory.quantity}
@@ -202,7 +202,7 @@ const LotesPage: React.FC = () => {
         </div>
 
         {/* Tabla de Lotes */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-100">
           {isLoading ? (
             <TableSkeleton
               columns={columns}

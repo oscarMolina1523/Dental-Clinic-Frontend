@@ -108,7 +108,7 @@ const InvoicesPage: React.FC = () => {
         {
             key: "invoiceNumber",
             header: "Número de factura",
-            className: "w-40 md:w-80",
+            className: "w-40 md:w-60",
             render: (invoice: Invoice) => (
                 <span className="text-sm text-slate-500">
                     {invoice.invoiceNumber}
@@ -118,7 +118,7 @@ const InvoicesPage: React.FC = () => {
         {
             key: "patientFullName",
             header: "Paciente",
-            className: "pl-2 w-40 md:w-80",
+            className: "pl-2 w-40 md:w-60",
             render: (invoice: Invoice) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -131,7 +131,7 @@ const InvoicesPage: React.FC = () => {
         {
             key: "totalAmount",
             header: "Monto total",
-            className: "w-30 md:w-40",
+            className: "w-30",
             render: (invoice: Invoice) => (
                 <span className="text-sm text-slate-500">
                     {`C$ ${invoice.totalAmount}`}
@@ -141,7 +141,7 @@ const InvoicesPage: React.FC = () => {
         {
             key: "paidAmount",
             header: "Pagado",
-            className: "w-30 md:w-40",
+            className: "w-30",
             render: (invoice: Invoice) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -281,7 +281,7 @@ const InvoicesPage: React.FC = () => {
                 </div>
 
                 {/* Tabla de Facturas */}
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto max-h-100">
                     {isLoading ? (
                         <TableSkeleton
                             columns={columns}

@@ -152,7 +152,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "patientFullName",
             header: "Paciente",
-            className: "pl-2 w-40 md:w-80",
+            className: "pl-2 w-40 md:w-60",
             render: (appointment: AppointmentModel) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -165,7 +165,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "dentistFullName",
             header: "Dentista",
-            className: "pl-2 w-40 md:w-80",
+            className: "pl-2 w-40 md:w-60",
             render: (appointment: AppointmentModel) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -212,7 +212,7 @@ const AppointmentPage: React.FC = () => {
         {
             key: "status",
             header: "Estado",
-            className: "w-24 md:w-50",
+            className: "w-24 md:w-30",
             render: (appointment: AppointmentModel) => {
                 const status = appointmentStatusConfig[appointment.status];
 
@@ -308,7 +308,7 @@ const AppointmentPage: React.FC = () => {
                 </div>
 
                 {/* Tabla de Citas */}
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto max-h-100">
                     {isLoading ? (
                         <TableSkeleton
                             columns={columns}

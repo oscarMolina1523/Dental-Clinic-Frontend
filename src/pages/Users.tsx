@@ -95,7 +95,7 @@ const UsersPage: React.FC = () => {
     {
       key: "name",
       header: "Nombre",
-      className: "pl-2 w-50 md:w-100",
+      className: "pl-2 w-50 md:w-70",
       render: (user: UserModel) => (
         <div className="flex items-center gap-3">
 
@@ -116,7 +116,7 @@ const UsersPage: React.FC = () => {
     {
       key: "phone",
       header: "Teléfono",
-      className: "w-40 md:w-50",
+      className: "w-40",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {user.phoneNumber}
@@ -127,7 +127,7 @@ const UsersPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
-      className: "w-50 md:w-105",
+      className: "w-50 md:w-60",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {user.email}
@@ -137,7 +137,7 @@ const UsersPage: React.FC = () => {
     {
       key: "roleId",
       header: "Role",
-      className: "w-40 md:w-50",
+      className: "w-40",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {getRoleName(user.roleId) ?? "Cargando..."}
@@ -148,7 +148,7 @@ const UsersPage: React.FC = () => {
     {
       key: "status",
       header: "Estado",
-      className: "w-20 md:w-80",
+      className: "w-20",
       render: (user: UserModel) => (
         user.active ? (
           <span className="text-emerald-500 font-medium text-sm">
@@ -248,7 +248,7 @@ const UsersPage: React.FC = () => {
         </div>
 
         {/* Tabla de Usuarios */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-100">
           {isLoading ? (
             <TableSkeleton
               columns={columns}

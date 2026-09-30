@@ -160,7 +160,7 @@ const TreatmentPlanPage: React.FC = () => {
         {
             key: "code",
             header: "Código",
-            className: "pl-2 w-40 md:w-80",
+            className: "pl-2 w-40 md:w-60",
             render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -219,7 +219,7 @@ const TreatmentPlanPage: React.FC = () => {
         {
             key: "totalAmount",
             header: "Monto total",
-            className: "w-40 md:w-50 text-center md:text-left",
+            className: "w-30 text-center md:text-left",
             render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {treatment.treatmentPlan.totalAmount}
@@ -229,7 +229,7 @@ const TreatmentPlanPage: React.FC = () => {
         {
             key: "createdAt",
             header: "Fecha de creación",
-            className: "pl-2 w-50 md:w-100",
+            className: "pl-2 w-50 md:w-60",
             render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {treatment.treatmentPlan.createdAt ? new Date(treatment.treatmentPlan.createdAt).toLocaleString("es-NI", {
@@ -339,7 +339,7 @@ const TreatmentPlanPage: React.FC = () => {
                 </div>
 
                 {/* Tabla de plan de tratamientos */}
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto max-h-100">
                     {isLoading ? (
                         <TableSkeleton
                             columns={columns}

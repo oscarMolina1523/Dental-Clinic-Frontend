@@ -261,7 +261,7 @@ const PatientsPage: React.FC = () => {
         </div>
 
         {/* Tabla de Pacientes */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-100">
           {isLoading ? (
             <TableSkeleton
               columns={columns}
