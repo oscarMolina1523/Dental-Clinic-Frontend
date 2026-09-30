@@ -630,7 +630,7 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
                 onHide={onHide}
                 title="Nueva Factura"
                 description="Registra una nueva factura"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button

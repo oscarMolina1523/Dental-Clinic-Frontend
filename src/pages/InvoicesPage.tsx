@@ -108,6 +108,7 @@ const InvoicesPage: React.FC = () => {
         {
             key: "invoiceNumber",
             header: "Número de factura",
+            className: "w-40 md:w-80",
             render: (invoice: Invoice) => (
                 <span className="text-sm text-slate-500">
                     {invoice.invoiceNumber}
@@ -117,7 +118,7 @@ const InvoicesPage: React.FC = () => {
         {
             key: "patientFullName",
             header: "Paciente",
-            className: "pl-2 w-80",
+            className: "pl-2 w-40 md:w-80",
             render: (invoice: Invoice) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -130,6 +131,7 @@ const InvoicesPage: React.FC = () => {
         {
             key: "totalAmount",
             header: "Monto total",
+            className: "w-30 md:w-40",
             render: (invoice: Invoice) => (
                 <span className="text-sm text-slate-500">
                     {`C$ ${invoice.totalAmount}`}
@@ -139,6 +141,7 @@ const InvoicesPage: React.FC = () => {
         {
             key: "paidAmount",
             header: "Pagado",
+            className: "w-30 md:w-40",
             render: (invoice: Invoice) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -151,6 +154,7 @@ const InvoicesPage: React.FC = () => {
         {
             key: "pendingAmount",
             header: "Por Pagar",
+            className: "w-30 md:w-40",
             render: (invoice: Invoice) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -163,6 +167,7 @@ const InvoicesPage: React.FC = () => {
         {
             key: "status",
             header: "Estado",
+            className: "w-40 md:w-50",
             render: (invoice: Invoice) => {
                 const status = invoice.status;
 
@@ -259,7 +264,7 @@ const InvoicesPage: React.FC = () => {
             )}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 {/* Encabezado */}
-                <div className="flex items-center justify-between pb-6 mb-2">
+                <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
                     <SearchInput
                         value={search}
@@ -296,7 +301,7 @@ const InvoicesPage: React.FC = () => {
             </div>
 
             {/* Paginación de la Tabla */}
-            <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
+            <div className="flex items-center justify-between py-4 px-2 text-xs text-slate-500">
                 <Pagination
                     currentPage={validPage}
                     totalItems={totalItems}

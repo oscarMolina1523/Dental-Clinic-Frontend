@@ -320,7 +320,7 @@ const RegisterPaymentDrawer: React.FC<
                 onHide={onHide}
                 title="Registrar pago"
                 description="Seleccione la cuota y registre el pago"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
             >
                 {toast && (
                     <Toast
