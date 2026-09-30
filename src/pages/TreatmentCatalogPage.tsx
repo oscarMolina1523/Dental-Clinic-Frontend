@@ -92,7 +92,7 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "name",
             header: "Nombre",
-            className: "pl-2 w-50 md:w-100",
+            className: "pl-2 w-50 md:w-60",
             render: (treatment: TreatmentCatalogModel) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -116,7 +116,7 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "basePrice",
             header: "Precio",
-            className: "w-20 md:w-60",
+            className: "w-20 md:w-40",
             render: (treatment: TreatmentCatalogModel) => (
                 <span className="text-sm text-slate-500">
                     {`C$ ${treatment.basePrice}`}
@@ -126,7 +126,7 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "estimatedDurationMinutes",
             header: "Duración",
-            className: "w-20 md:w-60",
+            className: "w-20 md:w-40",
             render: (treatment: TreatmentCatalogModel) => (
                 <span className="text-sm text-slate-500">
                     {`${treatment.estimatedDurationMinutes} .min`}
@@ -233,7 +233,7 @@ const TreatmentCatalogPage: React.FC = () => {
                 </div>
 
                 {/* Tabla de Tratamientos */}
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto max-h-100">
                     {isLoading ? (
                         <TableSkeleton
                             columns={columns}

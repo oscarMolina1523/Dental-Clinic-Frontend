@@ -93,7 +93,7 @@ const InventoryPage: React.FC = () => {
     {
       key: "currentStock",
       header: "Stock actual",
-      className: "w-30 md:w-100",
+      className: "w-30 md:w-60",
       render: (inventory: InventoryModel) => (
         <span className="text-sm text-slate-500">
           {inventory.currentStock}
@@ -103,7 +103,7 @@ const InventoryPage: React.FC = () => {
     {
       key: "minimumStock",
       header: "Stock mínimo",
-      className: "w-30 md:w-100",
+      className: "w-30 md:w-60",
       render: (inventory: InventoryModel) => (
         <span className="text-sm text-slate-500">
           {inventory.minimumStock}
@@ -156,7 +156,7 @@ const InventoryPage: React.FC = () => {
         </div>
 
         {/* Tabla de Inventarios */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-100">
           {isLoading ? (
             <TableSkeleton
               columns={columns}

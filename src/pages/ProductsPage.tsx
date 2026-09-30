@@ -101,7 +101,7 @@ const ProductsPage: React.FC = () => {
     {
       key: "name",
       header: "Nombre",
-      className: "pl-2 w-40 md:w-100",
+      className: "pl-2 w-40 md:w-60",
       render: (product: ProductModel) => (
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-slate-800">
@@ -114,7 +114,7 @@ const ProductsPage: React.FC = () => {
 
     {
       key: "barcode",
-      className: "w-40 md:w-50",
+      className: "w-40",
       header: "Código de barra",
       render: (product: ProductModel) => (
         <span className="text-sm text-slate-500">
@@ -222,7 +222,7 @@ const ProductsPage: React.FC = () => {
         </div>
 
         {/* Tabla de Productos */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-100">
           {isLoading ? (
             <TableSkeleton
               columns={columns}

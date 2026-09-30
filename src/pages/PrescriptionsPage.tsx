@@ -71,7 +71,7 @@ const PrescriptionsPage: React.FC = () => {
         {
             key: "patientFullName",
             header: "Paciente",
-            className: "pl-2 w-40 md:w-100",
+            className: "pl-2 w-40 md:w-60",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -85,7 +85,7 @@ const PrescriptionsPage: React.FC = () => {
         {
             key: "dentistFullName",
             header: "Dentista",
-            className:"w-50 md:w-100",
+            className:"w-50 md:w-60",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {prescription.medicalPrescription.dentistFullName}
@@ -95,7 +95,7 @@ const PrescriptionsPage: React.FC = () => {
         {
             key: "date",
             header: "Fecha de emisión",
-            className: "w-40 md:w-100",
+            className: "w-40 md:w-60",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {prescription.medicalPrescription.date ? new Date(prescription.medicalPrescription.date).toLocaleString("es-NI", {
@@ -155,7 +155,7 @@ const PrescriptionsPage: React.FC = () => {
                 </div>
 
                 {/* Tabla de Productos */}
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto max-h-100">
                     {isLoading ? (
                         <TableSkeleton
                             columns={columns}
