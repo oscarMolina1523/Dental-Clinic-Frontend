@@ -50,7 +50,7 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                 onHide={onHide}
                 title="Detalle del Plan de Tratamiento"
                 description="Información completa del plan de tratamiento"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
             >
                 {!treatmentPlan ? (
                     <div className="text-sm text-slate-500">

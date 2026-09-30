@@ -71,7 +71,7 @@ const PrescriptionsPage: React.FC = () => {
         {
             key: "patientFullName",
             header: "Paciente",
-            className: "pl-2 w-100",
+            className: "pl-2 w-40 md:w-100",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -85,6 +85,7 @@ const PrescriptionsPage: React.FC = () => {
         {
             key: "dentistFullName",
             header: "Dentista",
+            className:"w-50 md:w-100",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {prescription.medicalPrescription.dentistFullName}
@@ -94,7 +95,7 @@ const PrescriptionsPage: React.FC = () => {
         {
             key: "date",
             header: "Fecha de emisión",
-            className: "w-100",
+            className: "w-40 md:w-100",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {prescription.medicalPrescription.date ? new Date(prescription.medicalPrescription.date).toLocaleString("es-NI", {
@@ -110,6 +111,7 @@ const PrescriptionsPage: React.FC = () => {
         {
             key: "medicine",
             header: "Cantidad de productos recetados",
+            className: "w-20 text-center md:text-left md:w-40",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {prescription.details.length}
@@ -173,7 +175,7 @@ const PrescriptionsPage: React.FC = () => {
             </div>
 
             {/* Paginación de la Tabla */}
-            <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
+            <div className="flex items-center justify-between py-4 px-2 text-xs text-slate-500">
                 <Pagination
                     currentPage={validPage}
                     totalItems={totalItems}

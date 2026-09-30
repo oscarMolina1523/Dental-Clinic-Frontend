@@ -52,7 +52,7 @@ const RegisterPage: React.FC = () => {
                     <div className="relative flex h-40 w-40 items-center justify-center rounded-2xl overflow-hidden">
                         <img src="/register.webp" alt="register" />
                     </div>
-                    <h1 className="text-3xl font-bold text-[#1e293b]">
+                    <h1 className="text-2xl md:text-3xl font-bold text-[#1e293b]">
                         Crear Nueva Cuenta
                     </h1>
                 </div>

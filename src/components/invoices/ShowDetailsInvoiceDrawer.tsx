@@ -80,7 +80,7 @@ const ShowDetailsInvoiceDrawer: React.FC<
                     onHide={onHide}
                     title="Detalle de Factura"
                     description="Información de la factura y pagos"
-                    width="w-112.5"
+                    width="w-80 md:w-112.5"
                 >
 
                     {!invoice ? (

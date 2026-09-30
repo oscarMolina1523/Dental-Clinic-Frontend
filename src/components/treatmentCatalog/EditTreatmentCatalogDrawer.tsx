@@ -129,7 +129,7 @@ const EditTreatmentCatalogDrawer: React.FC<EditTreatmentCatalogProps> = ({
                 onHide={onHide}
                 title="Editar tratamiento"
                 description="Modifica la información del tratamiento"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button

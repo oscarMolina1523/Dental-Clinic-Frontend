@@ -652,7 +652,7 @@ const CreateTreatmentPlanDrawer: React.FC<
                     onHide={cleanForm}
                     title="Nuevo Plan de Tratamiento"
                     description="Registra un nuevo plan de tratamiento"
-                    width="w-112.5"
+                    width="w-80 md:w-112.5"
                     footer={
 
                         <>

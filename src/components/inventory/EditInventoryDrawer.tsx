@@ -132,7 +132,7 @@ const EditInventoryDrawer: React.FC<EditInventoryDrawerProps> = ({
                 onHide={onHide}
                 title="Editar Inventario"
                 description="Modifica la información del inventario"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button

@@ -4,6 +4,7 @@ import { useActivateUser, useChangeUserEmail, useChangeUserPassword, useChangeUs
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import User from "../../models/UserModel";
 import { useRoles } from "../../hooks/useRoles";
+import { getRoleName } from "../../hooks/useRolePermitions";
 
 interface SecurityUserDrawerProps {
     isOpen: boolean;
@@ -282,7 +283,8 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
                             {/* 3. Mapeo dinámico de los roles devueltos por la API */}
                             {roles.map((role) => (
                                 <option key={role.id} value={role.id}>
-                                    {role.name}
+                                    {/* para obtener el nombre del rol en español y no en ingles */}
+                                    {getRoleName(role.id)} 
                                 </option>
                             ))}
                         </select>

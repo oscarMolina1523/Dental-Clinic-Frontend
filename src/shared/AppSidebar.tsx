@@ -17,7 +17,7 @@ import {
   LogOut,
 } from "lucide-react";
 import useAuthContext from "../hooks/useAuthContext";
-import { useRolePermissions } from "../hooks/useRolePermitions";
+import { getRoleName, useRolePermissions } from "../hooks/useRolePermitions";
 
 // Lista de elementos de navegación con sus íconos
 const navItems = [
@@ -42,16 +42,16 @@ const AppSidebar: React.FC = () => {
   const menuRef = useRef<HTMLDivElement>(null);
   const { permissions } = useRolePermissions();
 
-  const roleName =
-    user?.roleId === "70ef9d9c7fb961b2"
-      ? "Administrador"
-      : user?.roleId === "946adffd1a8d8931"
-        ? "Demo"
-      : user?.roleId === "2f67c45e35ff526b"
-        ? "Dentista"
-      : user?.roleId === "5e3add1ef884e4e7"
-        ? "Recepcionista"
-        : "Usuario";
+  // const roleName =
+  //   user?.roleId === "70ef9d9c7fb961b2"
+  //     ? "Administrador"
+  //     : user?.roleId === "946adffd1a8d8931"
+  //       ? "Demo"
+  //     : user?.roleId === "2f67c45e35ff526b"
+  //       ? "Dentista"
+  //     : user?.roleId === "5e3add1ef884e4e7"
+  //       ? "Recepcionista"
+  //       : "Usuario";
 
   const filteredNavItems = navItems.filter((item) =>
     permissions.includes(`/${item.id}`)
@@ -142,7 +142,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className="flex flex-col text-left">
               <span className="text-xs font-semibold leading-tight">{user?.username || "Usuario"}</span>
-              <span className="text-[10px] text-blue-300 leading-tight">{roleName}</span>
+              <span className="text-[10px] text-blue-300 leading-tight">{getRoleName(user?.roleId)}</span>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span className="text-[9px] text-emerald-400 font-medium leading-none">En línea</span>

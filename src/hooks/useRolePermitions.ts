@@ -68,6 +68,26 @@ export const roleNames: Record<string, UserRole> = {
     "5e3add1ef884e4e7": UserRole.Receptionist,
 };
 
+//para obtener el nombre en español y mostrar
+export const getRoleName = (roleId?: string) => {
+  switch (roleId) {
+    case "70ef9d9c7fb961b2":
+      return "Administrador";
+
+    case "946adffd1a8d8931":
+      return "Demo";
+
+    case "2f67c45e35ff526b":
+      return "Dentista";
+
+    case "5e3add1ef884e4e7":
+      return "Recepcionista";
+
+    default:
+      return "Usuario";
+  }
+};
+
 export function useRolePermissions() {
     const { user } = useAuthContext();
 

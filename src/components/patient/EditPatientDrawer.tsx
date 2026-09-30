@@ -176,7 +176,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                 onHide={onHide}
                 title="Editar Paciente"
                 description="Modifica la información del paciente"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button

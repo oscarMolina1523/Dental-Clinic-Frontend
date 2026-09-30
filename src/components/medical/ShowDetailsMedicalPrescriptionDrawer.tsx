@@ -48,7 +48,7 @@ const ShowDetailsMedicalPrescriptionDrawer: React.FC<
                 onHide={onHide}
                 title="Detalle de Receta Médica"
                 description="Información de la receta médica"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
             >
                 {!prescription ? (
                     <div className="text-sm text-slate-500">

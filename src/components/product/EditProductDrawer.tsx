@@ -156,7 +156,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                 onHide={onHide}
                 title="Editar Producto"
                 description="Modifica la información del producto"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button
