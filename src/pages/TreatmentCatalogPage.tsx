@@ -92,7 +92,7 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "name",
             header: "Nombre",
-            className: "pl-2 w-100",
+            className: "pl-2 w-50 md:w-100",
             render: (treatment: TreatmentCatalogModel) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -106,6 +106,7 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "code",
             header: "CÓDIGO",
+            className: "w-20 md:w-80",
             render: (treatment: TreatmentCatalogModel) => (
                 <span className="text-sm text-slate-500">
                     {treatment.code}
@@ -115,6 +116,7 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "basePrice",
             header: "Precio",
+            className: "w-20 md:w-60",
             render: (treatment: TreatmentCatalogModel) => (
                 <span className="text-sm text-slate-500">
                     {`C$ ${treatment.basePrice}`}
@@ -124,6 +126,7 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "estimatedDurationMinutes",
             header: "Duración",
+            className: "w-20 md:w-60",
             render: (treatment: TreatmentCatalogModel) => (
                 <span className="text-sm text-slate-500">
                     {`${treatment.estimatedDurationMinutes} .min`}
@@ -133,6 +136,7 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "active",
             header: "Estado",
+            className: "w-20 md:w-60",
             render: (treatment: TreatmentCatalogModel) => (
                 treatment.active ? (
                     <span className="text-emerald-500 font-medium text-sm">
@@ -212,7 +216,7 @@ const TreatmentCatalogPage: React.FC = () => {
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 {/* Encabezado */}
-                <div className="flex items-center justify-between pb-6 mb-2">
+                <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Tratamientos</h1> */}
                     <SearchInput
                         value={search}

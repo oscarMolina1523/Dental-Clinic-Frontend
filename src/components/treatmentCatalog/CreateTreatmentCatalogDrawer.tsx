@@ -143,7 +143,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
                 onHide={onHide}
                 title="Nuevo Tratamiento"
                 description="Registra un nuevo tratamiento"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button
