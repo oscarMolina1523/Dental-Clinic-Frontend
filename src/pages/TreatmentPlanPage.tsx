@@ -160,6 +160,7 @@ const TreatmentPlanPage: React.FC = () => {
         {
             key: "code",
             header: "Código",
+            className: "pl-2 w-40 md:w-80",
             render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -172,7 +173,7 @@ const TreatmentPlanPage: React.FC = () => {
         {
             key: "patientFullName",
             header: "Paciente",
-            className: "pl-2 w-100",
+            className: "w-40 md:w-50",
             render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-slate-800">
@@ -186,6 +187,7 @@ const TreatmentPlanPage: React.FC = () => {
         {
             key: "dentistFullName",
             header: "Dentista",
+            className: "w-40 md:w-50",
             render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {treatment.treatmentPlan.dentistFullName}
@@ -195,6 +197,7 @@ const TreatmentPlanPage: React.FC = () => {
         {
             key: "status",
             header: "Estado",
+            className: "w-20 md:w-30",
             render: (treatment: TreatmentPlanOrchestratorResponse) => {
                 const status = treatment.treatmentPlan.status;
 
@@ -216,6 +219,7 @@ const TreatmentPlanPage: React.FC = () => {
         {
             key: "totalAmount",
             header: "Monto total",
+            className: "w-40 md:w-50 text-center md:text-left",
             render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {treatment.treatmentPlan.totalAmount}
@@ -225,6 +229,7 @@ const TreatmentPlanPage: React.FC = () => {
         {
             key: "createdAt",
             header: "Fecha de creación",
+            className: "pl-2 w-50 md:w-100",
             render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {treatment.treatmentPlan.createdAt ? new Date(treatment.treatmentPlan.createdAt).toLocaleString("es-NI", {
@@ -317,7 +322,7 @@ const TreatmentPlanPage: React.FC = () => {
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 {/* Encabezado */}
-                <div className="flex items-center justify-between pb-6 mb-2">
+                <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">plan de tratamientos</h1> */}
                     <SearchInput
                         value={search}
