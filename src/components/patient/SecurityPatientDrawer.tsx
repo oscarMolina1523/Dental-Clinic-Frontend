@@ -193,7 +193,7 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
                 onHide={onHide}
                 title="Seguridad del Paciente"
                 description="Modifica la información sensible del paciente"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button

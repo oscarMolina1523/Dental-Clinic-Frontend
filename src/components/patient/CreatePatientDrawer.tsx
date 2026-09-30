@@ -241,7 +241,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                 onHide={onHide}
                 title="Nuevo Paciente"
                 description="Registra un nuevo paciente"
-                width="w-112.5"
+                width="w-80 md:w-112.5"
                 footer={
                     <>
                         <button
