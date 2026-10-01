@@ -5,7 +5,7 @@ import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
-import { useAppointments } from "../hooks/useAppointment";
+import { useAppointments, useMarkReminderAsSent } from "../hooks/useAppointment";
 import type AppointmentModel from "../models/AppointmentModel";
 import CreateAppointmentDrawer from "../components/appointment/CreateAppointmentDrawer";
 import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawet";
@@ -66,6 +66,7 @@ const AppointmentPage: React.FC = () => {
     } = useAppointmentPage();
 
     const { role } = useRolePermissions();
+    const markReminderAsSentMutation = useMarkReminderAsSent();
 
     const isViewer = role === UserRole.Viewer;
     const canWrite = !isViewer;
@@ -242,6 +243,15 @@ const AppointmentPage: React.FC = () => {
 
     const actions: TableAction<typeof appointments[number]>[] = [
         {
+            label: "Marcar recordatorio como enviado",
+            icon: <CheckCircle2 className="w-4 h-4 text-emerald-600" />,
+            onClick: (appointment) => {
+                markReminderAsSentMutation.mutate(appointment.id);
+            },
+            hidden: (appointment) =>
+                !canWrite || appointment.reminderSent,
+        },
+        {
             label: "Editar Cita",
             icon: <Pencil className="w-4 h-4" />,
             onClick: (appointment) => {
@@ -299,8 +309,8 @@ const AppointmentPage: React.FC = () => {
                         placeholder="Buscar cita..."
                     />
                     <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
-                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
-                            : "bg-slate-300 cursor-not-allowed opacity-70"
+                        ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                        : "bg-slate-300 cursor-not-allowed opacity-70"
                         }`}>
                         <Plus className="w-4 h-4" />
                         <span>Nueva Cita</span>
