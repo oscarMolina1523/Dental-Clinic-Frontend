@@ -6,6 +6,7 @@ import type { AppointmentStatus } from "../../utils/appointmentStatus.enum";
 import { usePatients } from "../../hooks/usePatients";
 import { useUsers } from "../../hooks/useUsers";
 import { roleNames, UserRole } from "../../hooks/useRolePermitions";
+import { DateTimePicker } from "../../shared/DateTimePicker.tsx/DateTimePicker";
 
 interface CreateAppointmentProps {
     isOpen: boolean;
@@ -25,7 +26,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
     } = useUsers();
 
     const dentists = users.filter(
-         (user) => roleNames[user.roleId] === UserRole.Dentist //hace referencia al rol de dentista
+        (user) => roleNames[user.roleId] === UserRole.Dentist //hace referencia al rol de dentista
     );
 
     const [form, setForm] = useState<{
@@ -113,6 +114,13 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
     ) => {
         const { name, value } = e.target;
 
+        setForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const updateField = (name: keyof typeof form, value: string | boolean) => {
         setForm((prev) => ({
             ...prev,
             [name]: value,
@@ -319,51 +327,17 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Fecha y hora de inicio
-                        </label>
-
-                        <input
-                            key={isOpen ? "startAppointmentTime-open" : "startAppointmentTime-closed"}
-                            type="datetime-local"
-                            name="startAppointmentTime"
+                        <DateTimePicker
+                            label="Fecha y hora de inicio"
                             value={form.startAppointmentTime}
-                            onChange={handleChange}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
+                            onChange={(newValue) => updateField("startAppointmentTime", newValue)}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Fecha y hora de finalización
-                        </label>
-
-                        <input
-                            key={isOpen ? "endAppointmentTime-open" : "endAppointmentTime-closed"}
-                            type="datetime-local"
-                            name="endAppointmentTime"
+                        <DateTimePicker
+                            label="Fecha y hora de finalización"
                             value={form.endAppointmentTime}
-                            onChange={handleChange}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
+                            onChange={(newValue) => updateField("endAppointmentTime", newValue)}
                         />
                     </div>
                     <div>

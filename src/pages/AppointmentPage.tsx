@@ -253,283 +253,283 @@ const AppointmentPage: React.FC = () => {
                 appointment.status === "COMPLETED" ||
                 appointment.status === "CANCELLED",
         },
-    {
-        label: "Editar Cita",
-        icon: <Pencil className="w-4 h-4" />,
+        {
+            label: "Editar Cita",
+            icon: <Pencil className="w-4 h-4" />,
             onClick: (appointment) => {
                 setSelectedAppointment(appointment);
                 setIsEditDrawerOpen(true);
             },
-                hidden: () => !canWrite,
+            hidden: () => !canWrite,
         },
-{
-    label: "Cambios de estados",
-        icon: <Menu className="w-4 h-4 text-amber-600" />,
+        {
+            label: "Cambios de estados",
+            icon: <Menu className="w-4 h-4 text-amber-600" />,
             onClick: (appointment) => {
                 setSelectedAppointment(appointment);
                 setIsStatusModalOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
             },
-                hidden: (appointment) => {
-                    /*
-                     * El menú aparece para citas que todavía
-                     * permiten cambios de estado.
-                     *
-                     * También aparece para COMPLETED porque
-                     * desde ahí podemos crear la receta.
-                     */
-                    return !canWrite || !canChangeStatus(appointment.status);
-                },
+            hidden: (appointment) => {
+                /*
+                 * El menú aparece para citas que todavía
+                 * permiten cambios de estado.
+                 *
+                 * También aparece para COMPLETED porque
+                 * desde ahí podemos crear la receta.
+                 */
+                return !canWrite || !canChangeStatus(appointment.status);
+            },
         },
     ];
 
-const handleSearch = (value: string) => {
-    setSearch(value);
+    const handleSearch = (value: string) => {
+        setSearch(value);
 
-    /*
-     * Cuando el usuario empieza una nueva búsqueda,
-     * volvemos a la primera página.
-     */
-    setCurrentPage(1);
-};
+        /*
+         * Cuando el usuario empieza una nueva búsqueda,
+         * volvemos a la primera página.
+         */
+        setCurrentPage(1);
+    };
 
-return (
-    <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
-        {toast && (
-            <Toast
-                type={toast.type}
-                message={toast.message}
-                onClose={() => setToast(null)}
-            />
-        )}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-            {/* Encabezado */}
-            <div className="flex flex-col md:flex-row gap-2 items-end md:items-center justify-between pb-6 mb-2">
-                {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
-                <SearchInput
-                    value={search}
-                    onChange={handleSearch}
-                    placeholder="Buscar cita..."
+    return (
+        <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
+            {toast && (
+                <Toast
+                    type={toast.type}
+                    message={toast.message}
+                    onClose={() => setToast(null)}
                 />
-                <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
-                    ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
-                    : "bg-slate-300 cursor-not-allowed opacity-70"
-                    }`}>
-                    <Plus className="w-4 h-4" />
-                    <span>Nueva Cita</span>
-                </button>
+            )}
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                {/* Encabezado */}
+                <div className="flex flex-col md:flex-row gap-2 items-end md:items-center justify-between pb-6 mb-2">
+                    {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
+                    <SearchInput
+                        value={search}
+                        onChange={handleSearch}
+                        placeholder="Buscar cita..."
+                    />
+                    <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                        ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                        : "bg-slate-300 cursor-not-allowed opacity-70"
+                        }`}>
+                        <Plus className="w-4 h-4" />
+                        <span>Nueva Cita</span>
+                    </button>
+                </div>
+
+                {/* Tabla de Citas */}
+                <div className="overflow-x-auto max-h-100">
+                    {isLoading ? (
+                        <TableSkeleton
+                            columns={columns}
+                            rows={10}
+                            actions
+                        />
+                    ) : (
+                        <DataTable
+                            data={currentProducts}
+                            columns={columns}
+                            actions={actions}
+                            getRowId={(appointment) => appointment.id}
+                            emptyMessage="No hay Citas registradas."
+                        />
+                    )}
+                </div>
             </div>
 
-            {/* Tabla de Citas */}
-            <div className="overflow-x-auto max-h-100">
-                {isLoading ? (
-                    <TableSkeleton
-                        columns={columns}
-                        rows={10}
-                        actions
-                    />
-                ) : (
-                    <DataTable
-                        data={currentProducts}
-                        columns={columns}
-                        actions={actions}
-                        getRowId={(appointment) => appointment.id}
-                        emptyMessage="No hay Citas registradas."
-                    />
-                )}
+            {/* Paginación de la Tabla */}
+            <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
+                <Pagination
+                    currentPage={validPage}
+                    totalItems={totalItems}
+                    itemsPerPage={ITEMS_PER_PAGE}
+                    onPageChange={setCurrentPage}
+                    label="Citas"
+                />
             </div>
-        </div>
 
-        {/* Paginación de la Tabla */}
-        <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
-            <Pagination
-                currentPage={validPage}
-                totalItems={totalItems}
-                itemsPerPage={ITEMS_PER_PAGE}
-                onPageChange={setCurrentPage}
-                label="Citas"
+            <CreateAppointmentDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
+
+            <EditAppointmentDrawer
+                isOpen={isEditDrawerOpen}
+                onHide={() => {
+                    setIsEditDrawerOpen(false);
+                    setSelectedAppointment(null);
+                }}
+                appointment={selectedAppointment}
             />
-        </div>
 
-        <CreateAppointmentDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
-
-        <EditAppointmentDrawer
-            isOpen={isEditDrawerOpen}
-            onHide={() => {
-                setIsEditDrawerOpen(false);
-                setSelectedAppointment(null);
-            }}
-            appointment={selectedAppointment}
-        />
-
-        {/* MODAL CAMBIAR ESTADO */}
-        {isStatusModalOpen && selectedAppointment && (
-            <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-                        <div>
-                            <h3 className="font-semibold text-slate-800">
-                                Acciones Rápidas
-                            </h3>
-                            <p className="text-xs text-slate-500 mt-0.5">
-                                Estado actual:{" "}
-                                <span className="font-medium text-slate-700">
-                                    {appointmentStatusConfig[selectedAppointment.status].label}
-                                </span>
-                            </p>
+            {/* MODAL CAMBIAR ESTADO */}
+            {isStatusModalOpen && selectedAppointment && (
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-100 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                            <div>
+                                <h3 className="font-semibold text-slate-800">
+                                    Acciones Rápidas
+                                </h3>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                    Estado actual:{" "}
+                                    <span className="font-medium text-slate-700">
+                                        {appointmentStatusConfig[selectedAppointment.status].label}
+                                    </span>
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setIsStatusModalOpen(false)}
+                                className="text-slate-400 hover:text-slate-600 rounded-lg p-1 transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
                         </div>
-                        <button
-                            onClick={() => setIsStatusModalOpen(false)}
-                            className="text-slate-400 hover:text-slate-600 rounded-lg p-1 transition-colors"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-                    </div>
 
-                    <div className="p-3 space-y-1">
+                        <div className="p-3 space-y-1">
 
-                        {selectedAppointment.status === "COMPLETED" && (
-                            <button
-                                onClick={() =>
-                                    handleCreateClinicalProgress(
-                                        selectedAppointment
-                                    )
-                                }
-                                className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors"
-                            >
-                                <Plus className="w-4 h-4 text-emerald-600" />
+                            {selectedAppointment.status === "COMPLETED" && (
+                                <button
+                                    onClick={() =>
+                                        handleCreateClinicalProgress(
+                                            selectedAppointment
+                                        )
+                                    }
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors"
+                                >
+                                    <Plus className="w-4 h-4 text-emerald-600" />
 
-                                <span>Registrar progreso en expediente</span>
-                            </button>
-                        )}
+                                    <span>Registrar progreso en expediente</span>
+                                </button>
+                            )}
 
-                        {/* SCHEDULED -> CONFIRMED */}
-                        {canConfirm(selectedAppointment.status) && (
-                            <button
-                                disabled={isPendingAny}
-                                onClick={() => handleConfirm(selectedAppointment.id)}
-                                className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
-                            >
-                                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                                <span>Confirmar Cita</span>
-                            </button>
-                        )}
-
-                        {/* CONFIRMED -> IN_PROGRESS */}
-                        {canStart(selectedAppointment.status) && (
-                            <button
-                                disabled={isPendingAny}
-                                onClick={() => handleStart(selectedAppointment.id)}
-                                className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
-                            >
-                                <Play className="w-4 h-4 text-blue-600" />
-                                <span>Iniciar Cita (En curso)</span>
-                            </button>
-                        )}
-
-                        {/* IN_PROGRESS -> COMPLETED */}
-                        {canComplete(selectedAppointment.status) && (
-                            <button
-                                disabled={isPendingAny}
-                                onClick={() => handleComplete(selectedAppointment.id)}
-                                className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
-                            >
-                                <Check className="w-4 h-4 text-indigo-600" />
-                                <span>Completar Cita</span>
-                            </button>
-                        )}
-
-                        {/* CONFIRMED -> NO_SHOW */}
-                        {canNoShow(selectedAppointment.status) && (
-                            <button
-                                disabled={isPendingAny}
-                                onClick={() => handleNoShow(selectedAppointment.id)}
-                                className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
-                            >
-                                <UserX className="w-4 h-4 text-amber-600" />
-                                <span>Marcar No Asistió (No Show)</span>
-                            </button>
-                        )}
-
-                        {/* CANCELAR */}
-                        {canCancel(selectedAppointment.status) && (
-                            <>
-                                <div className="my-1 border-t border-slate-100" />
-
+                            {/* SCHEDULED -> CONFIRMED */}
+                            {canConfirm(selectedAppointment.status) && (
                                 <button
                                     disabled={isPendingAny}
-                                    onClick={() => setIsCancelModalOpen(true)}
-                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-rose-600 hover:bg-rose-50 rounded-xl transition-colors disabled:opacity-50 font-medium"
+                                    onClick={() => handleConfirm(selectedAppointment.id)}
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
                                 >
-                                    <XCircle className="w-4 h-4 text-rose-600" />
-                                    <span>Cancelar Cita</span>
+                                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                                    <span>Confirmar Cita</span>
                                 </button>
-                            </>
-                        )}
+                            )}
 
+                            {/* CONFIRMED -> IN_PROGRESS */}
+                            {canStart(selectedAppointment.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() => handleStart(selectedAppointment.id)}
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <Play className="w-4 h-4 text-blue-600" />
+                                    <span>Iniciar Cita (En curso)</span>
+                                </button>
+                            )}
+
+                            {/* IN_PROGRESS -> COMPLETED */}
+                            {canComplete(selectedAppointment.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() => handleComplete(selectedAppointment.id)}
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <Check className="w-4 h-4 text-indigo-600" />
+                                    <span>Completar Cita</span>
+                                </button>
+                            )}
+
+                            {/* CONFIRMED -> NO_SHOW */}
+                            {canNoShow(selectedAppointment.status) && (
+                                <button
+                                    disabled={isPendingAny}
+                                    onClick={() => handleNoShow(selectedAppointment.id)}
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                >
+                                    <UserX className="w-4 h-4 text-amber-600" />
+                                    <span>Marcar No Asistió (No Show)</span>
+                                </button>
+                            )}
+
+                            {/* CANCELAR */}
+                            {canCancel(selectedAppointment.status) && (
+                                <>
+                                    <div className="my-1 border-t border-slate-100" />
+
+                                    <button
+                                        disabled={isPendingAny}
+                                        onClick={() => setIsCancelModalOpen(true)}
+                                        className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-rose-600 hover:bg-rose-50 rounded-xl transition-colors disabled:opacity-50 font-medium"
+                                    >
+                                        <XCircle className="w-4 h-4 text-rose-600" />
+                                        <span>Cancelar Cita</span>
+                                    </button>
+                                </>
+                            )}
+
+                        </div>
                     </div>
                 </div>
-            </div>
-        )}
+            )}
 
-        {/* MODAL NOTA DE CANCELACIÓN */}
-        {isCancelModalOpen && selectedAppointment && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-60 flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-100 p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-                    <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-slate-800 text-lg">
-                            Cancelar Cita
-                        </h3>
-                        <button
-                            onClick={() => setIsCancelModalOpen(false)}
-                            className="text-slate-400 hover:text-slate-600 rounded-lg p-1"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-                    </div>
+            {/* MODAL NOTA DE CANCELACIÓN */}
+            {isCancelModalOpen && selectedAppointment && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-60 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-100 p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+                        <div className="flex items-center justify-between">
+                            <h3 className="font-semibold text-slate-800 text-lg">
+                                Cancelar Cita
+                            </h3>
+                            <button
+                                onClick={() => setIsCancelModalOpen(false)}
+                                className="text-slate-400 hover:text-slate-600 rounded-lg p-1"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
 
-                    <p className="text-sm text-slate-600">
-                        Ingresa el motivo por el cual se cancela la cita para guardar el registro:
-                    </p>
+                        <p className="text-sm text-slate-600">
+                            Ingresa el motivo por el cual se cancela la cita para guardar el registro:
+                        </p>
 
-                    <textarea
-                        value={cancelNotes}
-                        onChange={(e) => setCancelNotes(e.target.value)}
-                        placeholder="Escribe la razón (ej. Solicitud del paciente, emergencia dental, etc.)..."
-                        rows={4}
-                        className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
-                    />
+                        <textarea
+                            value={cancelNotes}
+                            onChange={(e) => setCancelNotes(e.target.value)}
+                            placeholder="Escribe la razón (ej. Solicitud del paciente, emergencia dental, etc.)..."
+                            rows={4}
+                            className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
+                        />
 
-                    <div className="flex justify-end gap-3 pt-2">
-                        <button
-                            onClick={() => setIsCancelModalOpen(false)}
-                            className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
-                        >
-                            Volver
-                        </button>
-                        <button
-                            onClick={handleCancelSubmit}
-                            disabled={!cancelNotes.trim() || cancelMutation.isPending}
-                            className="px-4 py-2 text-sm font-medium bg-rose-600 hover:bg-rose-700 text-white rounded-xl transition-colors disabled:opacity-50"
-                        >
-                            {cancelMutation.isPending
-                                ? "Canceling..."
-                                : "Confirmar Cancelación"}
-                        </button>
+                        <div className="flex justify-end gap-3 pt-2">
+                            <button
+                                onClick={() => setIsCancelModalOpen(false)}
+                                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                            >
+                                Volver
+                            </button>
+                            <button
+                                onClick={handleCancelSubmit}
+                                disabled={!cancelNotes.trim() || cancelMutation.isPending}
+                                className="px-4 py-2 text-sm font-medium bg-rose-600 hover:bg-rose-700 text-white rounded-xl transition-colors disabled:opacity-50"
+                            >
+                                {cancelMutation.isPending
+                                    ? "Canceling..."
+                                    : "Confirmar Cancelación"}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )}
+            )}
 
-        <CreateClinicalProgressDrawer
-            isOpen={isClinicalProgressDrawerOpen}
-            onHide={() => {
-                setIsClinicalProgressDrawerOpen(false);
-                setSelectedAppointment(null);
-            }}
-            appointment={selectedAppointment}
-        />
-    </div>
-);
+            <CreateClinicalProgressDrawer
+                isOpen={isClinicalProgressDrawerOpen}
+                onHide={() => {
+                    setIsClinicalProgressDrawerOpen(false);
+                    setSelectedAppointment(null);
+                }}
+                appointment={selectedAppointment}
+            />
+        </div>
+    );
 }
 
 export default AppointmentPage;
