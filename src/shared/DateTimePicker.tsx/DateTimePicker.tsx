@@ -88,9 +88,15 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({ label, value, on
                         onChange={handleMinuteChange}
                         className="px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white outline-none focus:border-blue-500"
                     >
-                        {["00", "15", "30", "45"].map((minute) => (
-                            <option key={minute} value={minute}>{minute}</option>
-                        ))}
+                        {Array.from({ length: 60 }, (_, i) => {
+                            const minute = String(i).padStart(2, "0");
+
+                            return (
+                                <option key={minute} value={minute}>
+                                    {minute}
+                                </option>
+                            );
+                        })}
                     </select>
 
                     {/* Período (AM/PM) */}
