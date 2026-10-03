@@ -4,6 +4,7 @@ import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import type PatientModel from "../../models/PatientModel";
 import { useUpdatePatient } from "../../hooks/usePatients";
 import { genderData } from "../../data/genderData";
+import { usePatientAgeValidation } from "../../utils/usePatientAgeValidation";
 
 interface EditPatientDrawerProps {
     isOpen: boolean;
@@ -20,6 +21,13 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
         mutate: updatePatient,
         isPending,
     } = useUpdatePatient();
+    const {
+        minAge,
+        maxAge,
+        minBirthdate,
+        maxBirthdate,
+        validateBirthdate,
+    } = usePatientAgeValidation();
 
     const [prevPatient, setPrevPatient] = useState<PatientModel | null>(patient);
     const [form, setForm] = useState<PatientModel | null>(patient);
@@ -109,10 +117,21 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
             return;
         }
 
+
         if (!form.birthdate) {
             showToast(
                 "error",
                 "Debe seleccionar la fecha de nacimiento."
+            );
+            return;
+        }
+
+        const birthdateString = formatDateForInput(form.birthdate);
+
+        if (!validateBirthdate(birthdateString)) {
+            showToast(
+                "error",
+                `La edad del paciente debe estar entre ${minAge} y ${maxAge} años.`
             );
             return;
         }
@@ -310,6 +329,8 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                             name="birthdate"
                             value={formatDateForInput(form?.birthdate)}
                             onChange={handleChange}
+                            min={minBirthdate}
+                            max={maxBirthdate}
                             className="
                                 w-full
                                 px-3 py-2.5

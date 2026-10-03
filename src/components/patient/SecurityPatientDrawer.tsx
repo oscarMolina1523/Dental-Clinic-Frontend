@@ -3,6 +3,7 @@ import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import PatientModel from "../../models/PatientModel";
 import { useActivatePatient, useChangePatientAddress, useChangePatientEmail, useChangePatientImage, useChangePatientPhoneNumber, useDeactivatePatient, useUpdateEmergencyContact } from "../../hooks/usePatients";
+import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
 
 interface SecurityPatientDrawerProps {
     isOpen: boolean;
@@ -84,6 +85,14 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
             return;
         }
 
+        if (!validatePhoneNumber(phone)) {
+            showToast(
+                "error",
+                "Ingrese un número de teléfono válido de 8 dígitos del paciente."
+            );
+            return;
+        }
+
         if (!address.trim()) {
             showToast("error", "Debes tener una dirección.");
             return;
@@ -101,6 +110,14 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
 
         if (!emergencyContactPhone.trim()) {
             showToast("error", "Debes tener un número de contacto de emergency.");
+            return;
+        }
+
+        if (!validatePhoneNumber(emergencyContactPhone)) {
+            showToast(
+                "error",
+                "Ingrese un número de teléfono válido de 8 dígitos del contacto de emergencia."
+            );
             return;
         }
 
@@ -133,7 +150,7 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
             }
 
             // Cambiar contacto de emergencia
-            if (emergencyContactName !== patient.emergencyContactName && emergencyContactPhone !== patient.emergencyContactPhone) {
+            if (emergencyContactName !== patient.emergencyContactName || emergencyContactPhone !== patient.emergencyContactPhone) {
                 promises.push(changeEmergencyContact({ id: patient.id, name: emergencyContactName, phone: emergencyContactPhone }));
             }
 
@@ -234,6 +251,15 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
                     </>
                 }
             >
+                <div className="flex items-center gap-4 my-6">
+                    <div className="flex-1 h-px bg-slate-200" />
+
+                    <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                        Datos del Paciente
+                    </h2>
+
+                    <div className="flex-1 h-px bg-slate-200" />
+                </div>
                 {/* TODO EL BODY ES EXCLUSIVO DE EDITAR */}
 
                 <div className="space-y-5">
@@ -277,8 +303,6 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
                         </label>
                     </div>
 
-                    <hr className="border-slate-200 my-4" />
-                    
                     {/* direccion */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -292,6 +316,15 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
                         />
                     </div>
 
+                    <div className="flex items-center gap-4 my-6">
+                        <div className="flex-1 h-px bg-slate-200" />
+
+                        <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                            Datos del Contacto de Emergencia
+                        </h2>
+
+                        <div className="flex-1 h-px bg-slate-200" />
+                    </div>
                     {/* nombre de contatco de emergencia */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">

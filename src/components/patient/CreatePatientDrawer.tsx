@@ -6,6 +6,7 @@ import { maritalStatuses } from "../../data/maritalStatusData";
 import { genderData } from "../../data/genderData";
 import { validateIdentityDocument } from "../../utils/validatIdentityDocument";
 import { usePatientAgeValidation } from "../../utils/usePatientAgeValidation";
+import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
 interface CreatePatientProps {
     isOpen: boolean;
     onHide: () => void;
@@ -38,7 +39,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
     const [toast, setToast] = useState<{
         type: "success" | "error";
         message: string;
-    } | null>(null);
+    } | null>(null); 
 
     const showToast = (
         type: "success" | "error",
@@ -108,18 +109,18 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             return;
         }
 
-        if (!/^\d{8}$/.test(phone)) {
+        if (!validatePhoneNumber(phone)) {
             showToast(
                 "error",
-                "Ingrese un número de teléfono válido de 8 dígitos del paciente sin espacios."
+                "Ingrese un número de teléfono válido de 8 dígitos del paciente."
             );
             return;
         }
 
-        if (!/^\d{8}$/.test(emergencyContactPhone)) {
+        if (!validatePhoneNumber(emergencyContactPhone)) {
             showToast(
                 "error",
-                "Ingrese un número de teléfono válido de 8 dígitos del contacto de emergencia sin espacios."
+                "Ingrese un número de teléfono válido de 8 dígitos del contacto de emergencia."
             );
             return;
         }

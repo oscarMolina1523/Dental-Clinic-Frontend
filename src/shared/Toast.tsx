@@ -74,7 +74,7 @@ const Toast: React.FC<ToastProps> = ({
 
                 <div className="flex-1">
                     <h4 className="font-bold text-sm leading-tight">
-                        {isSuccess ? "Success" : "Error"}
+                        {isSuccess ? "Éxito" : "Error"}
                     </h4>
                     <p className="text-sm mt-1 opacity-90 leading-snug">
                         {message}
