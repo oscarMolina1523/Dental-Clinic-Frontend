@@ -145,7 +145,7 @@ const PatientsPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
-      className: "w-50 md:w-80",
+      className: "w-50 md:w-70",
       render: (patient: PatientModel) => (
         <span className="text-sm text-slate-500">
           {patient.email}
@@ -155,7 +155,7 @@ const PatientsPage: React.FC = () => {
     {
       key: "maritalStatus",
       header: "Estado Civil",
-      className: "w-20",
+      className: "w-20 md:w-30",
       render: (patient: PatientModel) => (
         <span className="text-sm text-slate-500">
           {patient.maritalStatus}
