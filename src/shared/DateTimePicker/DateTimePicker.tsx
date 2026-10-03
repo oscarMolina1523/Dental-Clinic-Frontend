@@ -125,7 +125,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
      * PM -> 12, 01, 02, 03, 04, 05
      */
     const availableHours = isPM
-        ? [12, 1, 2, 3, 4, 5]
+        ? [1, 2, 3, 4, 5]
         : [8, 9, 10, 11];
 
     return (

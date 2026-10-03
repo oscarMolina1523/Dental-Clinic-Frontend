@@ -6,7 +6,7 @@ import type { AppointmentStatus } from "../../utils/appointmentStatus.enum";
 import { usePatients } from "../../hooks/usePatients";
 import { useUsers } from "../../hooks/useUsers";
 import { roleNames, UserRole } from "../../hooks/useRolePermitions";
-import { DateTimePicker } from "../../shared/DateTimePicker.tsx/DateTimePicker";
+import { DateTimePicker } from "../../shared/DateTimePicker/DateTimePicker";
 
 interface CreateAppointmentProps {
     isOpen: boolean;
