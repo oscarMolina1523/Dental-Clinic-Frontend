@@ -4,6 +4,8 @@ import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import { useAddPatient } from "../../hooks/usePatients";
 import { maritalStatuses } from "../../data/maritalStatusData";
 import { genderData } from "../../data/genderData";
+import { validateIdentityDocument } from "../../utils/validatIdentityDocument";
+import { usePatientAgeValidation } from "../../utils/usePatientAgeValidation";
 interface CreatePatientProps {
     isOpen: boolean;
     onHide: () => void;
@@ -11,6 +13,13 @@ interface CreatePatientProps {
 
 const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) => {
     const { mutate: addPatient, isPending } = useAddPatient();
+    const {
+        minAge,
+        maxAge,
+        minBirthdate,
+        maxBirthdate,
+        validateBirthdate,
+    } = usePatientAgeValidation();
 
     const [form, setForm] = useState({
         name: "",
@@ -60,7 +69,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
     };
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement  | HTMLSelectElement>
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         const { name, value } = e.target;
 
@@ -99,6 +108,22 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             return;
         }
 
+        if (!/^\d{8}$/.test(phone)) {
+            showToast(
+                "error",
+                "Ingrese un número de teléfono válido de 8 dígitos del paciente sin espacios."
+            );
+            return;
+        }
+
+        if (!/^\d{8}$/.test(emergencyContactPhone)) {
+            showToast(
+                "error",
+                "Ingrese un número de teléfono válido de 8 dígitos del contacto de emergencia sin espacios."
+            );
+            return;
+        }
+
         if (!idCard) {
             showToast(
                 "error",
@@ -107,10 +132,10 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             return;
         }
 
-        if (!birthdate) {
+        if (!validateBirthdate(birthdate)) {
             showToast(
                 "error",
-                "Debe seleccionar la fecha de nacimiento."
+                `La edad del paciente debe estar entre ${minAge} y ${maxAge} años.`
             );
             return;
         }
@@ -176,6 +201,14 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             return;
         }
 
+        if (!validateIdentityDocument(form.idCard)) {
+            showToast(
+                "error",
+                "El documento de identidad debe ser una cédula o un pasaporte válido."
+            );
+
+            return;
+        }
 
         addPatient(
             {
@@ -241,7 +274,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                 onHide={onHide}
                 title="Nuevo Paciente"
                 description="Registra un nuevo paciente"
-                width="w-80 md:w-112.5"
+                width="w-80 md:w-200"
                 footer={
                     <>
                         <button
@@ -286,19 +319,28 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             >
                 {/* BODY DEL CREATE */}
                 <div className="space-y-5">
+                    <div className="flex items-center gap-4 my-6">
+                        <div className="flex-1 h-px bg-slate-200" />
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombres
-                        </label>
+                        <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                            Datos del Paciente
+                        </h2>
 
-                        <input
-                            type="text"
-                            name="name"
-                            value={form.name}
-                            onChange={handleChange}
-                            placeholder="Ingrese el sus nombres"
-                            className="
+                        <div className="flex-1 h-px bg-slate-200" />
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Nombres
+                            </label>
+
+                            <input
+                                type="text"
+                                name="name"
+                                value={form.name}
+                                onChange={handleChange}
+                                placeholder="Ingrese el sus nombres"
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -309,20 +351,20 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Apellidos
-                        </label>
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Apellidos
+                            </label>
 
-                        <input
-                            type="text"
-                            name="lastName"
-                            value={form.lastName}
-                            onChange={handleChange}
-                            placeholder="Ingrese el sus apellidos"
-                            className="
+                            <input
+                                type="text"
+                                name="lastName"
+                                value={form.lastName}
+                                onChange={handleChange}
+                                placeholder="Ingrese el sus apellidos"
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -333,20 +375,22 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Documento de identidad
-                        </label>
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Documento de identidad (cédula o pasaporte)
+                            </label>
 
-                        <input
-                            type="text"
-                            name="idCard"
-                            value={form.idCard}
-                            onChange={handleChange}
-                            placeholder="Ingrese el su documento de identidad"
-                            className="
+                            <input
+                                type="text"
+                                name="idCard"
+                                value={form.idCard}
+                                onChange={handleChange}
+                                placeholder="Ingrese el su documento de identidad"
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -357,20 +401,22 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Fecha de nacimiento
-                        </label>
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Fecha de nacimiento
+                            </label>
 
-                        <input
-                            key={isOpen ? "birthdate-open" : "birthdate-closed"}
-                            type="date"
-                            name="birthdate"
-                            value={form.birthdate}
-                            onChange={handleChange}
-                            className="
+                            <input
+                                key={isOpen ? "birthdate-open" : "birthdate-closed"}
+                                type="date"
+                                name="birthdate"
+                                value={form.birthdate}
+                                onChange={handleChange}
+                                min={minBirthdate}
+                                max={maxBirthdate}
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -381,18 +427,20 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Género
-                        </label>
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Género
+                            </label>
 
-                        <select
-                            name="gender"
-                            value={form.gender}
-                            onChange={handleChange}
-                            className="
+                            <select
+                                name="gender"
+                                value={form.gender}
+                                onChange={handleChange}
+                                className="
                                 w-full 
                                 px-3 py-2.5 
                                 border border-slate-200 
@@ -403,31 +451,30 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2 
                                 focus:ring-blue-500/10
                             "
-                        >
-                            <option value="">
-                                Seleccione un género
-                            </option>
-
-                            {genderData.map((status) => (
-                                <option key={status} value={status}>
-                                    {status}
+                            >
+                                <option value="">
+                                    Seleccione un género
                                 </option>
-                            ))}
-                        </select>
-                    </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Email
-                        </label>
+                                {genderData.map((status) => (
+                                    <option key={status} value={status}>
+                                        {status}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Email
+                            </label>
 
-                        <input
-                            type="email"
-                            name="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            placeholder="correo@ejemplo.com"
-                            className="
+                            <input
+                                type="email"
+                                name="email"
+                                value={form.email}
+                                onChange={handleChange}
+                                placeholder="correo@ejemplo.com"
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -438,21 +485,22 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                            />
+                        </div>
                     </div>
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Número de teléfono del paciente
+                            </label>
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Número de teléfono
-                        </label>
-
-                        <input
-                            type="text"
-                            name="phoneNumber"
-                            value={form.phoneNumber}
-                            onChange={handleChange}
-                            placeholder="Ingrese su número de teléfono"
-                            className="
+                            <input
+                                type="text"
+                                name="phoneNumber"
+                                value={form.phoneNumber}
+                                onChange={handleChange}
+                                placeholder="Ingrese su número de teléfono"
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -463,21 +511,20 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
-                    </div>
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Dirección
+                            </label>
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Dirección
-                        </label>
-
-                        <input
-                            type="text"
-                            name="address"
-                            value={form.address}
-                            onChange={handleChange}
-                            placeholder="Ingrese su dirección"
-                            className="
+                            <input
+                                type="text"
+                                name="address"
+                                value={form.address}
+                                onChange={handleChange}
+                                placeholder="Ingrese su dirección"
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -488,59 +535,12 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                            />
+                        </div>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombre del contacto de emergencia
-                        </label>
-
-                        <input
-                            type="text"
-                            name="emergencyContactName"
-                            value={form.emergencyContactName}
-                            onChange={handleChange}
-                            placeholder="Ingrese el nombre del contacto de emergencia"
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Número del contacto de emergencia
-                        </label>
-
-                        <input
-                            type="text"
-                            name="emergencyContactPhone"
-                            value={form.emergencyContactPhone}
-                            onChange={handleChange}
-                            placeholder="Ingrese el número del contacto de emergencia"
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Estado Civil
+                            Estado Civil del paciente
                         </label>
                         <select
                             name="maritalStatus"
@@ -569,7 +569,65 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                             ))}
                         </select>
                     </div>
+                    <div className="flex items-center gap-4 my-6">
+                        <div className="flex-1 h-px bg-slate-200" />
 
+                        <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                            Datos del Contacto de Emergencia
+                        </h2>
+
+                        <div className="flex-1 h-px bg-slate-200" />
+                    </div>
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Nombre del contacto de emergencia
+                            </label>
+
+                            <input
+                                type="text"
+                                name="emergencyContactName"
+                                value={form.emergencyContactName}
+                                onChange={handleChange}
+                                placeholder="Ingrese el nombre del contacto de emergencia"
+                                className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Número del contacto de emergencia
+                            </label>
+
+                            <input
+                                type="text"
+                                name="emergencyContactPhone"
+                                value={form.emergencyContactPhone}
+                                onChange={handleChange}
+                                placeholder="Ingrese el número del contacto de emergencia"
+                                className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                            />
+                        </div>
+                    </div>
                 </div>
             </GenericDrawer>
         </>
