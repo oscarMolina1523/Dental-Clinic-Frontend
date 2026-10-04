@@ -5,6 +5,10 @@ import { useAddProduct } from "../../hooks/useProducts";
 import { useAddCategory, useCategories, useDeleteCategory } from "../../hooks/useCategories";
 import { useAddMeasurementUnit, useDeleteMeasurementUnit, useMeasurementUnites } from "../../hooks/useMeasurementUnit";
 import { Check, Plus, Trash2, X } from "lucide-react";
+import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
+import type CategoryModel from "../../models/CategoryModel";
+import type MeasurementUnitModel from "../../models/MeasurementUnitModel";
+import ConfirmModal from "../../shared/ConfirmModal";
 
 interface CreateProductProps {
     isOpen: boolean;
@@ -34,6 +38,12 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
 
     const [isCreatingCategory, setIsCreatingCategory] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState("");
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+    const [deleteType, setDeleteType] = useState<
+        "category" | "measurementUnit" | null
+    >(null);
 
     const [form, setForm] = useState({
         name: "",
@@ -141,33 +151,8 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
             return;
         }
 
-        const confirmed = window.confirm(
-            `¿Está seguro de eliminar la categoría "${selectedCategory.name}"?`
-        );
-
-        if (!confirmed) {
-            return;
-        }
-
-        deleteCategory(categoryId, {
-            onSuccess: () => {
-                showToast(
-                    "success",
-                    "La categoría se eliminó correctamente."
-                );
-
-                setForm((prev) => ({
-                    ...prev,
-                    category_id: "",
-                }));
-            },
-            onError: (error) => {
-                showToast(
-                    "error",
-                    error.message || "No se pudo eliminar la categoría."
-                );
-            },
-        });
+        setDeleteType("category");
+        setIsDeleteModalOpen(true);
     };
 
     const handleCreateMeasurementUnit = () => {
@@ -244,34 +229,8 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
             return;
         }
 
-        const confirmed = window.confirm(
-            `¿Está seguro de eliminar la unidad de medida "${selectedMeasurementUnit.name}"?`
-        );
-
-        if (!confirmed) {
-            return;
-        }
-
-        deleteMeasurementUnit(measurementUnitId, {
-            onSuccess: () => {
-                showToast(
-                    "success",
-                    "La unidad de medida se eliminó correctamente."
-                );
-
-                setForm((prev) => ({
-                    ...prev,
-                    measurement_unit_id: "",
-                }));
-            },
-            onError: (error) => {
-                showToast(
-                    "error",
-                    error.message ||
-                    "No se pudo eliminar la unidad de medida."
-                );
-            },
-        });
+        setDeleteType("measurementUnit");
+        setIsDeleteModalOpen(true);
     };
 
     const handleSubmit = () => {
@@ -334,6 +293,78 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                 },
             }
         );
+    };
+
+    const handleDeleteConfirm = () => {
+        if (!deleteType) return;
+
+        if (deleteType === "category") {
+            const categoryId = form.category_id;
+
+            if (!categoryId) return;
+
+            deleteCategory(categoryId, {
+                onSuccess: () => {
+                    showToast(
+                        "success",
+                        "La categoría se eliminó correctamente."
+                    );
+
+                    setForm((prev) => ({
+                        ...prev,
+                        category_id: "",
+                    }));
+
+                    setIsDeleteModalOpen(false);
+                    setDeleteType(null);
+                },
+                onError: (error) => {
+                    showToast(
+                        "error",
+                        error.message ||
+                        "No se pudo eliminar la categoría."
+                    );
+
+                    setIsDeleteModalOpen(false);
+                    setDeleteType(null);
+                },
+            });
+
+            return;
+        }
+
+        if (deleteType === "measurementUnit") {
+            const measurementUnitId = form.measurement_unit_id;
+
+            if (!measurementUnitId) return;
+
+            deleteMeasurementUnit(measurementUnitId, {
+                onSuccess: () => {
+                    showToast(
+                        "success",
+                        "La unidad de medida se eliminó correctamente."
+                    );
+
+                    setForm((prev) => ({
+                        ...prev,
+                        measurement_unit_id: "",
+                    }));
+
+                    setIsDeleteModalOpen(false);
+                    setDeleteType(null);
+                },
+                onError: (error) => {
+                    showToast(
+                        "error",
+                        error.message ||
+                        "No se pudo eliminar la unidad de medida."
+                    );
+
+                    setIsDeleteModalOpen(false);
+                    setDeleteType(null);
+                },
+            });
+        }
     };
 
     return (
@@ -437,7 +468,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Codigo de barra
+                            Codigo de barra (opcional)
                         </label>
 
                         <input
@@ -484,110 +515,104 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                             "
                         />
                     </div>
-
-                    {/* <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Categoria
-                        </label>
-
-                        <select
-                            name="category_id"
-                            value={form.category_id}
-                            onChange={handleChange}
-                            disabled={isLoadingCategories}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
-                        >
-                            <option value="">
-                                {isLoadingCategories ? "Cargando categorias..." : "Seleccione una categoria"}
-                            </option> */}
-                    {/* 3. Mapeo dinámico de los categories devueltos por la API */}
-                    {/* {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div> */}
-
                     <div>
-                        <div className="flex items-center justify-between mb-2">
-                            <label className="block text-sm font-medium text-slate-700">
-                                Categoría
-                            </label>
+                        <SearchableSelect<CategoryModel>
+                            label="Categorías"
+                            value={form.category_id}
+                            items={categories}
+                            getOptionValue={(category) => category.id}
+                            getOptionLabel={(category) =>
+                                category.name
+                            }
+                            placeholder={
+                                isLoadingCategories
+                                    ? "Cargando categorías..."
+                                    : "Seleccione una categoría"
+                            }
+                            searchPlaceholder="Buscar categoría por nombre..."
+                            noResultsMessage="No se encontraron categorías."
+                            disabled={isLoadingCategories}
+                            onChange={(category) => {
+                                setForm((prev) => ({
+                                    ...prev,
+                                    category_id: String(category.id),
+                                }));
+                            }}
+                            labelActions={
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsCreatingCategory((prev) => !prev);
+                                            setNewCategoryName("");
+                                        }}
+                                        disabled={isAddingCategory || isDeletingCategory}
+                                        className="
+                                        p-1.5
+                                        rounded-md
+                                        text-blue-600
+                                        hover:bg-blue-50
+                                        transition-colors
+                                        cursor-pointer
+                                        disabled:opacity-50
+                                    "
+                                        title="Nueva categoría"
+                                    >
+                                        {isCreatingCategory ? (
+                                            <X className="h-4 w-4" />
+                                        ) : (
+                                            <Plus className="h-4 w-4" />
+                                        )}
+                                    </button>
 
-                            <div className="flex items-center gap-1">
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setIsCreatingCategory((prev) => !prev);
-                                        setNewCategoryName("");
-                                    }}
-                                    disabled={isAddingCategory || isDeletingCategory}
-                                    className="
-                    p-1.5
-                    rounded-md
-                    text-blue-600
-                    hover:bg-blue-50
-                    transition-colors
-                    cursor-pointer
-                    disabled:opacity-50
-                "
-                                    title="Nueva categoría"
-                                >
-                                    {isCreatingCategory ? (
-                                        <X className="h-4 w-4" />
-                                    ) : (
-                                        <Plus className="h-4 w-4" />
-                                    )}
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={handleDeleteCategory}
-                                    disabled={
-                                        !form.category_id ||
-                                        isDeletingCategory ||
-                                        isAddingCategory
-                                    }
-                                    className="
-                    p-1.5
-                    rounded-md
-                    text-red-600
-                    hover:bg-red-50
-                    transition-colors
-                    cursor-pointer
-                    disabled:opacity-40
-                    disabled:cursor-not-allowed
-                "
-                                    title="Eliminar categoría"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
-                            </div>
-                        </div>
+                                    <button
+                                        type="button"
+                                        onClick={handleDeleteCategory}
+                                        disabled={
+                                            !form.category_id ||
+                                            isDeletingCategory ||
+                                            isAddingCategory
+                                        }
+                                        className="
+                                        p-1.5
+                                        rounded-md
+                                        text-red-600
+                                        hover:bg-red-50
+                                        transition-colors
+                                        cursor-pointer
+                                        disabled:opacity-40
+                                        disabled:cursor-not-allowed
+                                    "
+                                        title="Eliminar categoría"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            }
+                        />
 
                         {isCreatingCategory && (
-                            <div className="flex gap-2 mb-2">
+                            <div className="flex gap-2 mt-2">
                                 <input
                                     type="text"
                                     value={newCategoryName}
                                     onChange={(e) =>
                                         setNewCategoryName(e.target.value)
                                     }
-                                    placeholder="Nombre de la categoría"
+                                    placeholder="Nombre de la nueva categoría"
                                     disabled={isAddingCategory}
                                     className="
-                    flex-1
-                    px-3 py-2
-                    border border-slate-200
-                    rounded-lg
-                    text-sm
-                    outline-none
-                    focus:border-blue-500
-                    focus:ring-2
-                    focus:ring-blue-500/10
-                    disabled:bg-slate-50
-                "
+                                        flex-1
+                                        px-3 py-2
+                                        border border-slate-200
+                                        rounded-lg
+                                        text-sm
+                                        outline-none
+                                        focus:border-blue-500
+                                        focus:ring-2
+                                        focus:ring-blue-500/10
+                                        disabled:bg-slate-50
+                                    "
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter") {
                                             e.preventDefault();
@@ -620,111 +645,91 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                                 </button>
                             </div>
                         )}
-
-                        <select
-                            name="category_id"
-                            value={form.category_id}
-                            onChange={handleChange}
-                            disabled={
-                                isLoadingCategories ||
-                                isAddingCategory ||
-                                isDeletingCategory
-                            }
-                            className="
-            w-full
-            px-3 py-2.5
-            border border-slate-200
-            rounded-lg
-            text-sm
-            outline-none
-            focus:border-blue-500
-            focus:ring-2
-            focus:ring-blue-500/10
-            disabled:bg-slate-50
-            disabled:cursor-not-allowed
-        "
-                        >
-                            <option value="">
-                                {isLoadingCategories
-                                    ? "Cargando categorías..."
-                                    : "Seleccione una categoría"}
-                            </option>
-
-                            {categories.map((category) => (
-                                <option
-                                    key={category.id}
-                                    value={category.id}
-                                >
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
                     </div>
                     <div>
-                        <div className="flex items-center justify-between mb-2">
-                            <label className="block text-sm font-medium text-slate-700">
-                                Unidad de medida
-                            </label>
+                        <SearchableSelect<MeasurementUnitModel>
+                            label="Unidades de Medida"
+                            value={form.measurement_unit_id}
+                            items={measurementUnites}
+                            getOptionValue={(measurementUnit) => measurementUnit.id}
+                            getOptionLabel={(measurementUnit) =>
+                                `${measurementUnit.name} - ${measurementUnit.abreviation}`
+                            }
+                            placeholder={
+                                isLoadingMeasurementUnites
+                                    ? "Cargando unidades de medida..."
+                                    : "Seleccione una unidad de medida"
+                            }
+                            searchPlaceholder="Buscar unidad de medida por nombre..."
+                            noResultsMessage="No se encontraron unidades de medida."
+                            disabled={isLoadingMeasurementUnites}
+                            onChange={(measurementUnit) => {
+                                setForm((prev) => ({
+                                    ...prev,
+                                    measurement_unit_id: String(measurementUnit.id),
+                                }));
+                            }}
+                            labelActions={
+                                <div className="flex items-center gap-1">
+                                    {/* Crear unidad */}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsCreatingMeasurementUnit((prev) => !prev);
+                                            setNewMeasurementUnitName("");
+                                        }}
+                                        disabled={
+                                            isAddingMeasurementUnit ||
+                                            isDeletingMeasurementUnit
+                                        }
+                                        className="
+                                        p-1.5
+                                        rounded-md
+                                        text-blue-600
+                                        hover:bg-blue-50
+                                        transition-colors
+                                        cursor-pointer
+                                        disabled:opacity-50
+                                    "
+                                        title="Nueva unidad de medida"
+                                    >
+                                        {isCreatingMeasurementUnit ? (
+                                            <X className="h-4 w-4" />
+                                        ) : (
+                                            <Plus className="h-4 w-4" />
+                                        )}
+                                    </button>
 
-                            <div className="flex items-center gap-1">
-                                {/* Crear unidad */}
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        setIsCreatingMeasurementUnit((prev) => !prev);
-                                        setNewMeasurementUnitName("");
-                                    }}
-                                    disabled={
-                                        isAddingMeasurementUnit ||
-                                        isDeletingMeasurementUnit
-                                    }
-                                    className="
-                    p-1.5
-                    rounded-md
-                    text-blue-600
-                    hover:bg-blue-50
-                    transition-colors
-                    cursor-pointer
-                    disabled:opacity-50
-                "
-                                    title="Nueva unidad de medida"
-                                >
-                                    {isCreatingMeasurementUnit ? (
-                                        <X className="h-4 w-4" />
-                                    ) : (
-                                        <Plus className="h-4 w-4" />
-                                    )}
-                                </button>
-
-                                {/* Eliminar unidad */}
-                                <button
-                                    type="button"
-                                    onClick={handleDeleteMeasurementUnit}
-                                    disabled={
-                                        !form.measurement_unit_id ||
-                                        isDeletingMeasurementUnit ||
-                                        isAddingMeasurementUnit
-                                    }
-                                    className="
-                    p-1.5
-                    rounded-md
-                    text-red-600
-                    hover:bg-red-50
-                    transition-colors
-                    cursor-pointer
-                    disabled:opacity-40
-                    disabled:cursor-not-allowed
-                "
-                                    title="Eliminar unidad de medida"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
-                            </div>
-                        </div>
+                                    {/* Eliminar unidad */}
+                                    <button
+                                        type="button"
+                                        onClick={handleDeleteMeasurementUnit}
+                                        disabled={
+                                            !form.measurement_unit_id ||
+                                            isDeletingMeasurementUnit ||
+                                            isAddingMeasurementUnit
+                                        }
+                                        className="
+                                        p-1.5
+                                        rounded-md
+                                        text-red-600
+                                        hover:bg-red-50
+                                        transition-colors
+                                        cursor-pointer
+                                        disabled:opacity-40
+                                        disabled:cursor-not-allowed
+                                    "
+                                        title="Eliminar unidad de medida"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            }
+                        />
 
                         {/* Crear nueva unidad */}
                         {isCreatingMeasurementUnit && (
-                            <div className="space-y-2 mb-2">
+                            <div className="space-y-2 mt-2">
                                 <input
                                     type="text"
                                     value={newMeasurementUnitName}
@@ -734,17 +739,17 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                                     placeholder="Nombre de la unidad"
                                     disabled={isAddingMeasurementUnit}
                                     className="
-                w-full
-                px-3 py-2
-                border border-slate-200
-                rounded-lg
-                text-sm
-                outline-none
-                focus:border-blue-500
-                focus:ring-2
-                focus:ring-blue-500/10
-                disabled:bg-slate-50
-            "
+                                    w-full
+                                    px-3 py-2
+                                    border border-slate-200
+                                    rounded-lg
+                                    text-sm
+                                    outline-none
+                                    focus:border-blue-500
+                                    focus:ring-2
+                                    focus:ring-blue-500/10
+                                    disabled:bg-slate-50
+                                "
                                 />
 
                                 <div className="flex gap-2">
@@ -757,17 +762,17 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                                         placeholder="Abreviación (ej. kg, und, ml)"
                                         disabled={isAddingMeasurementUnit}
                                         className="
-                    flex-1
-                    px-3 py-2
-                    border border-slate-200
-                    rounded-lg
-                    text-sm
-                    outline-none
-                    focus:border-blue-500
-                    focus:ring-2
-                    focus:ring-blue-500/10
-                    disabled:bg-slate-50
-                "
+                                            flex-1
+                                            px-3 py-2
+                                            border border-slate-200
+                                            rounded-lg
+                                            text-sm
+                                            outline-none
+                                            focus:border-blue-500
+                                            focus:ring-2
+                                            focus:ring-blue-500/10
+                                            disabled:bg-slate-50
+                                        "
                                         onKeyDown={(e) => {
                                             if (e.key === "Enter") {
                                                 e.preventDefault();
@@ -785,16 +790,16 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                                             !newMeasurementUnitAbbreviation.trim()
                                         }
                                         className="
-                    px-3
-                    rounded-lg
-                    bg-[#001D4A]
-                    text-white
-                    hover:bg-[#00285f]
-                    transition-colors
-                    cursor-pointer
-                    disabled:opacity-50
-                    disabled:cursor-not-allowed
-                "
+                                            px-3
+                                            rounded-lg
+                                            bg-[#001D4A]
+                                            text-white
+                                            hover:bg-[#00285f]
+                                            transition-colors
+                                            cursor-pointer
+                                            disabled:opacity-50
+                                            disabled:cursor-not-allowed
+                                        "
                                         title="Guardar unidad de medida"
                                     >
                                         <Check className="h-4 w-4" />
@@ -802,50 +807,44 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                                 </div>
                             </div>
                         )}
-
-                        {/* Select */}
-                        <select
-                            name="measurement_unit_id"
-                            value={form.measurement_unit_id}
-                            onChange={handleChange}
-                            disabled={
-                                isLoadingMeasurementUnites ||
-                                isAddingMeasurementUnit ||
-                                isDeletingMeasurementUnit
-                            }
-                            className="
-            w-full
-            px-3 py-2.5
-            border border-slate-200
-            rounded-lg
-            text-sm
-            outline-none
-            focus:border-blue-500
-            focus:ring-2
-            focus:ring-blue-500/10
-            disabled:bg-slate-50
-            disabled:cursor-not-allowed
-        "
-                        >
-                            <option value="">
-                                {isLoadingMeasurementUnites
-                                    ? "Cargando unidades de medida..."
-                                    : "Seleccione una unidad de medida"}
-                            </option>
-
-                            {measurementUnites.map((measurementUnit) => (
-                                <option
-                                    key={measurementUnit.id}
-                                    value={measurementUnit.id}
-                                >
-                                    {measurementUnit.name}
-                                </option>
-                            ))}
-                        </select>
                     </div>
 
                 </div>
             </GenericDrawer>
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                title={
+                    deleteType === "category"
+                        ? `¿Estás seguro de eliminar la categoría "${categories.find(
+                            (category) =>
+                                String(category.id) === form.category_id
+                        )?.name ?? ""
+                        }"?`
+                        : `¿Estás seguro de eliminar la unidad de medida "${measurementUnites.find(
+                            (measurementUnit) =>
+                                String(measurementUnit.id) ===
+                                form.measurement_unit_id
+                        )?.name ?? ""
+                        }"?`
+                }
+                description="Esta acción no se puede deshacer. Los datos asociados se perderán permanentemente."
+                confirmText={
+                    deleteType === "category"
+                        ? isDeletingCategory
+                            ? "Eliminando..."
+                            : "Eliminar"
+                        : isDeletingMeasurementUnit
+                            ? "Eliminando..."
+                            : "Eliminar"
+                }
+                cancelText="Cancelar"
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => {
+                    setIsDeleteModalOpen(false);
+                    setDeleteType(null);
+                }}
+            />
         </>
     );
 }

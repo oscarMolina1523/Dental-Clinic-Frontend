@@ -14,6 +14,7 @@ interface SearchableSelectProps<T> {
     searchPlaceholder?: string;
     noResultsMessage?: string;
     disabled?: boolean;
+    labelActions?: React.ReactNode;
 }
 
 const SearchableSelect = <T,>(
@@ -28,6 +29,7 @@ const SearchableSelect = <T,>(
         searchPlaceholder = "Buscar...",
         noResultsMessage = "No se encontraron resultados.",
         disabled = false,
+        labelActions,
     }: SearchableSelectProps<T>
 ) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -62,9 +64,17 @@ const SearchableSelect = <T,>(
 
     return (
         <div className="relative">
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-                {label}
-            </label>
+            <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                    {label}
+                </label>
+
+                {labelActions && (
+                    <div className="flex items-center gap-2 mb-2">
+                        {labelActions}
+                    </div>
+                )}
+            </div>
 
             <button
                 type="button"
@@ -163,10 +173,9 @@ const SearchableSelect = <T,>(
                                             transition-colors
                                             cursor-pointer
                                             hover:bg-slate-50
-                                            ${
-                                                isSelected
-                                                    ? "bg-blue-50 text-blue-700"
-                                                    : "text-slate-700"
+                                            ${isSelected
+                                                ? "bg-blue-50 text-blue-700"
+                                                : "text-slate-700"
                                             }
                                         `}
                                     >
