@@ -33,13 +33,18 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
         address: "",
         emergencyContactName: "",
         emergencyContactPhone: "",
-        maritalStatus: ""
+        maritalStatus: "",
+        payerName: "",
+        payerIdCard: "",
+        payerPhoneNumber: "",
     });
+
+    const [isSelfPayer, setIsSelfPayer] = useState(true);
 
     const [toast, setToast] = useState<{
         type: "success" | "error";
         message: string;
-    } | null>(null); 
+    } | null>(null);
 
     const showToast = (
         type: "success" | "error",
@@ -49,6 +54,23 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             type,
             message,
         });
+    };
+
+    const handleSelfPayerChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const checked = e.target.checked;
+
+        setIsSelfPayer(checked);
+
+        if (checked) {
+            setForm((prev) => ({
+                ...prev,
+                payerName: "",
+                payerIdCard: "",
+                payerPhoneNumber: "",
+            }));
+        }
     };
 
     const cleanForm = () => {
@@ -63,7 +85,10 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             address: "",
             emergencyContactName: "",
             emergencyContactPhone: "",
-            maritalStatus: ""
+            maritalStatus: "",
+            payerName: "",
+            payerIdCard: "",
+            payerPhoneNumber: "",
         });
 
         onHide();
@@ -92,6 +117,9 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
         const emergencyContactName = form.emergencyContactName.trim();
         const emergencyContactPhone = form.emergencyContactPhone.trim();
         const maritalStatus = form.maritalStatus.trim();
+        const payerName = form.payerName.trim();
+        const payerIdCard = form.payerIdCard.trim();
+        const payerPhoneNumber = form.payerPhoneNumber.trim();
 
         // Validaciones
         if (!name) {
@@ -191,6 +219,40 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             return;
         }
 
+        if (!isSelfPayer) {
+            if (!payerName) {
+                showToast(
+                    "error",
+                    "Debe proporcionar el nombre del responsable de pago."
+                );
+                return;
+            }
+
+            if (!payerIdCard) {
+                showToast(
+                    "error",
+                    "Debe proporcionar el documento de identidad del responsable de pago."
+                );
+                return;
+            }
+
+            if (!validateIdentityDocument(form.payerIdCard)) {
+                showToast(
+                    "error",
+                    "El documento del responsable debe ser una cédula o un pasaporte válido."
+                );
+                return;
+            }
+
+            if (!validatePhoneNumber(payerPhoneNumber)) {
+                showToast(
+                    "error",
+                    "Ingrese un número de teléfono válido de 8 dígitos del responsable."
+                );
+                return;
+            }
+        }
+
         // Validación básica de email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -223,7 +285,19 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                 address,
                 emergencyContactName,
                 emergencyContactPhone,
-                maritalStatus
+                maritalStatus,
+                isSelfPayer,
+                payerName: isSelfPayer
+                    ? `${name} ${lastName}`
+                    : payerName,
+
+                payerIdCard: isSelfPayer
+                    ? idCard
+                    : payerIdCard,
+
+                payerPhoneNumber: isSelfPayer
+                    ? phone
+                    : payerPhoneNumber,
             },
             {
                 onSuccess: () => {
@@ -570,6 +644,27 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                             ))}
                         </select>
                     </div>
+                    <div className="mt-6">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={isSelfPayer}
+                                onChange={handleSelfPayerChange}
+                                className="
+                                    w-4 h-4
+                                    rounded
+                                    border-slate-300
+                                    text-blue-600
+                                    focus:ring-blue-500
+                                    cursor-pointer
+                                "
+                            />
+
+                            <span className="text-sm font-medium text-slate-700">
+                                El paciente es quien realiza el pago
+                            </span>
+                        </label>
+                    </div>
                     <div className="flex items-center gap-4 my-6">
                         <div className="flex-1 h-px bg-slate-200" />
 
@@ -629,6 +724,97 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                             />
                         </div>
                     </div>
+
+                    {!isSelfPayer && (
+                        <>
+                            <div className="flex items-center gap-4 my-6">
+                                <div className="flex-1 h-px bg-slate-200" />
+
+                                <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                                    Datos del Responsable de Pago
+                                </h2>
+
+                                <div className="flex-1 h-px bg-slate-200" />
+                            </div>
+
+                            <div className="flex flex-col md:flex-row gap-2 w-full">
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Nombre del responsable
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="payerName"
+                                        value={form.payerName}
+                                        onChange={handleChange}
+                                        placeholder="Ingrese el nombre del responsable"
+                                        className="
+                                            w-full
+                                            px-3 py-2.5
+                                            border border-slate-200
+                                            rounded-lg
+                                            text-sm
+                                            outline-none
+                                            focus:border-blue-500
+                                            focus:ring-2
+                                            focus:ring-blue-500/10
+                                        "
+                                    />
+                                </div>
+
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Documento de identidad del responsable
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="payerIdCard"
+                                        value={form.payerIdCard}
+                                        onChange={handleChange}
+                                        placeholder="Cédula o pasaporte"
+                                        className="
+                                            w-full
+                                            px-3 py-2.5
+                                            border border-slate-200
+                                            rounded-lg
+                                            text-sm
+                                            outline-none
+                                            focus:border-blue-500
+                                            focus:ring-2
+                                            focus:ring-blue-500/10
+                                        "
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Teléfono del responsable
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="payerPhoneNumber"
+                                    value={form.payerPhoneNumber}
+                                    onChange={handleChange}
+                                    placeholder="Ingrese el teléfono del responsable"
+                                    className="
+                                        w-full
+                                        px-3 py-2.5
+                                        border border-slate-200
+                                        rounded-lg
+                                        text-sm
+                                        outline-none
+                                        focus:border-blue-500
+                                        focus:ring-2
+                                        focus:ring-blue-500/10
+                                    "
+                                />
+                            </div>
+                        </>
+                    )}
                 </div>
             </GenericDrawer>
         </>
