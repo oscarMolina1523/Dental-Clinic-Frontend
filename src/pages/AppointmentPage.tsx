@@ -140,7 +140,7 @@ const AppointmentPage: React.FC = () => {
             className: "text-emerald-600",
         },
         CANCELLED: {
-            label: "Cancelada",
+            label: "Abortada",
             className: "text-red-600",
         },
         NO_SHOW: {
@@ -260,7 +260,7 @@ const AppointmentPage: React.FC = () => {
                 setSelectedAppointment(appointment);
                 setIsEditDrawerOpen(true);
             },
-            hidden: () => !canWrite,
+            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED",
         },
         {
             label: "Cambios de estados",
@@ -450,7 +450,7 @@ const AppointmentPage: React.FC = () => {
                                 </button>
                             )}
 
-                            {/* CANCELAR */}
+                            {/* Abortar */}
                             {canCancel(selectedAppointment.status) && (
                                 <>
                                     <div className="my-1 border-t border-slate-100" />
@@ -461,7 +461,7 @@ const AppointmentPage: React.FC = () => {
                                         className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-rose-600 hover:bg-rose-50 rounded-xl transition-colors disabled:opacity-50 font-medium"
                                     >
                                         <XCircle className="w-4 h-4 text-rose-600" />
-                                        <span>Cancelar Cita</span>
+                                        <span>Abortar Cita</span>
                                     </button>
                                 </>
                             )}
@@ -477,7 +477,7 @@ const AppointmentPage: React.FC = () => {
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden border border-slate-100 p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
                         <div className="flex items-center justify-between">
                             <h3 className="font-semibold text-slate-800 text-lg">
-                                Cancelar Cita
+                                Abortar Cita
                             </h3>
                             <button
                                 onClick={() => setIsCancelModalOpen(false)}
