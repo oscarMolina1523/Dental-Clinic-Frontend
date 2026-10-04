@@ -7,6 +7,9 @@ import { usePatients } from "../../hooks/usePatients";
 import { useUsers } from "../../hooks/useUsers";
 import { roleNames, UserRole } from "../../hooks/useRolePermitions";
 import { DateTimePicker } from "../../shared/DateTimePicker/DateTimePicker";
+import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
+import type PatientModel from "../../models/PatientModel";
+import type UserModel from "../../models/UserModel";
 
 interface CreateAppointmentProps {
     isOpen: boolean;
@@ -85,9 +88,8 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         onHide();
     };
 
-    const handlePatientChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedId = e.target.value;
-        const selectedPatient = patients.find((p) => String(p.id) === selectedId);
+    const handlePatientChange = (selectedPatient: PatientModel) => {
+        const selectedId = String(selectedPatient.id);
 
         setForm((prev) => ({
             ...prev,
@@ -98,9 +100,8 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         }));
     };
 
-    const handleDentistChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedId = e.target.value;
-        const selectedDentist = users.find((u) => String(u.id) === selectedId);
+    const handleDentistChange = (selectedDentist: UserModel) => {
+        const selectedId = String(selectedDentist.id);
 
         setForm((prev) => ({
             ...prev,
@@ -234,7 +235,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                 onHide={onHide}
                 title="Nueva Cita"
                 description="Registra una nueva cita"
-                width="w-80 md:w-112.5"
+                width="w-80 md:w-120"
                 footer={
                     <>
                         <button
@@ -281,50 +282,44 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                 <div className="space-y-5">
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Pacientes
-                        </label>
-
-                        <select
-                            name="patientId"
+                        <SearchableSelect<PatientModel>
+                            label="Pacientes"
                             value={form.patientId}
-                            onChange={handlePatientChange}
+                            items={patients}
+                            getOptionValue={(patient) => patient.id}
+                            getOptionLabel={(patient) =>
+                                `${patient.name} ${patient.lastName}`
+                            }
+                            placeholder={
+                                isLoadingPatients
+                                    ? "Cargando pacientes..."
+                                    : "Seleccione un paciente"
+                            }
+                            searchPlaceholder="Buscar paciente por nombre..."
+                            noResultsMessage="No se encontraron pacientes."
                             disabled={isLoadingPatients}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
-                        >
-                            <option value="">
-                                {isLoadingPatients ? "Cargando pacientes..." : "Seleccione un paciente"}
-                            </option>
-                            {/* 3. Mapeo dinámico de los patients devueltos por la API */}
-                            {patients.map((patient) => (
-                                <option key={patient.id} value={patient.id}>
-                                    {patient.name} {patient.lastName}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={handlePatientChange}
+                        />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Dentistas
-                        </label>
-
-                        <select
-                            name="dentistId"
+                        <SearchableSelect<UserModel>
+                            label="Especialistas"
                             value={form.dentistId}
-                            onChange={handleDentistChange}
+                            items={dentists}
+                            getOptionValue={(dentist) => dentist.id}
+                            getOptionLabel={(dentist) =>
+                                `${dentist.fullName} - ${dentist.email}`
+                            }
+                            placeholder={
+                                isLoadingUsers
+                                    ? "Cargando especialistas..."
+                                    : "Seleccione un especialista"
+                            }
+                            searchPlaceholder="Buscar especialista por nombre..."
+                            noResultsMessage="No se encontraron especialistas."
                             disabled={isLoadingUsers}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
-                        >
-                            <option value="">
-                                {isLoadingUsers ? "Cargando dentistas..." : "Seleccione un dentista"}
-                            </option>
-                            {/* 3. Mapeo dinámico de los dentistas devueltos por la API */}
-                            {dentists.map((dentist) => (
-                                <option key={dentist.id} value={dentist.id}>
-                                    {dentist.fullName}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={handleDentistChange}
+                        />
                     </div>
                     <div>
                         <DateTimePicker
