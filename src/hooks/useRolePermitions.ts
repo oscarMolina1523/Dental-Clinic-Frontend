@@ -78,7 +78,7 @@ export const getRoleName = (roleId?: string) => {
       return "Demo";
 
     case "2f67c45e35ff526b":
-      return "Dentista";
+      return "Especialista";
 
     case "5e3add1ef884e4e7":
       return "Recepcionista";
