@@ -4,6 +4,8 @@ import { useUpdateUser } from "../../hooks/useUsers";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import User from "../../models/UserModel";
 import useImageUpload from "../../hooks/useImageUpload";
+import { SPECIALTIES, type Specialty } from "../../utils/specialtiesData.enum";
+import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
 
 interface EditUserDrawerProps {
     isOpen: boolean;
@@ -16,7 +18,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
     onHide,
     user,
 }) => {
-    const { uploadImage} = useImageUpload();
+    const { uploadImage } = useImageUpload();
     const {
         mutate: updateUser,
         isPending,
@@ -26,6 +28,9 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
     const [form, setForm] = useState<User | null>(user);
 
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [isSpecialist, setIsSpecialist] = useState(
+        !!user?.specialties?.trim()
+    );
 
     const [toast, setToast] = useState<{
         type: "success" | "error";
@@ -35,6 +40,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
     if (user !== prevUser) {
         setPrevUser(user);
         setForm(user);
+        setIsSpecialist(!!user?.specialties?.trim());
     }
 
     const showToast = (
@@ -69,6 +75,66 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
         const file = e.target.files?.[0] || null;
 
         setImageFile(file);
+    };
+
+    const handleSpecialistChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const checked = e.target.checked;
+
+        setIsSpecialist(checked);
+
+        if (!checked) {
+            setForm((prev) => {
+                if (!prev) return prev;
+
+                return {
+                    ...prev,
+                    specialties: "",
+                    membershipNumber: "",
+                };
+            });
+        }
+    };
+
+    const handleSpecialtyChange = (specialty: Specialty) => {
+        setForm((prev) => {
+            if (!prev) return prev;
+
+            const currentSpecialties = prev.specialties
+                ? prev.specialties
+                    .split(",")
+                    .map((item) => item.trim())
+                    .filter(Boolean)
+                : [];
+
+            if (currentSpecialties.includes(specialty.id)) {
+                return prev;
+            }
+
+            return {
+                ...prev,
+                specialties: [...currentSpecialties, specialty.id].join(","),
+            };
+        });
+    };
+
+    const handleRemoveSpecialty = (specialtyId: string) => {
+        setForm((prev) => {
+            if (!prev) return prev;
+
+            const specialties = prev.specialties
+                .split(",")
+                .map((item) => item.trim())
+                .filter(
+                    (item) => item && item !== specialtyId
+                );
+
+            return {
+                ...prev,
+                specialties: specialties.join(","),
+            };
+        });
     };
 
     const handleSubmit = async () => {
@@ -124,7 +190,8 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                         fullName: form.fullName.trim(),
                         phoneNumber: form.phoneNumber.trim(),
                         image: imageUrl,
-                        membershipNumber: form.membershipNumber
+                        membershipNumber: form.membershipNumber,
+                        specialties: form.specialties
                     }
                 },
                 {
@@ -153,6 +220,17 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
             );
         }
     };
+
+    const selectedSpecialties = form?.specialties
+        ? form.specialties
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [];
+
+    const availableSpecialties = SPECIALTIES.filter(
+        (specialty) => !selectedSpecialties.includes(specialty.id)
+    );
 
     return (
         <>
@@ -358,7 +436,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                         )}
 
                     </div>
-                    <div>
+                    {/* <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
                             Codigo de Profesional
                         </label>
@@ -380,6 +458,137 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                                 focus:ring-blue-500/10
                             "
                         />
+                    </div> */}
+
+                    {/* Especialista */}
+                    <div className="border-t border-slate-100 pt-5">
+
+                        <label className="flex items-center gap-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={isSpecialist}
+                                onChange={handleSpecialistChange}
+                                className="
+                h-4
+                w-4
+                rounded
+                border-slate-300
+                text-blue-600
+                focus:ring-blue-500
+                cursor-pointer
+            "
+                            />
+
+                            <span className="text-sm font-medium text-slate-700">
+                                ¿Es especialista?
+                            </span>
+                        </label>
+
+                        {isSpecialist && (
+                            <div className="mt-4 space-y-5">
+
+                                {/* Especialidades */}
+                                <div>
+                                    <SearchableSelect<Specialty>
+                                        label="Especialidades"
+                                        value=""
+                                        items={availableSpecialties}
+                                        getOptionValue={(specialty) => specialty.id}
+                                        getOptionLabel={(specialty) => specialty.name}
+                                        placeholder="Seleccione una especialidad"
+                                        searchPlaceholder="Buscar especialidad..."
+                                        noResultsMessage="No se encontraron especialidades."
+                                        onChange={handleSpecialtyChange}
+                                    />
+
+                                    {/* Especialidades seleccionadas */}
+                                    {selectedSpecialties.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mt-3">
+                                            {selectedSpecialties.map((specialtyId) => {
+                                                const specialty = SPECIALTIES.find(
+                                                    (item) => item.id === specialtyId
+                                                );
+
+                                                if (!specialty) return null;
+
+                                                return (
+                                                    <div
+                                                        key={specialty.id}
+                                                        className="
+                                        inline-flex
+                                        items-center
+                                        gap-2
+                                        px-3
+                                        py-1.5
+                                        bg-blue-50
+                                        border
+                                        border-blue-100
+                                        rounded-lg
+                                        text-sm
+                                        text-blue-700
+                                    "
+                                                    >
+                                                        <span>
+                                                            {specialty.name}
+                                                        </span>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleRemoveSpecialty(
+                                                                    specialty.id
+                                                                )
+                                                            }
+                                                            className="
+                                            text-blue-500
+                                            hover:text-red-500
+                                            cursor-pointer
+                                            font-medium
+                                        "
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+
+                                    {selectedSpecialties.length === 0 && (
+                                        <p className="mt-2 text-xs text-slate-400">
+                                            Seleccione una o más especialidades.
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Código profesional */}
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Código de Profesional
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="membershipNumber"
+                                        value={form?.membershipNumber || ""}
+                                        onChange={handleChange}
+                                        placeholder="Ingrese el código de profesional"
+                                        className="
+                        w-full
+                        px-3 py-2.5
+                        border border-slate-200
+                        rounded-lg
+                        text-sm
+                        outline-none
+                        focus:border-blue-500
+                        focus:ring-2
+                        focus:ring-blue-500/10
+                    "
+                                    />
+                                </div>
+
+                            </div>
+                        )}
                     </div>
                 </div>
             </GenericDrawer >
