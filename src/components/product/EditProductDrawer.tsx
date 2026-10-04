@@ -5,6 +5,9 @@ import type ProductModel from "../../models/ProductModel";
 import { useUpdateProduct } from "../../hooks/useProducts";
 import { useCategories } from "../../hooks/useCategories";
 import { useMeasurementUnites } from "../../hooks/useMeasurementUnit";
+import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
+import type CategoryModel from "../../models/CategoryModel";
+import type MeasurementUnitModel from "../../models/MeasurementUnitModel";
 
 interface EditProductDrawerProps {
     isOpen: boolean;
@@ -226,7 +229,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Código de barra
+                            Código de barra (opcional)
                         </label>
 
                         <input
@@ -271,49 +274,61 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Categoria
-                        </label>
-
-                        <select
-                            name="category_id"
+                        <SearchableSelect<CategoryModel>
+                            label="Categorías"
                             value={form?.category_id || ""}
-                            onChange={handleChange}
+                            items={categories}
+                            getOptionValue={(category) => category.id}
+                            getOptionLabel={(category) =>
+                                category.name
+                            }
+                            placeholder={
+                                isLoadingCategories
+                                    ? "Cargando categorías..."
+                                    : "Seleccione una categoría"
+                            }
+                            searchPlaceholder="Buscar categoría por nombre..."
+                            noResultsMessage="No se encontraron categorías."
                             disabled={isLoadingCategories}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
-                        >
-                            <option value="">
-                                {isLoadingCategories ? "Cargando categorias..." : "Seleccione una categoria"}
-                            </option>
-                            {/* 3. Mapeo dinámico de los categories devueltos por la API */}
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={(category) => {
+                                setForm((prev) => {
+                                    if (!prev) return prev;
+
+                                    return {
+                                        ...prev,
+                                        category_id: String(category.id),
+                                    };
+                                });
+                            }}
+                        />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Unidad de medida
-                        </label>
-                        <select
-                            name="measurement_unit_id"
+                        <SearchableSelect<MeasurementUnitModel>
+                            label="Unidades de Medida"
                             value={form?.measurement_unit_id || ""}
-                            onChange={handleChange}
+                            items={measurementUnites}
+                            getOptionValue={(measurementUnit) => measurementUnit.id}
+                            getOptionLabel={(measurementUnit) =>
+                                `${measurementUnit.name} - ${measurementUnit.abreviation}`
+                            }
+                            placeholder={
+                                isLoadingMeasurementUnites
+                                    ? "Cargando unidades de medida..."
+                                    : "Seleccione una unidad de medida"
+                            }
+                            searchPlaceholder="Buscar unidad de medida por nombre..."
+                            noResultsMessage="No se encontraron unidades de medida."
                             disabled={isLoadingMeasurementUnites}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
-                        >
-                            <option value="">
-                                {isLoadingMeasurementUnites ? "Cargando unidades de medida..." : "Seleccione una Unidad de medida"}
-                            </option>
-                            {/* 3. Mapeo dinámico de los unidades de medidas devueltos por la API */}
-                            {measurementUnites.map((measurementUnit) => (
-                                <option key={measurementUnit.id} value={measurementUnit.id}>
-                                    {measurementUnit.name}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={(measurementUnit) => {
+                                setForm((prev) => {
+                                    if (!prev) return prev;
+
+                                    return {
+                                        ...prev,
+                                        measurement_unit_id: String(measurementUnit.id),
+                                    };
+                                });
+                            }} />
                     </div>
                 </div>
             </GenericDrawer>
