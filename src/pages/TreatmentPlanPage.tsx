@@ -75,7 +75,7 @@ const TreatmentPlanPage: React.FC = () => {
         totalPages
     );
 
-    //para obtener solo los plan de tratamientos que queremos por pagina, los visibles
+    //para obtener solo los paquete clínicos que queremos por pagina, los visibles
     const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -246,7 +246,7 @@ const TreatmentPlanPage: React.FC = () => {
 
     const actions: TableAction<typeof treatments[number]>[] = [
         {
-            label: "Ver plan de tratamiento",
+            label: "Ver paquete clínico",
             icon: <Eye className="w-4 h-4" />,
             onClick: (treatment) => {
                 setSelectedTreatment(treatment);
@@ -272,7 +272,7 @@ const TreatmentPlanPage: React.FC = () => {
             },
         },
         {
-            label: "Eliminar plan de tratamiento",
+            label: "Eliminar paquete clínico",
             icon: <Trash2 className="w-4 h-4" />,
             onClick: (treatment) => {
                 setSelectedTreatment(treatment);
@@ -304,7 +304,7 @@ const TreatmentPlanPage: React.FC = () => {
 
             onError: (error) => {
                 console.error(
-                    "Error al eliminar el plan de tratamiento:",
+                    "Error al eliminar el paquete clínico:",
                     error
                 );
             },
@@ -323,22 +323,22 @@ const TreatmentPlanPage: React.FC = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 {/* Encabezado */}
                 <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
-                    {/* <h1 className="text-xl font-bold text-[#001D4A]">plan de tratamientos</h1> */}
+                    {/* <h1 className="text-xl font-bold text-[#001D4A]">paquete clínicos</h1> */}
                     <SearchInput
                         value={search}
                         onChange={handleSearch}
-                        placeholder="Buscar plan de tratamiento..."
+                        placeholder="Buscar paquete clínico..."
                     />
                     <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
                             ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
                             : "bg-slate-300 cursor-not-allowed opacity-70"
                         }`}>
                         <Plus className="w-4 h-4" />
-                        <span>Nuevo plan de tratamiento</span>
+                        <span>Nuevo paquete clínico</span>
                     </button>
                 </div>
 
-                {/* Tabla de plan de tratamientos */}
+                {/* Tabla de paquete clínicos */}
                 <div className="overflow-x-auto max-h-100">
                     {isLoading ? (
                         <TableSkeleton
@@ -352,7 +352,7 @@ const TreatmentPlanPage: React.FC = () => {
                             columns={columns}
                             actions={actions}
                             getRowId={(treatment) => treatment.treatmentPlan.id}
-                            emptyMessage="No hay plan de tratamientos registrados."
+                            emptyMessage="No hay paquete clínicos registrados."
                         />
                     )}
                 </div>
@@ -365,7 +365,7 @@ const TreatmentPlanPage: React.FC = () => {
                     totalItems={totalItems}
                     itemsPerPage={ITEMS_PER_PAGE}
                     onPageChange={setCurrentPage}
-                    label="plan de tratamientos"
+                    label="paquete clínicos"
                 />
             </div>
 
@@ -521,8 +521,8 @@ const TreatmentPlanPage: React.FC = () => {
 
             <ConfirmModal
                 isOpen={isDeleteModalOpen}
-                title={`¿Estás seguro de eliminar a este plan de tratamientos`}
-                description="Esta acción no se puede deshacer. Todos los datos asociados a este plan de tratamiento se perderán permanentemente."
+                title={`¿Estás seguro de eliminar a este PAQUETE CLÍNICO?`}
+                description="Esta acción no se puede deshacer. Todos los datos asociados a este PAQUETE CLÍNICO se perderán permanentemente."
                 confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
                 cancelText="Cancelar"
                 onConfirm={handleDeleteConfirm}

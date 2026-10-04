@@ -73,7 +73,7 @@ const TreatmentCatalogPage: React.FC = () => {
         totalPages
     );
 
-    //para obtener solo los tratamientos que queremos por pagina, los visibles
+    //para obtener solo los Servicios que queremos por pagina, los visibles
     const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -163,7 +163,7 @@ const TreatmentCatalogPage: React.FC = () => {
         },
 
         {
-            label: "Editar tratamiento",
+            label: "Editar Servicio",
             icon: <Pencil className="w-4 h-4" />,
             onClick: (treatment) => {
                 setSelectedTreatment(treatment);
@@ -173,7 +173,7 @@ const TreatmentCatalogPage: React.FC = () => {
         },
 
         {
-            label: "Eliminar tratamiento",
+            label: "Eliminar Servicio",
             icon: <Trash2 className="w-4 h-4" />,
             onClick: (treatment) => {
                 setSelectedTreatment(treatment);
@@ -205,7 +205,7 @@ const TreatmentCatalogPage: React.FC = () => {
 
             onError: (error) => {
                 console.error(
-                    "Error al eliminar el tratamiento:",
+                    "Error al eliminar el Servicio:",
                     error
                 );
             },
@@ -217,22 +217,22 @@ const TreatmentCatalogPage: React.FC = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 {/* Encabezado */}
                 <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
-                    {/* <h1 className="text-xl font-bold text-[#001D4A]">Tratamientos</h1> */}
+                    {/* <h1 className="text-xl font-bold text-[#001D4A]">Servicios</h1> */}
                     <SearchInput
                         value={search}
                         onChange={handleSearch}
-                        placeholder="Buscar tratamiento..."
+                        placeholder="Buscar Servicio..."
                     />
                     <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
                             ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
                             : "bg-slate-300 cursor-not-allowed opacity-70"
                         }`}>
                         <Plus className="w-4 h-4" />
-                        <span>Nuevo Tratamiento</span>
+                        <span>Nuevo Servicio</span>
                     </button>
                 </div>
 
-                {/* Tabla de Tratamientos */}
+                {/* Tabla de Servicios */}
                 <div className="overflow-x-auto max-h-100">
                     {isLoading ? (
                         <TableSkeleton
@@ -246,7 +246,7 @@ const TreatmentCatalogPage: React.FC = () => {
                             columns={columns}
                             actions={actions}
                             getRowId={(treatment) => treatment.id}
-                            emptyMessage="No hay tratamientos registrados."
+                            emptyMessage="No hay Servicios registrados."
                         />
                     )}
                 </div>
@@ -259,7 +259,7 @@ const TreatmentCatalogPage: React.FC = () => {
                     totalItems={totalItems}
                     itemsPerPage={ITEMS_PER_PAGE}
                     onPageChange={setCurrentPage}
-                    label="tratamientos"
+                    label="Servicios"
                 />
             </div>
 
@@ -285,8 +285,8 @@ const TreatmentCatalogPage: React.FC = () => {
 
             <ConfirmModal
                 isOpen={isDeleteModalOpen}
-                title={`¿Estás seguro de eliminar a ${selectedTreatment?.name ?? "este tratamiento"}?`}
-                description="Esta acción no se puede deshacer. Todos los datos asociados a este tratamiento se perderán permanentemente."
+                title={`¿Estás seguro de eliminar a ${selectedTreatment?.name ?? "este Servicio"}?`}
+                description="Esta acción no se puede deshacer. Todos los datos asociados a este Servicio se perderán permanentemente."
                 confirmText={isDeleting ? "Eliminando..." : "Eliminar"}
                 cancelText="Cancelar"
                 onConfirm={handleDeleteConfirm}

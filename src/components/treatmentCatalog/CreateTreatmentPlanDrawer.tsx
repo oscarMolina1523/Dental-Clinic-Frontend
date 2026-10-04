@@ -245,7 +245,7 @@ const CreateTreatmentPlanDrawer: React.FC<
 
 
         // ============================================================
-        // SELECCIONAR TRATAMIENTO
+        // SELECCIONAR servicio
         // ============================================================
 
         const handleTreatmentChange = (
@@ -505,7 +505,7 @@ const CreateTreatmentPlanDrawer: React.FC<
 
                 showToast(
                     "error",
-                    "Debe completar correctamente todos los tratamientos."
+                    "Debe completar correctamente todos los servicios."
                 );
 
                 return;
@@ -582,7 +582,7 @@ const CreateTreatmentPlanDrawer: React.FC<
 
                         showToast(
                             "success",
-                            "El plan de tratamiento se creó correctamente."
+                            "El paquete clínico se creó correctamente."
                         );
 
 
@@ -596,7 +596,7 @@ const CreateTreatmentPlanDrawer: React.FC<
                         showToast(
                             "error",
                             error.message ||
-                            "No se pudo crear el plan de tratamiento."
+                            "No se pudo crear el paquete clínico."
                         );
 
                     }
@@ -641,8 +641,8 @@ const CreateTreatmentPlanDrawer: React.FC<
                 <GenericDrawer
                     isOpen={isOpen}
                     onHide={cleanForm}
-                    title="Nuevo Plan de Tratamiento"
-                    description="Registra un nuevo plan de tratamiento"
+                    title="Nuevo paquete clínico"
+                    description="Registra un nuevo paquete clínico"
                     width="w-80 md:w-112.5"
                     footer={
 
@@ -794,7 +794,7 @@ const CreateTreatmentPlanDrawer: React.FC<
 
 
                         {/* =================================================
-                            TRATAMIENTOS
+                            servicios
                         ================================================= */}
 
                         <div className="
@@ -817,7 +817,7 @@ const CreateTreatmentPlanDrawer: React.FC<
                                     font-semibold
                                     text-slate-800
                                 ">
-                                        Tratamientos
+                                        servicios
                                     </h3>
 
 
@@ -826,7 +826,7 @@ const CreateTreatmentPlanDrawer: React.FC<
                                     text-slate-500
                                     mt-1
                                 ">
-                                        Agrega los tratamientos del plan.
+                                        Agrega los servicios del plan.
                                     </p>
 
                                 </div>
@@ -887,7 +887,7 @@ const CreateTreatmentPlanDrawer: React.FC<
                                                 font-semibold
                                                 text-slate-700
                                             ">
-                                                    Tratamiento {index + 1}
+                                                    servicio {index + 1}
                                                 </span>
 
 
@@ -915,12 +915,12 @@ const CreateTreatmentPlanDrawer: React.FC<
 
 
                                             {/* =================================================
-                                                TRATAMIENTO
+                                                servicio
                                             ================================================= */}
 
                                             <div>
                                                 <SearchableSelect<TreatmentCatalogModel>
-                                                    label="Tratamientos"
+                                                    label="servicios"
                                                     value={detail.treatmentId}
                                                     items={treatments}
                                                     getOptionValue={(treatment) => treatment.id}
@@ -929,11 +929,11 @@ const CreateTreatmentPlanDrawer: React.FC<
                                                     }
                                                     placeholder={
                                                         isLoadingTreatments
-                                                            ? "Cargando tratamientos..."
-                                                            : "Seleccione un tratamiento"
+                                                            ? "Cargando servicios..."
+                                                            : "Seleccione un servicio"
                                                     }
-                                                    searchPlaceholder="Buscar tratamiento por nombre..."
-                                                    noResultsMessage="No se encontraron tratamientos."
+                                                    searchPlaceholder="Buscar servicio por nombre..."
+                                                    noResultsMessage="No se encontraron servicios."
                                                     disabled={isLoadingTreatments}
                                                     onChange={(selectedTreatment) =>
                                                         handleTreatmentChange(index, selectedTreatment)
