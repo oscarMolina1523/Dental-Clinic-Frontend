@@ -4,6 +4,8 @@ import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import { useAddInventory, useInventories } from "../../hooks/useInventory";
 import { useProducts } from "../../hooks/useProducts";
 import type InventoryModel from "../../models/InventoryModel";
+import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
+import type ProductModel from "../../models/ProductModel";
 
 interface CreateInventoryProps {
     isOpen: boolean;
@@ -52,9 +54,8 @@ const CreateInventoryDrawer: React.FC<CreateInventoryProps> = ({ isOpen, onHide 
     };
 
     //esta funcion es especificamente para meter el product id y el product name
-    const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedId = e.target.value;
-        const selectedProduct = products.find((p) => String(p.id) === selectedId);
+    const handleProductChange = (selectedProduct: ProductModel) => {
+        const selectedId = String(selectedProduct.id);
 
         setForm((prev) => ({
             ...prev,
@@ -204,27 +205,23 @@ const CreateInventoryDrawer: React.FC<CreateInventoryProps> = ({ isOpen, onHide 
                 {/* BODY DEL CREATE */}
                 <div className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Productos
-                        </label>
-
-                        <select
-                            name="productId"
+                        <SearchableSelect<ProductModel>
+                            label="Productos"
                             value={form.productId}
-                            onChange={handleProductChange}
+                            items={products}
+                            getOptionValue={(product) => product.id}
+                            getOptionLabel={(product) =>
+                                product.name
+                            }
+                            placeholder={
+                                isLoadingProducts
+                                    ? "Cargando productos..."
+                                    : "Seleccione un producto"
+                            }
+                            searchPlaceholder="Buscar producto por nombre..."
+                            noResultsMessage="No se encontraron productos."
                             disabled={isLoadingProducts}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
-                        >
-                            <option value="">
-                                {isLoadingProducts ? "Cargando productos..." : "Seleccione un producto"}
-                            </option>
-                            {/* 3. Mapeo dinámico de los products devueltos por la API */}
-                            {products.map((product) => (
-                                <option key={product.id} value={product.id}>
-                                    {product.name}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={handleProductChange} />
                     </div>
 
                     <div>
