@@ -307,9 +307,14 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                             value={form.dentistId}
                             items={dentists}
                             getOptionValue={(dentist) => dentist.id}
-                            getOptionLabel={(dentist) =>
-                                `${dentist.fullName} - ${dentist.email}`
-                            }
+                            getOptionLabel={(dentist) => {
+                                const firstSpecialty = dentist.specialties
+                                    ?.split(",")
+                                    .map((specialty) => specialty.trim())
+                                    .filter(Boolean)[0];
+
+                                return `${dentist.fullName} - ${firstSpecialty ?? "Sin especialidad"}`;
+                            }}
                             placeholder={
                                 isLoadingUsers
                                     ? "Cargando especialistas..."
