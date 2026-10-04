@@ -65,7 +65,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
         if (!name) {
             showToast(
                 "error",
-                "El nombre del tratamiento es obligatorio."
+                "El nombre del servicio es obligatorio."
             );
             return;
         }
@@ -97,7 +97,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
                 onSuccess: () => {
                     showToast(
                         "success",
-                        "El tratamiento se creó correctamente."
+                        "El servicio se creó correctamente."
                     );
 
                     cleanForm();
@@ -108,7 +108,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
                     showToast(
                         "error",
                         error.message ||
-                        "No se pudo crear el tratamiento."
+                        "No se pudo crear el servicio."
                     );
                 },
             }
@@ -141,8 +141,8 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
             <GenericDrawer
                 isOpen={isOpen}
                 onHide={onHide}
-                title="Nuevo Tratamiento"
-                description="Registra un nuevo tratamiento"
+                title="Nuevo Servicio"
+                description="Registra un nuevo servicio"
                 width="w-80 md:w-112.5"
                 footer={
                     <>
@@ -181,7 +181,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
                         >
                             {isPending
                                 ? "Creando..."
-                                : "Crear Tratamiento"}
+                                : "Crear Servicio"}
                         </button>
                     </>
                 }
@@ -240,7 +240,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Precio Base
+                            Precio Base (C$)
                         </label>
 
                         <input

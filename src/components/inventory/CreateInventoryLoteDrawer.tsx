@@ -7,6 +7,9 @@ import type InventoryLoteModel from "../../models/InventoryLote";
 import { useCreateInventoryLote } from "../../hooks/useInventoryOrchestrator";
 import type { CreateInventoryOrchestratorRequest } from "../../models/InventoryOrchestratorModel";
 import { useSuppliers } from "../../hooks/useSupplier";
+import type ProductModel from "../../models/ProductModel";
+import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
+import type SupplierModel from "../../models/SupplierModel";
 
 interface CreateInventoryLoteProps {
     isOpen: boolean;
@@ -67,9 +70,8 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
     };
 
     //esta funcion es especificamente para meter el product id y el product name
-    const handleProductChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedId = e.target.value;
-        const selectedProduct = products.find((p) => String(p.id) === selectedId);
+    const handleProductChange = (selectedProduct: ProductModel) => {
+        const selectedId = String(selectedProduct.id);
 
         setForm((prev) => ({
             ...prev,
@@ -78,8 +80,8 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
         }));
     };
 
-    const handleSupplierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedId = e.target.value;
+    const handleSupplierChange = (selectedSupplier: SupplierModel) => {
+        const selectedId = String(selectedSupplier.id);
 
         setForm((prev) => ({
             ...prev,
@@ -256,51 +258,43 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                 {/* BODY DEL CREATE */}
                 <div className="space-y-5">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Productos
-                        </label>
-
-                        <select
-                            name="productId"
+                        <SearchableSelect<ProductModel>
+                            label="Productos"
                             value={form.productId}
-                            onChange={handleProductChange}
+                            items={products}
+                            getOptionValue={(product) => product.id}
+                            getOptionLabel={(product) =>
+                                product.name
+                            }
+                            placeholder={
+                                isLoadingProducts
+                                    ? "Cargando productos..."
+                                    : "Seleccione un producto"
+                            }
+                            searchPlaceholder="Buscar producto por nombre..."
+                            noResultsMessage="No se encontraron productos."
                             disabled={isLoadingProducts}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
-                        >
-                            <option value="">
-                                {isLoadingProducts ? "Cargando productos..." : "Seleccione un producto"}
-                            </option>
-                            {/* 3. Mapeo dinámico de los products devueltos por la API */}
-                            {products.map((product) => (
-                                <option key={product.id} value={product.id}>
-                                    {product.name}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={handleProductChange} />
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Proveedores
-                        </label>
-
-                         <select
-                            name="supplierId"
+                        <SearchableSelect<SupplierModel>
+                            label="Proveedores"
                             value={form.supplierId}
-                            onChange={handleSupplierChange}
+                            items={suppliers}
+                            getOptionValue={(supplier) => supplier.id}
+                            getOptionLabel={(supplier) =>
+                                supplier.name
+                            }
+                            placeholder={
+                                isLoadingSuppliers
+                                    ? "Cargando proveedores..."
+                                    : "Seleccione un proveedor"
+                            }
+                            searchPlaceholder="Buscar proveedor por nombre..."
+                            noResultsMessage="No se encontraron proveedores."
                             disabled={isLoadingSuppliers}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:cursor-not-allowed"
-                        >
-                            <option value="">
-                                {isLoadingSuppliers ? "Cargando proveedores..." : "Seleccione un proveedor"}
-                            </option>
-                            {/* 3. Mapeo dinámico de los suppliers devueltos por la API */}
-                            {suppliers.map((supplier) => (
-                                <option key={supplier.id} value={supplier.id}>
-                                    {supplier.name}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={handleSupplierChange} />
                     </div>
 
                     <div>
@@ -362,6 +356,7 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                             name="dueDate"
                             value={form.dueDate}
                             onChange={handleChange}
+                            min={new Date().toISOString().split("T")[0]} // Fecha mínima de vencimiento es hoy
                             className="
                                 w-full
                                 px-3 py-2.5

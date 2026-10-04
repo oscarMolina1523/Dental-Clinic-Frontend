@@ -8,6 +8,7 @@ export default class User extends BaseModel {
   password: string;
   phoneNumber: string;
   membershipNumber?: string;
+  specialties: string;
   active: boolean;
   createdAt?: Date;
   updatedAt?: Date;
@@ -21,6 +22,7 @@ export default class User extends BaseModel {
     password,
     phoneNumber,
     membershipNumber,
+    specialties,
     active,
     createdAt,
     updatedAt,
@@ -33,6 +35,7 @@ export default class User extends BaseModel {
     password: string;
     phoneNumber: string;
     membershipNumber?: string;
+    specialties: string;
     active: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -46,6 +49,7 @@ export default class User extends BaseModel {
     this.phoneNumber = phoneNumber;
     this.membershipNumber = membershipNumber;
     this.active = active;
+    this.specialties = specialties;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }
@@ -68,6 +72,7 @@ export interface UpdateUserDTO {
   image?: string;
   phoneNumber: string;
   membershipNumber?: string;
+  specialties?: string;
 };
 
 export interface ChangeEmailVariables {

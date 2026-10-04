@@ -15,6 +15,10 @@ export default class PatientModel extends BaseModel {
   emergencyContactPhone: string;
   maritalStatus: string;
   active: boolean;
+  isSelfPayer: boolean;
+  payerName: string;
+  payerIdCard: string;
+  payerPhoneNumber: string;
   createdAt: Date;
   updatedAt: Date;
 
@@ -34,6 +38,10 @@ export default class PatientModel extends BaseModel {
     emergencyContactPhone,
     maritalStatus,
     active,
+    isSelfPayer,
+    payerName,
+    payerIdCard,
+    payerPhoneNumber,
     createdAt,
     updatedAt,
   }: {
@@ -52,6 +60,10 @@ export default class PatientModel extends BaseModel {
     emergencyContactPhone: string;
     maritalStatus: string;
     active: boolean;
+    isSelfPayer: boolean;
+    payerName: string;
+    payerIdCard: string;
+    payerPhoneNumber: string;
     createdAt: Date;
     updatedAt: Date;
   }) {
@@ -72,6 +84,10 @@ export default class PatientModel extends BaseModel {
     this.active = active;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.isSelfPayer = isSelfPayer;
+    this.payerName = payerName;
+    this.payerIdCard = payerIdCard;
+    this.payerPhoneNumber = payerPhoneNumber;
   }
 
 }
@@ -89,6 +105,10 @@ export interface CreatePatientDTO {
   emergencyContactName: string;
   emergencyContactPhone: string;
   maritalStatus: string;
+  isSelfPayer: boolean;
+  payerName: string;
+  payerIdCard: string;
+  payerPhoneNumber: string;
 }
 
 export interface UpdatePatientDTO {
@@ -96,6 +116,10 @@ export interface UpdatePatientDTO {
   lastName: string;
   birthdate: Date;
   gender: string;
+  isSelfPayer: boolean;
+  payerName: string;
+  payerIdCard: string;
+  payerPhoneNumber: string;
 }
 
 export interface UpdatePatientVariables {

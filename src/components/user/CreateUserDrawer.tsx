@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAddUser } from "../../hooks/useUsers";
 import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
+import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
 interface CreateUserProps {
     isOpen: boolean;
     onHide: () => void;
@@ -100,6 +101,14 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
             showToast(
                 "error",
                 "La contraseña debe tener al menos 6 caracteres."
+            );
+            return;
+        }
+
+        if (!validatePhoneNumber(phone)) {
+            showToast(
+                "error",
+                "Ingrese un número de teléfono válido de 8 dígitos del paciente."
             );
             return;
         }

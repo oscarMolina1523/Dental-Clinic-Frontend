@@ -135,6 +135,16 @@ const UsersPage: React.FC = () => {
       ),
     },
     {
+      key: "specialties",
+      header: "Especialidades",
+      className: "w-50 md:w-60",
+      render: (user: UserModel) => (
+        <span className="text-sm text-slate-500 break-words whitespace-normal">
+          {user.specialties ?? "N/A"} 
+        </span>
+      ),
+    },
+    {
       key: "roleId",
       header: "Role",
       className: "w-40",
