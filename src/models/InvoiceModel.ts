@@ -4,7 +4,10 @@ import BaseModel from "./BaseModel";
 export default class Invoice extends BaseModel {
   patientId: string;
   patientFullName:string;
-  treatmentPlanId: string;
+
+  treatmentPlanId?: string;
+  treatmentId?: string;
+
   invoiceNumber: string;
   totalAmount: number;
   paidAmount: number;
@@ -16,6 +19,7 @@ export default class Invoice extends BaseModel {
     patientId,
     patientFullName,
     treatmentPlanId,
+    treatmentId,
     invoiceNumber,
     totalAmount,
     paidAmount,
@@ -25,7 +29,8 @@ export default class Invoice extends BaseModel {
     id: string;
     patientId: string;
     patientFullName: string;
-    treatmentPlanId: string;
+    treatmentPlanId?: string;
+    treatmentId?: string;
     invoiceNumber: string;
     totalAmount: number;
     paidAmount: number;
@@ -37,6 +42,7 @@ export default class Invoice extends BaseModel {
     this.patientId = patientId;
     this.patientFullName = patientFullName;
     this.treatmentPlanId = treatmentPlanId;
+    this.treatmentId = treatmentId;
     this.invoiceNumber = invoiceNumber;
     this.totalAmount = totalAmount;
     this.paidAmount = paidAmount;
@@ -48,7 +54,8 @@ export default class Invoice extends BaseModel {
 export interface InvoiceDto {
   patientId: string;
   patientFullName: string;
-  treatmentPlanId: string;
+  treatmentPlanId?: string;
+  treatmentId?: string;
   totalAmount: number;
   paidAmount: number;
   pendingAmount: number;
