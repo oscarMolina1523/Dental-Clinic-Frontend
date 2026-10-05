@@ -82,6 +82,11 @@ export function useAddAppointmentOrchestrator() {
           "appointmentOrchestrator",
         ],
       });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "appointments",
+        ],
+      });
     },
   });
 }
@@ -120,6 +125,12 @@ export function useUpdateAppointmentOrchestrator() {
 
       queryClient.invalidateQueries({
         queryKey: [
+          "appointments",
+        ],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [
           "appointmentOrchestratorById",
           variables.id,
         ],
@@ -153,6 +164,12 @@ export function useDeleteAppointmentOrchestrator() {
       queryClient.invalidateQueries({
         queryKey: [
           "appointmentOrchestrator",
+        ],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "appointments",
         ],
       });
 

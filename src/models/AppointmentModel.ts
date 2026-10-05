@@ -103,13 +103,14 @@ export interface CreateAppointmentDTO {
   patientFullName: string;
   dentistId: string;
   dentistFullName: string;
+  dentistSpeciality: string;
+  
   startAppointmentTime: Date;
   endAppointmentTime: Date;
   reason: string;
   status: AppointmentStatus;
   cancelationNotes: string;
   reminderSent: boolean;
-  dentistSpeciality: string;
 
   treatmentPlanId?: string;
   treatmentId?: string;
