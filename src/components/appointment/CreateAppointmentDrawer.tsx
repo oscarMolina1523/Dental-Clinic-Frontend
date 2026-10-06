@@ -43,6 +43,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
     const [selectedTreatments, setSelectedTreatments] = useState<
         TreatmentCatalogModel[]
     >([]);
+    const [dentistSpecialities, setDentistSpecialities] = useState<string[]>([]);
 
     const [treatmentDetails, setTreatmentDetails] = useState<TreatmentPlanDetailDto[]>([]);
 
@@ -146,16 +147,20 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
 
     const handleDentistChange = (selectedDentist: UserModel) => {
         const selectedId = String(selectedDentist.id);
-        const firstSpecialty = selectedDentist.specialties
-            ?.split(",")
-            .map((specialty) => specialty.trim())
-            .filter(Boolean)[0] ?? "";
+
+        const specialities =
+            selectedDentist.specialties
+                ?.split(",")
+                .map((specialty) => specialty.trim())
+                .filter(Boolean) ?? [];
+
+        setDentistSpecialities(specialities);
 
         setForm((prev) => ({
             ...prev,
             dentistId: selectedId,
-            dentistFullName: selectedDentist ? selectedDentist.fullName : "",
-            dentistSpeciality: firstSpecialty,
+            dentistFullName: selectedDentist.fullName,
+            dentistSpeciality: "",
         }));
     };
 
@@ -716,6 +721,34 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                 noResultsMessage="No se encontraron especialistas."
                                 disabled={isLoadingUsers}
                                 onChange={handleDentistChange}
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <SearchableSelect<string>
+                                label="Especialidad"
+                                value={form.dentistSpeciality}
+                                items={dentistSpecialities}
+                                getOptionValue={(speciality) => speciality}
+                                getOptionLabel={(speciality) => speciality}
+                                placeholder={
+                                    !form.dentistId
+                                        ? "Seleccione primero un especialista"
+                                        : dentistSpecialities.length === 0
+                                            ? "Sin especialidades registradas"
+                                            : "Seleccione una especialidad"
+                                }
+                                searchPlaceholder="Buscar especialidad..."
+                                noResultsMessage="No se encontraron especialidades."
+                                disabled={
+                                    !form.dentistId ||
+                                    dentistSpecialities.length === 0
+                                }
+                                onChange={(speciality) => {
+                                    setForm((prev) => ({
+                                        ...prev,
+                                        dentistSpeciality: speciality,
+                                    }));
+                                }}
                             />
                         </div>
                     </div>
