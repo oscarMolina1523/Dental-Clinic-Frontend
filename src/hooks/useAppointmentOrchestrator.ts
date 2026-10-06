@@ -87,6 +87,11 @@ export function useAddAppointmentOrchestrator() {
           "appointments",
         ],
       });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "appointmentOrchestratorById",
+        ],
+      });
     },
   });
 }
