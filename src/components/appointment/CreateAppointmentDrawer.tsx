@@ -306,7 +306,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         );
     };
 
-    const handleRemoveClinicalNote = ( ) => {
+    const handleRemoveClinicalNote = () => {
         setClinicalNotes([]);
     };
 
@@ -859,10 +859,11 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                 Diagnósticos
                             </label>
 
-                            <button
-                                type="button"
-                                onClick={handleAddDiagnosis}
-                                className="
+                            {diagnoses.length === 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleAddDiagnosis}
+                                    className="
                                     px-3
                                     py-1.5
                                     text-xs
@@ -875,9 +876,32 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                     transition-colors
                                     cursor-pointer
                                 "
-                            >
-                                + Agregar diagnóstico
-                            </button>
+                                >
+                                    + Agregar diagnóstico
+                                </button>
+                            )}
+
+                            {diagnoses.length === 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleRemoveDiagnosis()
+                                    }
+                                    className="
+                                            px-3
+                                            py-2
+                                            text-xs
+                                            text-red-500
+                                            border
+                                            border-red-200
+                                            rounded-lg
+                                            hover:bg-red-50
+                                            cursor-pointer
+                                        "
+                                >
+                                    Eliminar
+                                </button>
+                            )}
                         </div>
 
                         <div className="space-y-3">
@@ -911,25 +935,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                         "
                                     />
 
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleRemoveDiagnosis()
-                                        }
-                                        className="
-                                            px-3
-                                            py-2
-                                            text-xs
-                                            text-red-500
-                                            border
-                                            border-red-200
-                                            rounded-lg
-                                            hover:bg-red-50
-                                            cursor-pointer
-                                        "
-                                    >
-                                        Eliminar
-                                    </button>
+
                                 </div>
                             ))}
                         </div>
@@ -941,10 +947,11 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                 Alergias
                             </label>
 
-                            <button
-                                type="button"
-                                onClick={handleAddAllergy}
-                                className="
+                            {allergies.length === 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleAddAllergy}
+                                    className="
                                     px-3
                                     py-1.5
                                     text-xs
@@ -957,9 +964,32 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                     transition-colors
                                     cursor-pointer
                                 "
-                            >
-                                + Agregar alergia
-                            </button>
+                                >
+                                    + Agregar alergia
+                                </button>
+                            )}
+
+                            {allergies.length === 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleRemoveAllergy()
+                                    }
+                                    className="
+                                                px-3
+                                                py-2
+                                                text-xs
+                                                text-red-500
+                                                border
+                                                border-red-200
+                                                rounded-lg
+                                                hover:bg-red-50
+                                                cursor-pointer
+                                            "
+                                >
+                                    Eliminar
+                                </button>
+                            )}
                         </div>
 
                         {allergies.length > 0 && (
@@ -993,26 +1023,6 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                                 focus:ring-blue-500/10
                                             "
                                         />
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleRemoveAllergy()
-                                            }
-                                            className="
-                            px-3
-                            py-2
-                            text-xs
-                            text-red-500
-                            border
-                            border-red-200
-                            rounded-lg
-                            hover:bg-red-50
-                            cursor-pointer
-                        "
-                                        >
-                                            Eliminar
-                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -1025,10 +1035,11 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                 Síntomas
                             </label>
 
-                            <button
-                                type="button"
-                                onClick={handleAddSymptom}
-                                className="
+                            {symptoms.length === 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleAddSymptom}
+                                    className="
                                     px-3
                                     py-1.5
                                     text-xs
@@ -1041,9 +1052,32 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                     transition-colors
                                     cursor-pointer
                                 "
-                            >
-                                + Agregar síntoma
-                            </button>
+                                >
+                                    + Agregar síntoma
+                                </button>
+                            )}
+
+                            {symptoms.length === 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleRemoveSymptom()
+                                    }
+                                    className="
+                                                px-3
+                                                py-2
+                                                text-xs
+                                                text-red-500
+                                                border
+                                                border-red-200
+                                                rounded-lg
+                                                hover:bg-red-50
+                                                cursor-pointer
+                                            "
+                                >
+                                    Eliminar
+                                </button>
+                            )}
                         </div>
 
                         {symptoms.length > 0 && (
@@ -1077,26 +1111,6 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                                 focus:ring-blue-500/10
                                             "
                                         />
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleRemoveSymptom()
-                                            }
-                                            className="
-                                                px-3
-                                                py-2
-                                                text-xs
-                                                text-red-500
-                                                border
-                                                border-red-200
-                                                rounded-lg
-                                                hover:bg-red-50
-                                                cursor-pointer
-                                            "
-                                        >
-                                            Eliminar
-                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -1109,10 +1123,11 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                 Notas clínicas
                             </label>
 
-                            <button
-                                type="button"
-                                onClick={handleAddClinicalNote}
-                                className="
+                            {clinicalNotes.length === 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleAddClinicalNote}
+                                    className="
                                     px-3
                                     py-1.5
                                     text-xs
@@ -1125,9 +1140,32 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                     transition-colors
                                     cursor-pointer
                                 "
-                            >
-                                + Agregar nota
-                            </button>
+                                >
+                                    + Agregar nota
+                                </button>
+                            )}
+
+                            {clinicalNotes.length === 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleRemoveClinicalNote()
+                                    }
+                                    className="
+                                                px-3
+                                                py-2
+                                                text-xs
+                                                text-red-500
+                                                border
+                                                border-red-200
+                                                rounded-lg
+                                                hover:bg-red-50
+                                                cursor-pointer
+                                            "
+                                >
+                                    Eliminar
+                                </button>
+                            )}
                         </div>
 
                         {clinicalNotes.length > 0 && (
@@ -1161,26 +1199,6 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                                 focus:ring-blue-500/10
                                             "
                                         />
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleRemoveClinicalNote()
-                                            }
-                                            className="
-                                                px-3
-                                                py-2
-                                                text-xs
-                                                text-red-500
-                                                border
-                                                border-red-200
-                                                rounded-lg
-                                                hover:bg-red-50
-                                                cursor-pointer
-                                            "
-                                        >
-                                            Eliminar
-                                        </button>
                                     </div>
                                 ))}
                             </div>

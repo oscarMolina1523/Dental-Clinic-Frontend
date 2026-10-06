@@ -110,41 +110,26 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         setDentistSpecialities(specialities);
 
         setDiagnoses(
-            appointment?.diagnosis
-                ? appointment.diagnosis
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean)
+            appointment?.diagnosis?.trim()
+                ? [appointment.diagnosis]
                 : []
         );
 
-        // Cargar alergias
         setAllergies(
-            appointment?.allergies
-                ? appointment.allergies
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean)
+            appointment?.allergies?.trim()
+                ? [appointment.allergies]
                 : []
         );
 
-        // Cargar síntomas
         setSymptoms(
-            appointment?.symptoms
-                ? appointment.symptoms
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean)
+            appointment?.symptoms?.trim()
+                ? [appointment.symptoms]
                 : []
         );
 
-        // Cargar notas clínicas
         setClinicalNotes(
-            appointment?.clinicalNotes
-                ? appointment.clinicalNotes
-                    .split(",")
-                    .map((item) => item.trim())
-                    .filter(Boolean)
+            appointment?.clinicalNotes?.trim()
+                ? [appointment.clinicalNotes]
                 : []
         );
 
@@ -560,11 +545,11 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     };
 
     const handleRemoveAllergy = () => {
-       setAllergies([]);
+        setAllergies([]);
     };
 
     const handleAddSymptom = () => {
-         setSymptoms([""]);
+        setSymptoms([""]);
     };
 
     const handleSymptomChange = (
@@ -581,11 +566,11 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     };
 
     const handleRemoveSymptom = () => {
-       setSymptoms([]);
+        setSymptoms([]);
     };
 
     const handleAddClinicalNote = () => {
-       setClinicalNotes([""]);
+        setClinicalNotes([""]);
     };
 
     const handleClinicalNoteChange = (
@@ -1147,10 +1132,11 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                 Diagnósticos
                             </label>
 
-                            <button
-                                type="button"
-                                onClick={handleAddDiagnosis}
-                                className="
+                            {diagnoses.length === 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleAddDiagnosis}
+                                    className="
                                     px-3
                                     py-1.5
                                     text-xs
@@ -1163,9 +1149,32 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                     transition-colors
                                     cursor-pointer
                                 "
-                            >
-                                + Agregar diagnóstico
-                            </button>
+                                >
+                                    + Agregar diagnóstico
+                                </button>
+                            )}
+
+                            {diagnoses.length === 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleRemoveDiagnosis()
+                                    }
+                                    className="
+                                            px-3
+                                            py-2
+                                            text-xs
+                                            text-red-500
+                                            border
+                                            border-red-200
+                                            rounded-lg
+                                            hover:bg-red-50
+                                            cursor-pointer
+                                        "
+                                >
+                                    Eliminar
+                                </button>
+                            )}
                         </div>
 
                         <div className="space-y-3">
@@ -1198,26 +1207,6 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                             focus:ring-blue-500/10
                                         "
                                     />
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            handleRemoveDiagnosis()
-                                        }
-                                        className="
-                                            px-3
-                                            py-2
-                                            text-xs
-                                            text-red-500
-                                            border
-                                            border-red-200
-                                            rounded-lg
-                                            hover:bg-red-50
-                                            cursor-pointer
-                                        "
-                                    >
-                                        Eliminar
-                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -1229,10 +1218,11 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                 Alergias
                             </label>
 
-                            <button
-                                type="button"
-                                onClick={handleAddAllergy}
-                                className="
+                            {allergies.length === 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleAddAllergy}
+                                    className="
                                     px-3
                                     py-1.5
                                     text-xs
@@ -1245,9 +1235,32 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                     transition-colors
                                     cursor-pointer
                                 "
-                            >
-                                + Agregar alergia
-                            </button>
+                                >
+                                    + Agregar alergia
+                                </button>
+                            )}
+
+                            {allergies.length === 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleRemoveAllergy()
+                                    }
+                                    className="
+                                                px-3
+                                                py-2
+                                                text-xs
+                                                text-red-500
+                                                border
+                                                border-red-200
+                                                rounded-lg
+                                                hover:bg-red-50
+                                                cursor-pointer
+                                            "
+                                >
+                                    Eliminar
+                                </button>
+                            )}
                         </div>
 
                         {allergies.length > 0 && (
@@ -1281,26 +1294,6 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                                 focus:ring-blue-500/10
                                             "
                                         />
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleRemoveAllergy()
-                                            }
-                                            className="
-                                                px-3
-                                                py-2
-                                                text-xs
-                                                text-red-500
-                                                border
-                                                border-red-200
-                                                rounded-lg
-                                                hover:bg-red-50
-                                                cursor-pointer
-                                            "
-                                        >
-                                            Eliminar
-                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -1312,11 +1305,11 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                             <label className="block text-sm font-medium text-slate-700">
                                 Síntomas
                             </label>
-
-                            <button
-                                type="button"
-                                onClick={handleAddSymptom}
-                                className="
+                            {symptoms.length === 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleAddSymptom}
+                                    className="
                                     px-3
                                     py-1.5
                                     text-xs
@@ -1329,9 +1322,33 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                     transition-colors
                                     cursor-pointer
                                 "
-                            >
-                                + Agregar síntoma
-                            </button>
+                                >
+                                    + Agregar síntoma
+                                </button>
+                            )}
+
+                            {symptoms.length === 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleRemoveSymptom()
+                                    }
+                                    className="
+                                                px-3
+                                                py-2
+                                                text-xs
+                                                text-red-500
+                                                border
+                                                border-red-200
+                                                rounded-lg
+                                                hover:bg-red-50
+                                                cursor-pointer
+                                            "
+                                >
+                                    Eliminar
+                                </button>
+                            )}
+
                         </div>
 
                         {symptoms.length > 0 && (
@@ -1365,26 +1382,6 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                                 focus:ring-blue-500/10
                                             "
                                         />
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleRemoveSymptom()
-                                            }
-                                            className="
-                                                px-3
-                                                py-2
-                                                text-xs
-                                                text-red-500
-                                                border
-                                                border-red-200
-                                                rounded-lg
-                                                hover:bg-red-50
-                                                cursor-pointer
-                                            "
-                                        >
-                                            Eliminar
-                                        </button>
                                     </div>
                                 ))}
                             </div>
@@ -1397,10 +1394,11 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                 Notas clínicas
                             </label>
 
-                            <button
-                                type="button"
-                                onClick={handleAddClinicalNote}
-                                className="
+                            {clinicalNotes.length === 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleAddClinicalNote}
+                                    className="
                                     px-3
                                     py-1.5
                                     text-xs
@@ -1413,9 +1411,32 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                     transition-colors
                                     cursor-pointer
                                 "
-                            >
-                                + Agregar nota
-                            </button>
+                                >
+                                    + Agregar nota
+                                </button>
+                            )}
+
+                            {clinicalNotes.length === 1 && (
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        handleRemoveClinicalNote()
+                                    }
+                                    className="
+                                                px-3
+                                                py-2
+                                                text-xs
+                                                text-red-500
+                                                border
+                                                border-red-200
+                                                rounded-lg
+                                                hover:bg-red-50
+                                                cursor-pointer
+                                            "
+                                >
+                                    Eliminar
+                                </button>
+                            )}
                         </div>
 
                         {clinicalNotes.length > 0 && (
@@ -1449,26 +1470,6 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                                 focus:ring-blue-500/10
                                             "
                                         />
-
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleRemoveClinicalNote()
-                                            }
-                                            className="
-                                                px-3
-                                                py-2
-                                                text-xs
-                                                text-red-500
-                                                border
-                                                border-red-200
-                                                rounded-lg
-                                                hover:bg-red-50
-                                                cursor-pointer
-                                            "
-                                        >
-                                            Eliminar
-                                        </button>
                                     </div>
                                 ))}
                             </div>
