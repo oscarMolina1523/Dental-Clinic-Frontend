@@ -227,10 +227,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
     };
 
     const handleAddDiagnosis = () => {
-        setDiagnoses((prev) => [
-            ...prev,
-            "",
-        ]);
+        setDiagnoses([""]);
     };
 
     const handleDiagnosisChange = (
@@ -246,19 +243,12 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         );
     };
 
-    const handleRemoveDiagnosis = (
-        index: number
-    ) => {
-        setDiagnoses((prev) =>
-            prev.filter((_, i) => i !== index)
-        );
+    const handleRemoveDiagnosis = () => {
+        setDiagnoses([]);
     };
 
     const handleAddAllergy = () => {
-        setAllergies((prev) => [
-            ...prev,
-            "",
-        ]);
+        setAllergies([""]);
     };
 
     const handleAllergyChange = (
@@ -274,19 +264,12 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         );
     };
 
-    const handleRemoveAllergy = (
-        index: number
-    ) => {
-        setAllergies((prev) =>
-            prev.filter((_, i) => i !== index)
-        );
+    const handleRemoveAllergy = () => {
+        setAllergies([]);
     };
 
     const handleAddSymptom = () => {
-        setSymptoms((prev) => [
-            ...prev,
-            "",
-        ]);
+        setSymptoms([""]);
     };
 
     const handleSymptomChange = (
@@ -302,19 +285,12 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         );
     };
 
-    const handleRemoveSymptom = (
-        index: number
-    ) => {
-        setSymptoms((prev) =>
-            prev.filter((_, i) => i !== index)
-        );
+    const handleRemoveSymptom = () => {
+        setSymptoms([]);
     };
 
     const handleAddClinicalNote = () => {
-        setClinicalNotes((prev) => [
-            ...prev,
-            "",
-        ]);
+        setClinicalNotes([""]);
     };
 
     const handleClinicalNoteChange = (
@@ -330,12 +306,8 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         );
     };
 
-    const handleRemoveClinicalNote = (
-        index: number
-    ) => {
-        setClinicalNotes((prev) =>
-            prev.filter((_, i) => i !== index)
-        );
+    const handleRemoveClinicalNote = ( ) => {
+        setClinicalNotes([]);
     };
 
     const handleChange = (
@@ -942,7 +914,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            handleRemoveDiagnosis(index)
+                                            handleRemoveDiagnosis()
                                         }
                                         className="
                                             px-3
@@ -1025,7 +997,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                handleRemoveAllergy(index)
+                                                handleRemoveAllergy()
                                             }
                                             className="
                             px-3
@@ -1109,7 +1081,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                handleRemoveSymptom(index)
+                                                handleRemoveSymptom()
                                             }
                                             className="
                                                 px-3
@@ -1193,7 +1165,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                handleRemoveClinicalNote(index)
+                                                handleRemoveClinicalNote()
                                             }
                                             className="
                                                 px-3

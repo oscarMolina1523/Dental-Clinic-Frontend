@@ -865,7 +865,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
 
             <GenericDrawer
                 isOpen={isOpen}
-                onHide={onHide}
+                onHide={handleCancel}
                 title="Editar Cita"
                 description="Modifica la información de la cita"
                 width="w-80 md:w-200"
