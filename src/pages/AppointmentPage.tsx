@@ -419,7 +419,7 @@ const AppointmentPage: React.FC = () => {
                                 <button
                                     disabled={isPendingAny}
                                     onClick={() => handleStart(selectedAppointment.id)}
-                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-blue-100 rounded-xl transition-colors disabled:opacity-50"
                                 >
                                     <Play className="w-4 h-4 text-blue-600" />
                                     <span>Iniciar Cita (En curso)</span>
@@ -431,7 +431,7 @@ const AppointmentPage: React.FC = () => {
                                 <button
                                     disabled={isPendingAny}
                                     onClick={() => handleComplete(selectedAppointment.id)}
-                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-indigo-100 rounded-xl transition-colors disabled:opacity-50"
                                 >
                                     <Check className="w-4 h-4 text-indigo-600" />
                                     <span>Completar Cita</span>
@@ -443,10 +443,10 @@ const AppointmentPage: React.FC = () => {
                                 <button
                                     disabled={isPendingAny}
                                     onClick={() => handleNoShow(selectedAppointment.id)}
-                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-slate-50 rounded-xl transition-colors disabled:opacity-50"
+                                    className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-amber-100 rounded-xl transition-colors disabled:opacity-50"
                                 >
                                     <UserX className="w-4 h-4 text-amber-600" />
-                                    <span>Marcar No Asistió (No Show)</span>
+                                    <span>Marcar No Asistió </span>
                                 </button>
                             )}
 

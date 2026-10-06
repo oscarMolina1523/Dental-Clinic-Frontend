@@ -5,10 +5,10 @@ export default class TreatmentPlanDetail extends BaseModel {
   planId: string;
   treatmentId: string;
   treatmentName: string;
-   toothNumber: number;
-   quantity: number;
-   unitPrice: number; //almacena el precio del momento que tenia el tratamiento, asi en el futuro cuando aumente el precio este tendra el de ese momento y no se cambiara
-   subtotal: number;
+  toothNumber?: number;
+  quantity: number;
+  unitPrice: number; //almacena el precio del momento que tenia el tratamiento, asi en el futuro cuando aumente el precio este tendra el de ese momento y no se cambiara
+  subtotal: number;
   status: TreatmentPlanDetailStatus;
 
   constructor({
@@ -26,7 +26,7 @@ export default class TreatmentPlanDetail extends BaseModel {
     planId: string;
     treatmentId: string;
     treatmentName: string;
-    toothNumber: number;
+    toothNumber?: number;
     quantity: number;
     unitPrice: number;
     subtotal: number;
@@ -48,7 +48,7 @@ export default class TreatmentPlanDetail extends BaseModel {
 export interface TreatmentPlanDetailDto {
   treatmentId: string;
   treatmentName: string;
-  toothNumber: number;
+  toothNumber?: number;
   quantity: number;
   unitPrice: number;
   subtotal: number;

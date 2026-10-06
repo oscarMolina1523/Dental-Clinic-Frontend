@@ -6,12 +6,22 @@ export default class Appointment extends BaseModel {
   patientFullName: string;
   dentistId: string;
   dentistFullName: string;
+  dentistSpeciality: string;
+
+  treatmentPlanId?: string;
+  treatmentId?: string;
+
+  allergies?: string;
+  symptoms?: string;
+  diagnosis?: string;
+  clinicalNotes?: string;
+
   startAppointmentTime: Date;
   endAppointmentTime: Date;
   reason: string;
   status: AppointmentStatus;
   cancelationNotes: string;
-  reminderSent: boolean ;
+  reminderSent: boolean;
   createdAt: Date;
 
   constructor({
@@ -20,6 +30,16 @@ export default class Appointment extends BaseModel {
     patientFullName,
     dentistId,
     dentistFullName,
+
+    dentistSpeciality,
+    treatmentPlanId,
+
+    treatmentId,
+    allergies,
+    symptoms,
+    diagnosis,
+    clinicalNotes,
+
     startAppointmentTime,
     endAppointmentTime,
     reason,
@@ -33,12 +53,22 @@ export default class Appointment extends BaseModel {
     patientFullName: string;
     dentistId: string;
     dentistFullName: string;
+    dentistSpeciality: string;
+
+    treatmentPlanId?: string;
+    treatmentId?: string;
+
+    allergies?: string;
+    symptoms?: string;
+    diagnosis?: string;
+    clinicalNotes?: string;
+
     startAppointmentTime: Date;
     endAppointmentTime: Date;
     reason: string;
     status: AppointmentStatus;
     cancelationNotes: string;
-    reminderSent: boolean ;
+    reminderSent: boolean;
     createdAt: Date;
   }) {
     super(id);
@@ -47,6 +77,16 @@ export default class Appointment extends BaseModel {
     this.patientFullName = patientFullName;
     this.dentistId = dentistId;
     this.dentistFullName = dentistFullName;
+    this.dentistSpeciality = dentistSpeciality;
+
+    this.treatmentPlanId = treatmentPlanId;
+    this.treatmentId = treatmentId;
+    
+    this.allergies = allergies;
+    this.symptoms = symptoms;
+    this.diagnosis = diagnosis;
+    this.clinicalNotes = clinicalNotes;
+
     this.startAppointmentTime = startAppointmentTime;
     this.endAppointmentTime = endAppointmentTime;
     this.reason = reason;
@@ -63,12 +103,22 @@ export interface CreateAppointmentDTO {
   patientFullName: string;
   dentistId: string;
   dentistFullName: string;
+  dentistSpeciality: string;
+  
   startAppointmentTime: Date;
   endAppointmentTime: Date;
   reason: string;
   status: AppointmentStatus;
   cancelationNotes: string;
-  reminderSent: boolean ;
+  reminderSent: boolean;
+
+  treatmentPlanId?: string;
+  treatmentId?: string;
+
+  allergies?: string;
+  symptoms?: string;
+  diagnosis?: string;
+  clinicalNotes?: string;
 }
 
 export interface UpdateAppointmentDTO {
@@ -76,6 +126,16 @@ export interface UpdateAppointmentDTO {
   patientFullName: string;
   dentistId: string;
   dentistFullName: string;
+  dentistSpeciality: string;
+
+  treatmentPlanId?: string;
+  treatmentId?: string;
+
+  allergies?: string;
+  symptoms?: string;
+  diagnosis?: string;
+  clinicalNotes?: string;
+  
   startAppointmentTime: Date;
   endAppointmentTime: Date;
   reason: string;
