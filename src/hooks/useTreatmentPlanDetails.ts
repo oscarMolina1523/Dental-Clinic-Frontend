@@ -281,6 +281,12 @@ export function useStartTreatmentPlanDetail() {
           id,
         ],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "appointmentOrchestratorById",
+        ],
+      });
     },
   });
 }
@@ -317,6 +323,12 @@ export function useCompleteTreatmentPlanDetail() {
           id,
         ],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "appointmentOrchestratorById",
+        ],
+      });
     },
   });
 }
@@ -351,6 +363,12 @@ export function useCancelTreatmentPlanDetail() {
         queryKey: [
           "treatmentPlanDetailById",
           id,
+        ],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "appointmentOrchestratorById",
         ],
       });
     },

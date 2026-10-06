@@ -14,7 +14,12 @@ import type TreatmentCatalogModel from "../../models/TreatmentCatalogModel";
 import { useTreatments } from "../../hooks/useTreatmentsCatalog";
 import type { TreatmentPlanDetailDto } from "../../models/TreatmentPlanDetailsModel";
 import { useAppointmentOrchestratorById, useUpdateAppointmentOrchestrator } from "../../hooks/useAppointmentOrchestrator";
+import { useCancelTreatmentPlanDetail, useCompleteTreatmentPlanDetail, useStartTreatmentPlanDetail } from "../../hooks/useTreatmentPlanDetails";
 
+interface TreatmentPlanDetailState extends TreatmentPlanDetailDto {
+    id?: string;
+    planId?: string;
+}
 interface EditAppointmentDrawerProps {
     isOpen: boolean;
     onHide: () => void;
@@ -35,6 +40,21 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         mutate: updateAppointment,
         isPending,
     } = useUpdateAppointmentOrchestrator();
+
+    const {
+        mutate: startTreatmentPlanDetail,
+        isPending: isStartingTreatment,
+    } = useStartTreatmentPlanDetail();
+
+    const {
+        mutate: completeTreatmentPlanDetail,
+        isPending: isCompletingTreatment,
+    } = useCompleteTreatmentPlanDetail();
+
+    const {
+        mutate: cancelTreatmentPlanDetail,
+        isPending: isCancelingTreatment,
+    } = useCancelTreatmentPlanDetail();
 
     const {
         data: appointmentDetails,
@@ -66,7 +86,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     const [selectedTreatments, setSelectedTreatments] = useState<
         TreatmentCatalogModel[]
     >([]);
-    const [treatmentDetails, setTreatmentDetails] = useState<TreatmentPlanDetailDto[]>([]);
+    const [treatmentDetails, setTreatmentDetails] = useState<TreatmentPlanDetailState[]>([]);
 
     const [diagnoses, setDiagnoses] = useState<string[]>([]);
     const [allergies, setAllergies] = useState<string[]>([]);
@@ -590,6 +610,71 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         setClinicalNotes([]);
     };
 
+    const handleStartTreatment = (detailId?: string) => {
+        if (!detailId) return;
+
+        startTreatmentPlanDetail(detailId, {
+            onSuccess: () => {
+
+                showToast(
+                    "success",
+                    "El tratamiento se inició correctamente."
+                );
+            },
+
+            onError: (error) => {
+                showToast(
+                    "error",
+                    error.message ||
+                    "No se pudo iniciar el tratamiento."
+                );
+            },
+        });
+    };
+
+    const handleCompleteTreatment = (detailId?: string) => {
+        if (!detailId) return;
+
+        completeTreatmentPlanDetail(detailId, {
+            onSuccess: () => {
+
+                showToast(
+                    "success",
+                    "El tratamiento se completó correctamente."
+                );
+            },
+
+            onError: (error) => {
+                showToast(
+                    "error",
+                    error.message ||
+                    "No se pudo completar el tratamiento."
+                );
+            },
+        });
+    };
+
+    const handleCancelTreatment = (detailId?: string) => {
+        if (!detailId) return;
+
+        cancelTreatmentPlanDetail(detailId, {
+            onSuccess: () => {
+                showToast(
+                    "success",
+                    "El tratamiento fue cancelado correctamente."
+                );
+            },
+
+            onError: (error) => {
+                showToast(
+                    "error",
+                    error.message ||
+                    "No se pudo cancelar el tratamiento."
+                );
+            },
+        });
+    };
+
     const handleSubmit = () => {
         if (!appointment || !form) {
             return;
@@ -732,8 +817,13 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         // ============================================================
 
         const totalAmount = treatmentDetails.reduce(
-            (total, detail) =>
-                total + Number(detail.subtotal),
+            (total, detail) => {
+                if (detail.status === "CANCELLED") {
+                    return total;
+                }
+
+                return total + Number(detail.subtotal);
+            },
             0
         );
 
@@ -988,6 +1078,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
 
                     {selectedTreatments.length > 0 && (
                         <div className="mt-3 space-y-2">
+
                             {selectedTreatments.map((treatment) => {
                                 const detail = treatmentDetails.find(
                                     (item) =>
@@ -995,23 +1086,38 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                         String(treatment.id)
                                 );
 
+                                const status = detail?.status;
+
+                                const isStarting =
+                                    isStartingTreatment;
+
+                                const isCompleting =
+                                    isCompletingTreatment;
+
+                                const isCanceling =
+                                    isCancelingTreatment;
+
                                 return (
                                     <div
                                         key={String(treatment.id)}
                                         className="
                                             flex
-                                            items-center
-                                            justify-between
+                                            flex-col
+                                            md:flex-row
+                                            md:items-center
+                                            md:justify-between
                                             gap-3
                                             px-3
-                                            py-2
+                                            py-3
                                             bg-slate-50
                                             border
                                             border-slate-200
                                             rounded-lg
                                         "
                                     >
-                                        <div className="min-w-0">
+                                        {/* INFORMACIÓN DEL TRATAMIENTO */}
+                                        <div className="min-w-0 flex-1">
+
                                             <p className="text-sm font-medium text-slate-700">
                                                 {treatment.name}
                                             </p>
@@ -1023,6 +1129,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                             )}
 
                                             <div className="flex flex-wrap items-center gap-3 mt-1">
+
                                                 <p className="text-xs text-slate-500">
                                                     C$ {Number(
                                                         detail?.unitPrice ??
@@ -1030,52 +1137,177 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                                     ).toFixed(2)}
                                                 </p>
 
-                                                {detail?.quantity !== undefined && (
-                                                    <p className="text-xs text-slate-500">
-                                                        Cantidad: {detail.quantity}
-                                                    </p>
-                                                )}
-
                                                 {detail?.status && (
                                                     <span
-                                                        className="
+                                                        className={`
                                                             px-2
                                                             py-0.5
                                                             rounded-full
                                                             text-xs
                                                             font-medium
-                                                            bg-blue-100
-                                                            text-blue-700
-                                                        "
+                                                            ${detail.status === "PENDING"
+                                                                ? "bg-yellow-100 text-yellow-700"
+                                                                : detail.status === "IN_PROGRESS"
+                                                                    ? "bg-blue-100 text-blue-700"
+                                                                    : detail.status === "COMPLETED"
+                                                                        ? "bg-emerald-100 text-emerald-700"
+                                                                        : "bg-red-100 text-red-700"
+                                                            }
+                                                        `}
                                                     >
-                                                        {detail.status}
+                                                        {detail.status === "PENDING"
+                                                            ? "Pendiente"
+                                                            : detail.status === "IN_PROGRESS"
+                                                                ? "En progreso"
+                                                                : detail.status === "COMPLETED"
+                                                                    ? "Completado"
+                                                                    : "Abortado"}
                                                     </span>
                                                 )}
                                             </div>
                                         </div>
 
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                handleRemoveTreatment(
-                                                    String(treatment.id)
-                                                )
-                                            }
-                                            className="
-                                                shrink-0
-                                                px-2.5
-                                                py-1.5
-                                                text-xs
-                                                text-red-500
-                                                border
-                                                border-red-200
-                                                rounded-lg
-                                                hover:bg-red-50
-                                                cursor-pointer
-                                            "
-                                        >
-                                            Eliminar
-                                        </button>
+                                        {/* ACCIONES */}
+                                        <div className="flex flex-wrap items-center gap-2">
+
+                                            {/* PENDING -> IN_PROGRESS */}
+                                            {status === "PENDING" && detail?.id && (
+                                                <button
+                                                    type="button"
+                                                    disabled={
+                                                        isStarting ||
+                                                        isCompleting ||
+                                                        isCanceling
+                                                    }
+                                                    onClick={() =>
+                                                        handleStartTreatment(
+                                                            detail.id
+                                                        )
+                                                    }
+                                                    className="
+                                                        px-3
+                                                        py-1.5
+                                                        text-xs
+                                                        font-medium
+                                                        text-blue-600
+                                                        border
+                                                        border-blue-200
+                                                        rounded-lg
+                                                        hover:bg-blue-50
+                                                        cursor-pointer
+                                                        disabled:opacity-50
+                                                        disabled:cursor-not-allowed
+                                                    "
+                                                >
+                                                    {isStarting
+                                                        ? "Iniciando..."
+                                                        : "Comenzar servicio"}
+                                                </button>
+                                            )}
+
+                                            {/* IN_PROGRESS -> COMPLETED */}
+                                            {status === "IN_PROGRESS" && detail?.id && (
+                                                <>
+                                                    <button
+                                                        type="button"
+                                                        disabled={
+                                                            isStarting ||
+                                                            isCompleting ||
+                                                            isCanceling
+                                                        }
+                                                        onClick={() =>
+                                                            handleCompleteTreatment(
+                                                                detail.id
+                                                            )
+                                                        }
+                                                        className="
+                                                            px-3
+                                                            py-1.5
+                                                            text-xs
+                                                            font-medium
+                                                            text-emerald-600
+                                                            border
+                                                            border-emerald-200
+                                                            rounded-lg
+                                                            hover:bg-emerald-50
+                                                            cursor-pointer
+                                                            disabled:opacity-50
+                                                            disabled:cursor-not-allowed
+                                                        "
+                                                    >
+                                                        {isCompleting
+                                                            ? "Completando..."
+                                                            : "Finalizar"}
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        disabled={
+                                                            isStarting ||
+                                                            isCompleting ||
+                                                            isCanceling
+                                                        }
+                                                        onClick={() =>
+                                                            handleCancelTreatment(
+                                                                detail.id
+                                                            )
+                                                        }
+                                                        className="
+                                                            px-3
+                                                            py-1.5
+                                                            text-xs
+                                                            font-medium
+                                                            text-red-600
+                                                            border
+                                                            border-red-200
+                                                            rounded-lg
+                                                            hover:bg-red-50
+                                                            cursor-pointer
+                                                            disabled:opacity-50
+                                                            disabled:cursor-not-allowed
+                                                        "
+                                                    >
+                                                        {isCanceling
+                                                            ? "Cancelando..."
+                                                            : "Abortar"}
+                                                    </button>
+                                                </>
+                                            )}
+
+                                            {/* ELIMINAR DEL PLAN */}
+                                            {!detail?.id &&
+                                                status !== "COMPLETED" &&
+                                                status !== "CANCELLED" && (
+                                                    <button
+                                                        type="button"
+                                                        disabled={
+                                                            isStarting ||
+                                                            isCompleting ||
+                                                            isCanceling
+                                                        }
+                                                        onClick={() =>
+                                                            handleRemoveTreatment(
+                                                                String(treatment.id)
+                                                            )
+                                                        }
+                                                        className="
+                        px-2.5
+                        py-1.5
+                        text-xs
+                        text-red-500
+                        border
+                        border-red-200
+                        rounded-lg
+                        hover:bg-red-50
+                        cursor-pointer
+                        disabled:opacity-50
+                        disabled:cursor-not-allowed
+                    "
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                )}
+                                        </div>
                                     </div>
                                 );
                             })}
@@ -1101,14 +1333,28 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                 </p>
 
                                 <p className="text-lg font-semibold text-slate-700">
-                                    C${" "}
-                                    {selectedTreatments
-                                        .reduce(
-                                            (total, treatment) =>
-                                                total + Number(treatment.basePrice),
-                                            0
-                                        )
-                                        .toFixed(2)}
+                                    <p className="text-lg font-semibold text-slate-700">
+                                        C${" "}
+                                        {selectedTreatments
+                                            .reduce((total, treatment) => {
+                                                const detail = treatmentDetails.find(
+                                                    (item) =>
+                                                        String(item.treatmentId) ===
+                                                        String(treatment.id)
+                                                );
+
+                                                // Si el servicio está cancelado/abortado,
+                                                // no se incluye en el total.
+                                                if (detail?.status === "CANCELLED") {
+                                                    return total;
+                                                }
+
+                                                return total + Number(
+                                                    detail?.subtotal ?? treatment.basePrice
+                                                );
+                                            }, 0)
+                                            .toFixed(2)}
+                                    </p>
                                 </p>
                             </div>
                         </div>
