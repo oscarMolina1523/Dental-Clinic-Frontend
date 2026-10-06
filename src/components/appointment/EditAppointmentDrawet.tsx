@@ -522,10 +522,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     };
 
     const handleAddDiagnosis = () => {
-        setDiagnoses((prev) => [
-            ...prev,
-            "",
-        ]);
+        setDiagnoses([""]);
     };
 
     const handleDiagnosisChange = (
@@ -541,19 +538,12 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         );
     };
 
-    const handleRemoveDiagnosis = (
-        index: number
-    ) => {
-        setDiagnoses((prev) =>
-            prev.filter((_, i) => i !== index)
-        );
+    const handleRemoveDiagnosis = () => {
+        setDiagnoses([]);
     };
 
     const handleAddAllergy = () => {
-        setAllergies((prev) => [
-            ...prev,
-            "",
-        ]);
+        setAllergies([""]);
     };
 
     const handleAllergyChange = (
@@ -569,19 +559,12 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         );
     };
 
-    const handleRemoveAllergy = (
-        index: number
-    ) => {
-        setAllergies((prev) =>
-            prev.filter((_, i) => i !== index)
-        );
+    const handleRemoveAllergy = () => {
+       setAllergies([]);
     };
 
     const handleAddSymptom = () => {
-        setSymptoms((prev) => [
-            ...prev,
-            "",
-        ]);
+         setSymptoms([""]);
     };
 
     const handleSymptomChange = (
@@ -597,19 +580,12 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         );
     };
 
-    const handleRemoveSymptom = (
-        index: number
-    ) => {
-        setSymptoms((prev) =>
-            prev.filter((_, i) => i !== index)
-        );
+    const handleRemoveSymptom = () => {
+       setSymptoms([]);
     };
 
     const handleAddClinicalNote = () => {
-        setClinicalNotes((prev) => [
-            ...prev,
-            "",
-        ]);
+       setClinicalNotes([""]);
     };
 
     const handleClinicalNoteChange = (
@@ -625,12 +601,8 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         );
     };
 
-    const handleRemoveClinicalNote = (
-        index: number
-    ) => {
-        setClinicalNotes((prev) =>
-            prev.filter((_, i) => i !== index)
-        );
+    const handleRemoveClinicalNote = () => {
+        setClinicalNotes([]);
     };
 
     const handleSubmit = () => {
@@ -1230,7 +1202,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            handleRemoveDiagnosis(index)
+                                            handleRemoveDiagnosis()
                                         }
                                         className="
                                             px-3
@@ -1313,7 +1285,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                handleRemoveAllergy(index)
+                                                handleRemoveAllergy()
                                             }
                                             className="
                                                 px-3
@@ -1397,7 +1369,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                handleRemoveSymptom(index)
+                                                handleRemoveSymptom()
                                             }
                                             className="
                                                 px-3
@@ -1481,7 +1453,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                         <button
                                             type="button"
                                             onClick={() =>
-                                                handleRemoveClinicalNote(index)
+                                                handleRemoveClinicalNote()
                                             }
                                             className="
                                                 px-3
