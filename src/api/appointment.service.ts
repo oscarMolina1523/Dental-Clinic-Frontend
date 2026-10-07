@@ -161,6 +161,18 @@ export default class AppointmentService extends HTTPService {
     return response || null;
   }
 
+  /**
+   * Marca como creada la factura
+   */
+  async markAsInvoiced(
+    id: string
+  ): Promise<Appointment | null> {
+    const response = await super.post<Appointment>(
+      `${this.path}/${id}/mark-as-invoiced`
+    );
+
+    return response || null;
+  }
   // ============================================================
   // INFORMATION
   // ============================================================

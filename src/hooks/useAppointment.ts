@@ -289,6 +289,31 @@ export function useMarkReminderAsSent() {
 };
 
 /* =========================================================
+   MARK REMINDER AS INVOICED
+========================================================= */
+
+export function useMarkAsInvoiced() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Appointment | null, Error, string>({
+    mutationKey: ["markAsInvoiced"],
+
+    mutationFn: (id) =>
+      appointmentService.markAsInvoiced(id),
+
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({
+        queryKey: ["appointments"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["appointmentById", id],
+      });
+    },
+  });
+};
+
+/* =========================================================
    GET DURATION
 ========================================================= */
 
