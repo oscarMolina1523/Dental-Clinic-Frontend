@@ -13,15 +13,11 @@ import type {
 import type {
     MedicalPrescriptionDetailDto,
 } from "../../models/MedicalPrescriptionDetailModel";
-import { useTreatments } from "../../hooks/useTreatmentsCatalog";
 
 interface CreateMedicalPrescriptionDrawerProps {
     appointment: Appointment | null;
     onChange: (
         data: CreateMedicalPrescriptionRequest | null
-    ) => void;
-    onTreatmentChange: (
-        treatmentId: string
     ) => void;
     onDiagnosisChange: (
         diagnosis: string
@@ -29,7 +25,7 @@ interface CreateMedicalPrescriptionDrawerProps {
     onObservationChange: (
         observations: string
     ) => void;
-    clinicalProgressId:string;
+    clinicalProgressId: string;
 }
 
 const MedicalPrescriptionSection: React.FC<
@@ -37,15 +33,10 @@ const MedicalPrescriptionSection: React.FC<
 > = ({
     appointment,
     onChange,
-    onTreatmentChange,
     onDiagnosisChange,
     onObservationChange,
     clinicalProgressId
 }) => {
-        const {
-            data: treatments = [],
-            isLoading: isLoadingTreatments,
-        } = useTreatments();
 
         /*
          * =========================================================
@@ -62,13 +53,11 @@ const MedicalPrescriptionSection: React.FC<
             date: appointment?.startAppointmentTime
                 ? new Date(appointment.startAppointmentTime)
                 : new Date(),
-            generalInstructions: "",
+            generalInstructions: appointment?.clinicalNotes || "",
         });
 
-        const [treatmentId, setTreatmentId] =
-            useState<string>("");
         const [diagnosis, setDiagnosis] =
-            useState<string>("");
+            useState<string>(appointment?.diagnosis || "");
 
         const [form, setForm] =
             useState<MedicalPrescriptionDto>(
@@ -91,13 +80,6 @@ const MedicalPrescriptionSection: React.FC<
                 },
             ]);
 
-        /*
-         * =========================================================
-         * CONTROLAR CAMBIO DE CITA
-         *
-         * No usamos useEffect.
-         * =========================================================
-         */
 
         const [prevAppointment, setPrevAppointment] =
             useState<Appointment | null>(appointment);
@@ -123,11 +105,8 @@ const MedicalPrescriptionSection: React.FC<
 
             setForm(newForm);
 
-            setTreatmentId("");
-            onTreatmentChange("");
-
-            setDiagnosis("");
-            onDiagnosisChange("");
+            setDiagnosis( appointment?.diagnosis || "");
+            // onDiagnosisChange("");
 
             setDetails([
                 {
@@ -155,20 +134,6 @@ const MedicalPrescriptionSection: React.FC<
                 data: newForm,
                 details: newDetails,
             });
-        };
-
-        const handleTreatmentChange = (
-            e: React.ChangeEvent<HTMLSelectElement>
-        ) => {
-            const value = e.target.value;
-
-            setTreatmentId(value);
-
-            /*
-             * Mandamos el treatmentId directamente
-             * al padre.
-             */
-            onTreatmentChange(value);
         };
 
         const handleDiagnosisChange = (
@@ -415,100 +380,19 @@ const MedicalPrescriptionSection: React.FC<
 
                 </div>
 
-                <div className="
-                border-t
-                border-slate-100
-                pt-5
-            ">
+                {/* =================================================
+                    DIAGNÓSTICO
+                ================================================= */}
 
-                    <div className="mb-4">
+                <div>
 
-                        <h3 className="
-                        text-sm
-                        font-semibold
-                        text-slate-800
-                    ">
-                            Tratamiento
-                        </h3>
-
-                        <p className="
-                        text-xs
-                        text-slate-500
-                        mt-1
-                    ">
-                            Selecciona el tratamiento asociado
-                            al progreso clínico.
-                        </p>
-
-                    </div>
-
-                    <div>
-
-                        <label className="
+                    <label className="
                         block
                         text-sm
                         font-medium
                         text-slate-700
                         mb-2
                     ">
-                            Tratamiento *
-                        </label>
-
-                        <select
-                            value={treatmentId}
-                            onChange={handleTreatmentChange}
-                            disabled={isLoadingTreatments}
-                            className="
-                            w-full
-                            px-3 py-2.5
-                            border border-slate-200
-                            rounded-lg
-                            text-sm
-                            bg-white
-                            outline-none
-                            focus:border-blue-500
-                            focus:ring-2
-                            focus:ring-blue-500/10
-                            disabled:bg-slate-50
-                            disabled:text-slate-400
-                        "
-                        >
-
-                            <option value="">
-                                {isLoadingTreatments
-                                    ? "Cargando tratamientos..."
-                                    : "Seleccione un tratamiento"}
-                            </option>
-
-                            {treatments.map((treatment) => (
-                                <option
-                                    key={treatment.id}
-                                    value={treatment.id}
-                                >
-                                    {treatment.name}
-                                </option>
-                            ))}
-
-                        </select>
-
-                    </div>
-
-                </div>
-
-
-                {/* =================================================
-    DIAGNÓSTICO
-================================================= */}
-
-                <div>
-
-                    <label className="
-        block
-        text-sm
-        font-medium
-        text-slate-700
-        mb-2
-    ">
                         Diagnóstico *
                     </label>
 
@@ -518,17 +402,17 @@ const MedicalPrescriptionSection: React.FC<
                         placeholder="Ingrese el diagnóstico del paciente..."
                         rows={4}
                         className="
-            w-full
-            px-3 py-2.5
-            border border-slate-200
-            rounded-lg
-            text-sm
-            outline-none
-            resize-none
-            focus:border-blue-500
-            focus:ring-2
-            focus:ring-blue-500/10
-        "
+                            w-full
+                            px-3 py-2.5
+                            border border-slate-200
+                            rounded-lg
+                            text-sm
+                            outline-none
+                            resize-none
+                            focus:border-blue-500
+                            focus:ring-2
+                            focus:ring-blue-500/10
+                        "
                     />
 
                 </div>
