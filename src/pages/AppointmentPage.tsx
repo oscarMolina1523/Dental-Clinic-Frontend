@@ -15,6 +15,7 @@ import CreateClinicalProgressDrawer from "../components/medical/CreateClinicalPr
 import type { AppointmentStatus } from "../utils/appointmentStatus.enum";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
 import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
+import { useAppointmentOrchestratorById } from "../hooks/useAppointmentOrchestrator";
 
 const AppointmentPage: React.FC = () => {
     const {
@@ -64,6 +65,13 @@ const AppointmentPage: React.FC = () => {
         setIsClinicalProgressDrawerOpen,
         handleCreateClinicalProgress
     } = useAppointmentPage();
+
+    const {
+        data: appointmentDetails,
+        isLoading: isLoadingAppointmentDetails,
+    } = useAppointmentOrchestratorById(
+        selectedAppointment?.id || ""
+    );
 
     const { role } = useRolePermissions();
     const markReminderAsSentMutation = useMarkReminderAsSent();
@@ -260,7 +268,7 @@ const AppointmentPage: React.FC = () => {
                 setSelectedAppointment(appointment);
                 setIsEditDrawerOpen(true);
             },
-            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED",
+            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced,
         },
         {
             label: "Cambios de estados",
@@ -277,10 +285,59 @@ const AppointmentPage: React.FC = () => {
                  * También aparece para COMPLETED porque
                  * desde ahí podemos crear la receta.
                  */
-                return !canWrite || !canChangeStatus(appointment.status);
+                return !canWrite || !canChangeStatus(appointment.status) || appointment?.isClinicalProgressRegistered;
             },
         },
     ];
+
+    const handleCompleteAppointment = () => {
+        if (!selectedAppointment) {
+            return;
+        }
+
+        // ============================================================
+        // CITA CON PLAN DE TRATAMIENTO
+        // ============================================================
+
+        if (selectedAppointment.treatmentPlanId) {
+            const treatmentDetails =
+                appointmentDetails?.treatmentPlanDetails ?? [];
+
+            const allTreatmentsFinished =
+                treatmentDetails.length > 0 &&
+                treatmentDetails.every(
+                    (detail) =>
+                        detail.status === "COMPLETED" ||
+                        detail.status === "CANCELLED"
+                );
+
+            if (!allTreatmentsFinished) {
+                setToast({
+                    type: "error",
+                    message:
+                        "Todos los tratamientos deben estar completados o abortados antes de completar la cita.",
+                });
+
+                return;
+            }
+        }
+
+        if (!selectedAppointment.isInvoiced) {
+            setToast({
+                type: "error",
+                message:
+                    "Debe generar la factura antes de marcar como completada.",
+            });
+
+            return;
+        }
+
+        // ============================================================
+        // SI TODO ESTÁ CORRECTO
+        // ============================================================
+
+        handleComplete(selectedAppointment.id);
+    };
 
     const handleSearch = (value: string) => {
         setSearch(value);
@@ -429,8 +486,11 @@ const AppointmentPage: React.FC = () => {
                             {/* IN_PROGRESS -> COMPLETED */}
                             {canComplete(selectedAppointment.status) && (
                                 <button
-                                    disabled={isPendingAny}
-                                    onClick={() => handleComplete(selectedAppointment.id)}
+                                    disabled={
+                                        isPendingAny ||
+                                        isLoadingAppointmentDetails
+                                    }
+                                    onClick={handleCompleteAppointment}
                                     className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-indigo-100 rounded-xl transition-colors disabled:opacity-50"
                                 >
                                     <Check className="w-4 h-4 text-indigo-600" />

@@ -23,6 +23,8 @@ export default class Appointment extends BaseModel {
   cancelationNotes: string;
   reminderSent: boolean;
   createdAt: Date;
+  isInvoiced: boolean;
+  isClinicalProgressRegistered: boolean;
 
   constructor({
     id,
@@ -47,6 +49,9 @@ export default class Appointment extends BaseModel {
     cancelationNotes,
     reminderSent,
     createdAt,
+
+    isInvoiced,
+    isClinicalProgressRegistered
   }: {
     id: string;
     patientId: string;
@@ -70,6 +75,9 @@ export default class Appointment extends BaseModel {
     cancelationNotes: string;
     reminderSent: boolean;
     createdAt: Date;
+
+    isInvoiced: boolean;
+    isClinicalProgressRegistered: boolean;
   }) {
     super(id);
 
@@ -94,6 +102,8 @@ export default class Appointment extends BaseModel {
     this.cancelationNotes = cancelationNotes?.trim() ?? "";
     this.reminderSent = reminderSent;
     this.createdAt = createdAt;
+    this.isInvoiced = isInvoiced;
+    this.isClinicalProgressRegistered = isClinicalProgressRegistered;
   }
 }
 
@@ -119,6 +129,9 @@ export interface CreateAppointmentDTO {
   symptoms?: string;
   diagnosis?: string;
   clinicalNotes?: string;
+
+  isInvoiced: boolean;
+  isClinicalProgressRegistered: boolean;
 }
 
 export interface UpdateAppointmentDTO {
@@ -139,4 +152,7 @@ export interface UpdateAppointmentDTO {
   startAppointmentTime: Date;
   endAppointmentTime: Date;
   reason: string;
+
+  isInvoiced: boolean;
+  isClinicalProgressRegistered: boolean;
 }

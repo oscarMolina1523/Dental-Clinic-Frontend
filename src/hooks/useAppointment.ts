@@ -289,6 +289,56 @@ export function useMarkReminderAsSent() {
 };
 
 /* =========================================================
+   MARK REMINDER AS INVOICED
+========================================================= */
+
+export function useMarkAsInvoiced() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Appointment | null, Error, string>({
+    mutationKey: ["markAsInvoiced"],
+
+    mutationFn: (id) =>
+      appointmentService.markAsInvoiced(id),
+
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({
+        queryKey: ["appointments"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["appointmentById", id],
+      });
+    },
+  });
+};
+
+/* =========================================================
+   MARK REMINDER AS CLINICAL PROGRESS REGISTERED
+========================================================= */
+
+export function useMarkAsClinicalProgressRegistered() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Appointment | null, Error, string>({
+    mutationKey: ["markAsClinicalProgressRegistered"],
+
+    mutationFn: (id) =>
+      appointmentService.markAsClinicalRegistered(id),
+
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({
+        queryKey: ["appointments"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["appointmentById", id],
+      });
+    },
+  });
+};
+
+/* =========================================================
    GET DURATION
 ========================================================= */
 

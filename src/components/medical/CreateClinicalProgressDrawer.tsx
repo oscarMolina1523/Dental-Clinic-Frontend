@@ -25,6 +25,7 @@ import MedicalPrescriptionSection from "./MedicalPrescriptionSection";
 import DentalChartSection from "./DentalChartSection";
 import PatientAttachmentSection from "./PatientAttachmentSection";
 import { useAddClinicalProgressOrchestrator } from "../../hooks/useClinicalProgressOrchestrator";
+import { useMarkAsClinicalProgressRegistered } from "../../hooks/useAppointment";
 
 interface CreateClinicalProgressDrawerProps {
     isOpen: boolean;
@@ -44,6 +45,10 @@ const CreateClinicalProgressDrawer: React.FC<
             isPending,
         } = useAddClinicalProgressOrchestrator();
 
+        const {
+            mutateAsync: markAsClinicalRegistered
+        } = useMarkAsClinicalProgressRegistered();
+
         const [toast, setToast] = useState<{
             type: "success" | "error";
             message: string;
@@ -59,6 +64,7 @@ const CreateClinicalProgressDrawer: React.FC<
                 dentistId: "",
                 diagnosis: "",
                 treatmentId: "",
+                treatmentPlanId: "",
                 observations: "",
                 registrationDate: new Date(),
             });
@@ -90,9 +96,10 @@ const CreateClinicalProgressDrawer: React.FC<
                         patientId: appointment.patientId,
                         dateId: appointment.id,
                         dentistId: appointment.dentistId,
-                        diagnosis: "",
-                        treatmentId: "",
-                        observations: "",
+                        diagnosis: appointment?.diagnosis || "",
+                        treatmentId: appointment?.treatmentId || "",
+                        treatmentPlanId: appointment?.treatmentPlanId || "",
+                        observations: appointment?.clinicalNotes || "",
                         registrationDate: new Date(),
                     }
                     : {
@@ -101,6 +108,7 @@ const CreateClinicalProgressDrawer: React.FC<
                         dentistId: "",
                         diagnosis: "",
                         treatmentId: "",
+                        treatmentPlanId: "",
                         observations: "",
                         registrationDate: new Date(),
                     }
@@ -136,6 +144,7 @@ const CreateClinicalProgressDrawer: React.FC<
                 dentistId: "",
                 diagnosis: "",
                 treatmentId: "",
+                treatmentPlanId: "",
                 observations: "",
                 registrationDate: new Date(),
             });
@@ -179,15 +188,6 @@ const CreateClinicalProgressDrawer: React.FC<
                 showToast(
                     "error",
                     "No se encontró el dentista de la cita."
-                );
-
-                return false;
-            }
-
-            if (!clinicalProgress.treatmentId.trim()) {
-                showToast(
-                    "error",
-                    "Debe ingresar el tratamiento."
                 );
 
                 return false;
@@ -334,13 +334,21 @@ const CreateClinicalProgressDrawer: React.FC<
 
             return true;
         };
-        
+
         const handleSubmit = async () => {
             if (!validateClinicalProgress()) {
                 return;
             }
 
             if (!validateOptionalSections()) {
+                return;
+            }
+
+            if (!appointment?.id) {
+                showToast(
+                    "error",
+                    "No se encontró el identificador de la cita."
+                );
                 return;
             }
 
@@ -366,9 +374,15 @@ const CreateClinicalProgressDrawer: React.FC<
                             diagnosis:
                                 clinicalProgress.diagnosis.trim(),
 
-                            treatmentId:
-                                clinicalProgress.treatmentId.trim(),
-
+                            ...(clinicalProgress.treatmentPlanId
+                                ? {
+                                    treatmentPlanId: clinicalProgress.treatmentPlanId,
+                                }
+                                : clinicalProgress.treatmentId
+                                    ? {
+                                        treatmentId: clinicalProgress.treatmentId,
+                                    }
+                                    : {}),
                             observations:
                                 clinicalProgress.observations.trim(),
 
@@ -447,6 +461,7 @@ const CreateClinicalProgressDrawer: React.FC<
                     "El progreso clínico se creó correctamente."
                 );
 
+                await markAsClinicalRegistered(appointment.id);
                 cleanForm();
 
             } catch (error) {
@@ -535,12 +550,6 @@ const CreateClinicalProgressDrawer: React.FC<
                             key={`prescription-${appointment?.id ?? "empty"}`}
                             appointment={appointment}
                             onChange={setMedicalPrescription}
-                            onTreatmentChange={(treatmentId) => {
-                                setClinicalProgress((prev) => ({
-                                    ...prev,
-                                    treatmentId,
-                                }));
-                            }}
                             onDiagnosisChange={(diagnosis) => {
                                 setClinicalProgress((prev) => ({
                                     ...prev,

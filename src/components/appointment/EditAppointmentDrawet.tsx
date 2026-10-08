@@ -15,6 +15,7 @@ import { useTreatments } from "../../hooks/useTreatmentsCatalog";
 import type { TreatmentPlanDetailDto } from "../../models/TreatmentPlanDetailsModel";
 import { useAppointmentOrchestratorById, useUpdateAppointmentOrchestrator } from "../../hooks/useAppointmentOrchestrator";
 import { useCancelTreatmentPlanDetail, useCompleteTreatmentPlanDetail, useStartTreatmentPlanDetail } from "../../hooks/useTreatmentPlanDetails";
+import { useMarkAsInvoiced } from "../../hooks/useAppointment";
 
 interface TreatmentPlanDetailState extends TreatmentPlanDetailDto {
     id?: string;
@@ -35,6 +36,11 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         data: treatments = [],
         isLoading: isLoadingTreatments,
     } = useTreatments();
+
+    const {
+        mutate: markAsInvoiced,
+        isPending: isMarkingAsInvoiced,
+    } = useMarkAsInvoiced();
 
     const {
         mutate: updateAppointment,
@@ -166,7 +172,6 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         // ============================================================
         // TRATAMIENTO INDIVIDUAL
         // ============================================================
-
         if (
             appointmentData.treatmentId &&
             appointmentDetails.treatment
@@ -177,7 +182,17 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                 treatment,
             ]);
 
-            setTreatmentDetails([]);
+            setTreatmentDetails([
+                {
+                    id: `virtual-${treatment.id}`,
+                    treatmentId: String(treatment.id),
+                    treatmentName: treatment.name,
+                    quantity: 1,
+                    unitPrice: Number(treatment.basePrice),
+                    subtotal: Number(treatment.basePrice),
+                    status: "PENDING",
+                },
+            ]);
         }
 
         // ============================================================
@@ -446,12 +461,23 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
             appointmentData.treatmentId &&
             appointmentDetails.treatment
         ) {
+            const treatment = appointmentDetails.treatment;
+
             setSelectedTreatments([
-                appointmentDetails.treatment,
+                treatment,
             ]);
 
-            // Un tratamiento individual no tiene TreatmentPlanDetail
-            setTreatmentDetails([]);
+            setTreatmentDetails([
+                {
+                    id: `virtual-${treatment.id}`,
+                    treatmentId: String(treatment.id),
+                    treatmentName: treatment.name,
+                    quantity: 1,
+                    unitPrice: Number(treatment.basePrice),
+                    subtotal: Number(treatment.basePrice),
+                    status: "PENDING",
+                },
+            ]);
 
             return;
         }
@@ -613,9 +639,33 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     const handleStartTreatment = (detailId?: string) => {
         if (!detailId) return;
 
+        if (appointment?.status !== "IN_PROGRESS") {
+            showToast(
+                "error",
+                "Para empezar el tratamiento, la cita debe estar marcada en progreso."
+            );
+            return;
+        }
+
+        // Tratamiento individual: solo cambia el estado local
+        if (!appointment?.treatmentPlanId) {
+            setTreatmentDetails((prev) =>
+                prev.map((detail) =>
+                    String(detail.id) === String(detailId)
+                        ? {
+                            ...detail,
+                            status: "IN_PROGRESS",
+                        }
+                        : detail
+                )
+            );
+
+            return;
+        }
+
+        // Treatment Plan real
         startTreatmentPlanDetail(detailId, {
             onSuccess: () => {
-
                 showToast(
                     "success",
                     "El tratamiento se inició correctamente."
@@ -635,9 +685,25 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     const handleCompleteTreatment = (detailId?: string) => {
         if (!detailId) return;
 
+        // Tratamiento individual: solo cambia el estado local
+        if (!appointment?.treatmentPlanId) {
+            setTreatmentDetails((prev) =>
+                prev.map((detail) =>
+                    String(detail.id) === String(detailId)
+                        ? {
+                            ...detail,
+                            status: "COMPLETED",
+                        }
+                        : detail
+                )
+            );
+
+            return;
+        }
+
+        // Treatment Plan real
         completeTreatmentPlanDetail(detailId, {
             onSuccess: () => {
-
                 showToast(
                     "success",
                     "El tratamiento se completó correctamente."
@@ -657,6 +723,23 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     const handleCancelTreatment = (detailId?: string) => {
         if (!detailId) return;
 
+        // Tratamiento individual: solo cambia el estado local
+        if (!appointment?.treatmentPlanId) {
+            setTreatmentDetails((prev) =>
+                prev.map((detail) =>
+                    String(detail.id) === String(detailId)
+                        ? {
+                            ...detail,
+                            status: "CANCELLED",
+                        }
+                        : detail
+                )
+            );
+
+            return;
+        }
+
+        // Treatment Plan real
         cancelTreatmentPlanDetail(detailId, {
             onSuccess: () => {
                 showToast(
@@ -670,6 +753,62 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                     "error",
                     error.message ||
                     "No se pudo cancelar el tratamiento."
+                );
+            },
+        });
+    };
+
+    const canMarkAsInvoiced = () => {
+        if (!appointment) {
+            return false;
+        }
+
+        if (appointment.isInvoiced) {
+            return false;
+        }
+
+        if (
+            !treatmentDetails ||
+            treatmentDetails.length === 0
+        ) {
+            return false;
+        }
+
+        return treatmentDetails.every(
+            (detail) =>
+                detail.status === "COMPLETED" ||
+                detail.status === "CANCELLED"
+        );
+    };
+    
+    const handleMarkAsInvoiced = () => {
+        if (!appointment) {
+            return;
+        }
+
+        if (!canMarkAsInvoiced()) {
+            showToast(
+                "error",
+                "Todos los servicios deben estar completados o cancelados para marcar la cita como facturada."
+            );
+            return;
+        }
+
+        markAsInvoiced(appointment.id, {
+            onSuccess: () => {
+                showToast(
+                    "success",
+                    "La cita fue marcada como facturada correctamente."
+                );
+
+                onHide();
+            },
+
+            onError: (error) => {
+                showToast(
+                    "error",
+                    error.message ||
+                    "No se pudo marcar la cita como facturada."
                 );
             },
         });
@@ -763,6 +902,9 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
             symptoms: cleanedSymptoms.join(", "),
             diagnosis: cleanedDiagnoses.join(", "),
             clinicalNotes: cleanedClinicalNotes.join(", "),
+
+            isInvoiced: form.isInvoiced,
+            isClinicalProgressRegistered: form.isClinicalProgressRegistered
         };
 
         // ============================================================
@@ -873,7 +1015,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                         "La cita y el plan de tratamiento se actualizaron correctamente."
                     );
 
-                    onHide();
+                    handleCancel();
                 },
 
                 onError: (error) => {
@@ -1275,8 +1417,9 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                             )}
 
                                             {/* ELIMINAR DEL PLAN */}
-                                            {!detail?.id &&
+                                            {
                                                 status !== "COMPLETED" &&
+                                                status !== "IN_PROGRESS" &&
                                                 status !== "CANCELLED" && (
                                                     <button
                                                         type="button"
@@ -1316,7 +1459,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
 
                     {/* Mostramos el total */}
                     {selectedTreatments.length > 0 && (
-                        <div className="mt-3 flex justify-end">
+                        <div className="mt-3 flex flex-col justify-end">
                             <div
                                 className="
                                 w-full
@@ -1357,6 +1500,31 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                     </p>
                                 </p>
                             </div>
+                            {canMarkAsInvoiced() && (
+                                <button
+                                    type="button"
+                                    onClick={handleMarkAsInvoiced}
+                                    disabled={
+                                        isPending ||
+                                        isMarkingAsInvoiced
+                                    }
+                                    className="
+                                        px-4 py-2.5
+                                        text-sm font-medium
+                                        text-white
+                                        bg-emerald-600
+                                        hover:bg-emerald-700
+                                        rounded-lg
+                                        cursor-pointer
+                                        disabled:opacity-50
+                                        disabled:cursor-not-allowed
+                                    "
+                                >
+                                    {isMarkingAsInvoiced
+                                        ? "Generando..."
+                                        : "Generar factura"}
+                                </button>
+                            )}
                         </div>
                     )}
 
