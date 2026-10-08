@@ -1453,6 +1453,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                                             {/* ELIMINAR DEL PLAN */}
                                             {
                                                 status !== "COMPLETED" &&
+                                                status !== "IN_PROGRESS" &&
                                                 status !== "CANCELLED" && (
                                                     <button
                                                         type="button"
