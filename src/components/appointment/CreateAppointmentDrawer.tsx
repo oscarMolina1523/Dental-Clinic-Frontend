@@ -434,7 +434,8 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
             symptoms: cleanedSymptoms.join(", "),
             diagnosis: diagnosis || "",
             clinicalNotes: cleanedClinicalNotes.join(", "),
-            isInvoiced: false
+            isInvoiced: false,
+            isClinicalProgressRegistered: false,
         };
 
         // ============================================================

@@ -173,6 +173,16 @@ export default class AppointmentService extends HTTPService {
 
     return response || null;
   }
+
+  async markAsClinicalRegistered(
+    id: string
+  ): Promise<Appointment | null> {
+    const response = await super.post<Appointment>(
+      `${this.path}/${id}/mark-as-clinical-progress-registered`
+    );
+
+    return response || null;
+  }
   // ============================================================
   // INFORMATION
   // ============================================================

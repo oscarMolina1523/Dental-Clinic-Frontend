@@ -25,6 +25,7 @@ import MedicalPrescriptionSection from "./MedicalPrescriptionSection";
 import DentalChartSection from "./DentalChartSection";
 import PatientAttachmentSection from "./PatientAttachmentSection";
 import { useAddClinicalProgressOrchestrator } from "../../hooks/useClinicalProgressOrchestrator";
+import { useMarkAsClinicalProgressRegistered } from "../../hooks/useAppointment";
 
 interface CreateClinicalProgressDrawerProps {
     isOpen: boolean;
@@ -43,6 +44,10 @@ const CreateClinicalProgressDrawer: React.FC<
             mutateAsync: addClinicalProgressOrchestrator,
             isPending,
         } = useAddClinicalProgressOrchestrator();
+
+        const {
+            mutateAsync: markAsClinicalRegistered
+        } = useMarkAsClinicalProgressRegistered();
 
         const [toast, setToast] = useState<{
             type: "success" | "error";
@@ -339,6 +344,14 @@ const CreateClinicalProgressDrawer: React.FC<
                 return;
             }
 
+            if (!appointment?.id) {
+                showToast(
+                    "error",
+                    "No se encontró el identificador de la cita."
+                );
+                return;
+            }
+
             try {
                 /*
                  * =====================================================
@@ -448,6 +461,7 @@ const CreateClinicalProgressDrawer: React.FC<
                     "El progreso clínico se creó correctamente."
                 );
 
+                await markAsClinicalRegistered(appointment.id);
                 cleanForm();
 
             } catch (error) {

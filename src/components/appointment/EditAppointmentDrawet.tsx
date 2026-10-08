@@ -619,6 +619,14 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     const handleStartTreatment = (detailId?: string) => {
         if (!detailId) return;
 
+        if (appointment?.status !== "IN_PROGRESS") {
+            showToast(
+                "error",
+                "Para empezar el tratamiento , la cita debe estar marcada en progreso."
+            );
+            return;
+        }
+
         startTreatmentPlanDetail(detailId, {
             onSuccess: () => {
 
@@ -844,6 +852,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
             clinicalNotes: cleanedClinicalNotes.join(", "),
 
             isInvoiced: form.isInvoiced,
+            isClinicalProgressRegistered: form.isClinicalProgressRegistered
         };
 
         // ============================================================
