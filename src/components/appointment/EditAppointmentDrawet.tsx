@@ -173,6 +173,19 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         // TRATAMIENTO INDIVIDUAL
         // ============================================================
 
+        // if (
+        //     appointmentData.treatmentId &&
+        //     appointmentDetails.treatment
+        // ) {
+        //     const treatment = appointmentDetails.treatment;
+
+        //     setSelectedTreatments([
+        //         treatment,
+        //     ]);
+
+        //     setTreatmentDetails([]);
+        // }
+
         if (
             appointmentData.treatmentId &&
             appointmentDetails.treatment
@@ -183,7 +196,17 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                 treatment,
             ]);
 
-            setTreatmentDetails([]);
+            setTreatmentDetails([
+                {
+                    id: `virtual-${treatment.id}`,
+                    treatmentId: String(treatment.id),
+                    treatmentName: treatment.name,
+                    quantity: 1,
+                    unitPrice: Number(treatment.basePrice),
+                    subtotal: Number(treatment.basePrice),
+                    status: "PENDING",
+                },
+            ]);
         }
 
         // ============================================================
@@ -452,12 +475,23 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
             appointmentData.treatmentId &&
             appointmentDetails.treatment
         ) {
+            const treatment = appointmentDetails.treatment;
+
             setSelectedTreatments([
-                appointmentDetails.treatment,
+                treatment,
             ]);
 
-            // Un tratamiento individual no tiene TreatmentPlanDetail
-            setTreatmentDetails([]);
+            setTreatmentDetails([
+                {
+                    id: `virtual-${treatment.id}`,
+                    treatmentId: String(treatment.id),
+                    treatmentName: treatment.name,
+                    quantity: 1,
+                    unitPrice: Number(treatment.basePrice),
+                    subtotal: Number(treatment.basePrice),
+                    status: "PENDING",
+                },
+            ]);
 
             return;
         }
@@ -616,20 +650,66 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         setClinicalNotes([]);
     };
 
+    // const handleStartTreatment = (detailId?: string) => {
+    //     if (!detailId) return;
+
+    //     if (appointment?.status !== "IN_PROGRESS") {
+    //         showToast(
+    //             "error",
+    //             "Para empezar el tratamiento , la cita debe estar marcada en progreso."
+    //         );
+    //         return;
+    //     }
+
+    //     startTreatmentPlanDetail(detailId, {
+    //         onSuccess: () => {
+
+    //             showToast(
+    //                 "success",
+    //                 "El tratamiento se inició correctamente."
+    //             );
+    //         },
+
+    //         onError: (error) => {
+    //             showToast(
+    //                 "error",
+    //                 error.message ||
+    //                 "No se pudo iniciar el tratamiento."
+    //             );
+    //         },
+    //     });
+    // };
+
     const handleStartTreatment = (detailId?: string) => {
         if (!detailId) return;
 
         if (appointment?.status !== "IN_PROGRESS") {
             showToast(
                 "error",
-                "Para empezar el tratamiento , la cita debe estar marcada en progreso."
+                "Para empezar el tratamiento, la cita debe estar marcada en progreso."
             );
             return;
         }
 
+        // Tratamiento individual: solo cambia el estado local
+        if (!appointment?.treatmentPlanId) {
+            setTreatmentDetails((prev) =>
+                prev.map((detail) =>
+                    String(detail.id) === String(detailId)
+                        ? {
+                            ...detail,
+                            status: "IN_PROGRESS",
+                        }
+                        : detail
+                )
+            );
+
+            return;
+        }
+
+        // Treatment Plan real
         startTreatmentPlanDetail(detailId, {
             onSuccess: () => {
-
                 showToast(
                     "success",
                     "El tratamiento se inició correctamente."
@@ -646,12 +726,50 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         });
     };
 
+    // const handleCompleteTreatment = (detailId?: string) => {
+    //     if (!detailId) return;
+
+    //     completeTreatmentPlanDetail(detailId, {
+    //         onSuccess: () => {
+
+    //             showToast(
+    //                 "success",
+    //                 "El tratamiento se completó correctamente."
+    //             );
+    //         },
+
+    //         onError: (error) => {
+    //             showToast(
+    //                 "error",
+    //                 error.message ||
+    //                 "No se pudo completar el tratamiento."
+    //             );
+    //         },
+    //     });
+    // };
+
     const handleCompleteTreatment = (detailId?: string) => {
         if (!detailId) return;
 
+        // Tratamiento individual: solo cambia el estado local
+        if (!appointment?.treatmentPlanId) {
+            setTreatmentDetails((prev) =>
+                prev.map((detail) =>
+                    String(detail.id) === String(detailId)
+                        ? {
+                            ...detail,
+                            status: "COMPLETED",
+                        }
+                        : detail
+                )
+            );
+
+            return;
+        }
+
+        // Treatment Plan real
         completeTreatmentPlanDetail(detailId, {
             onSuccess: () => {
-
                 showToast(
                     "success",
                     "El tratamiento se completó correctamente."
@@ -668,9 +786,47 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         });
     };
 
+    // const handleCancelTreatment = (detailId?: string) => {
+    //     if (!detailId) return;
+
+    //     cancelTreatmentPlanDetail(detailId, {
+    //         onSuccess: () => {
+    //             showToast(
+    //                 "success",
+    //                 "El tratamiento fue cancelado correctamente."
+    //             );
+    //         },
+
+    //         onError: (error) => {
+    //             showToast(
+    //                 "error",
+    //                 error.message ||
+    //                 "No se pudo cancelar el tratamiento."
+    //             );
+    //         },
+    //     });
+    // };
+
     const handleCancelTreatment = (detailId?: string) => {
         if (!detailId) return;
 
+        // Tratamiento individual: solo cambia el estado local
+        if (!appointment?.treatmentPlanId) {
+            setTreatmentDetails((prev) =>
+                prev.map((detail) =>
+                    String(detail.id) === String(detailId)
+                        ? {
+                            ...detail,
+                            status: "CANCELLED",
+                        }
+                        : detail
+                )
+            );
+
+            return;
+        }
+
+        // Treatment Plan real
         cancelTreatmentPlanDetail(detailId, {
             onSuccess: () => {
                 showToast(
@@ -689,30 +845,55 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         });
     };
 
+    // const canMarkAsInvoiced = () => {
+    //     if (!appointment) {
+    //         return false;
+    //     }
+
+    //     // Ya está facturada
+    //     if (appointment.isInvoiced) {
+    //         return false;
+    //     }
+
+    //     // ============================================================
+    //     // CITA SIN PLAN / TRATAMIENTO INDIVIDUAL
+    //     // ============================================================
+
+    //     if (!appointment.treatmentPlanId) {
+    //         return (
+    //             appointment.status === "COMPLETED" ||
+    //             appointment.status === "CANCELLED"
+    //         );
+    //     }
+
+    //     // ============================================================
+    //     // PLAN DE TRATAMIENTO
+    //     // ============================================================
+
+    //     if (
+    //         !treatmentDetails ||
+    //         treatmentDetails.length === 0
+    //     ) {
+    //         return false;
+    //     }
+
+    //     // Todos los servicios deben estar COMPLETED o CANCELLED
+    //     return treatmentDetails.every(
+    //         (detail) =>
+    //             detail.status === "COMPLETED" ||
+    //             detail.status === "CANCELLED"
+    //     );
+    // };
+
+
     const canMarkAsInvoiced = () => {
         if (!appointment) {
             return false;
         }
 
-        // Ya está facturada
         if (appointment.isInvoiced) {
             return false;
         }
-
-        // ============================================================
-        // CITA SIN PLAN / TRATAMIENTO INDIVIDUAL
-        // ============================================================
-
-        if (!appointment.treatmentPlanId) {
-            return (
-                appointment.status === "COMPLETED" ||
-                appointment.status === "CANCELLED"
-            );
-        }
-
-        // ============================================================
-        // PLAN DE TRATAMIENTO
-        // ============================================================
 
         if (
             !treatmentDetails ||
@@ -721,13 +902,46 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
             return false;
         }
 
-        // Todos los servicios deben estar COMPLETED o CANCELLED
         return treatmentDetails.every(
             (detail) =>
                 detail.status === "COMPLETED" ||
                 detail.status === "CANCELLED"
         );
     };
+
+    // const handleMarkAsInvoiced = () => {
+    //     if (!appointment) {
+    //         return;
+    //     }
+
+    //     if (!canMarkAsInvoiced()) {
+    //         showToast(
+    //             "error",
+    //             "Todos los servicios deben estar completados o cancelados para marcar la cita como facturada."
+    //         );
+    //         return;
+    //     }
+
+    //     markAsInvoiced(appointment.id, {
+    //         onSuccess: () => {
+    //             showToast(
+    //                 "success",
+    //                 "La cita fue marcada como facturada correctamente."
+    //             );
+
+    //             onHide();
+    //         },
+
+    //         onError: (error) => {
+    //             showToast(
+    //                 "error",
+    //                 error.message ||
+    //                 "No se pudo marcar la cita como facturada."
+    //             );
+    //         },
+    //     });
+    // };
+
 
     const handleMarkAsInvoiced = () => {
         if (!appointment) {
