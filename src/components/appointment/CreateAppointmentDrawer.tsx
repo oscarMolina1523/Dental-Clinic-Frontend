@@ -14,6 +14,34 @@ import { useAddAppointmentOrchestrator } from "../../hooks/useAppointmentOrchest
 import type TreatmentCatalogModel from "../../models/TreatmentCatalogModel";
 import type { TreatmentPlanDetailDto } from "../../models/TreatmentPlanDetailsModel";
 
+const getLocalDateTime = () => {
+    const now = new Date();
+
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const localDateTimeToDate = (value: string): Date => {
+    const [datePart, timePart] = value.split("T");
+
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hours, minutes] = timePart.split(":").map(Number);
+
+    return new Date(
+        year,
+        month - 1,
+        day,
+        hours,
+        minutes,
+        0,
+        0
+    );
+};
 interface CreateAppointmentProps {
     isOpen: boolean;
     onHide: () => void;
@@ -82,8 +110,8 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
 
         treatmentPlanId: "",
         treatmentId: "",
-        startAppointmentTime: new Date().toISOString().slice(0, 16),
-        endAppointmentTime: new Date().toISOString().slice(0, 16),
+        startAppointmentTime: getLocalDateTime(),
+        endAppointmentTime: getLocalDateTime(),
         reason: "",
         status: "SCHEDULED",
         cancelationNotes: "",
@@ -115,8 +143,8 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
 
             treatmentPlanId: "",
             treatmentId: "",
-            startAppointmentTime: new Date().toISOString().slice(0, 16),
-            endAppointmentTime: new Date().toISOString().slice(0, 16),
+            startAppointmentTime: getLocalDateTime(),
+            endAppointmentTime: getLocalDateTime(),
             reason: "",
             status: "SCHEDULED",
             cancelationNotes: "",
@@ -410,6 +438,8 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
             .map((note) => note.trim())
             .filter(Boolean);
 
+        console.log("start appointment time", startAppointmentTime);
+        console.log("date time satrt appointment time", new Date(startAppointmentTime));
         // ============================================================
         // APPOINTMENT BASE
         // ============================================================
@@ -422,8 +452,8 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
             dentistFullName,
             dentistSpeciality,
 
-            startAppointmentTime: new Date(startAppointmentTime),
-            endAppointmentTime: new Date(endAppointmentTime),
+            startAppointmentTime: localDateTimeToDate(startAppointmentTime),
+            endAppointmentTime: localDateTimeToDate(endAppointmentTime),
 
             reason,
             status,
@@ -435,7 +465,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
             diagnosis: diagnosis || "",
             clinicalNotes: cleanedClinicalNotes.join(", "),
             isInvoiced: false,
-            isClinicalProgressRegistered: false,
+            isClinicalProgressRegistered: false
         };
 
         // ============================================================
