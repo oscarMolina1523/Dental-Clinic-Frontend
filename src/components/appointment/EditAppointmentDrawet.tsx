@@ -780,41 +780,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                 detail.status === "CANCELLED"
         );
     };
-
-    // const handleMarkAsInvoiced = () => {
-    //     if (!appointment) {
-    //         return;
-    //     }
-
-    //     if (!canMarkAsInvoiced()) {
-    //         showToast(
-    //             "error",
-    //             "Todos los servicios deben estar completados o cancelados para marcar la cita como facturada."
-    //         );
-    //         return;
-    //     }
-
-    //     markAsInvoiced(appointment.id, {
-    //         onSuccess: () => {
-    //             showToast(
-    //                 "success",
-    //                 "La cita fue marcada como facturada correctamente."
-    //             );
-
-    //             onHide();
-    //         },
-
-    //         onError: (error) => {
-    //             showToast(
-    //                 "error",
-    //                 error.message ||
-    //                 "No se pudo marcar la cita como facturada."
-    //             );
-    //         },
-    //     });
-    // };
-
-
+    
     const handleMarkAsInvoiced = () => {
         if (!appointment) {
             return;
@@ -1049,7 +1015,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                         "La cita y el plan de tratamiento se actualizaron correctamente."
                     );
 
-                    onHide();
+                    handleCancel();
                 },
 
                 onError: (error) => {
