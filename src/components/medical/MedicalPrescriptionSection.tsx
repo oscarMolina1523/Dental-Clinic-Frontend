@@ -439,23 +439,20 @@ const MedicalPrescriptionSection: React.FC<
                             form.generalInstructions
                         }
                         onChange={handleChange}
-                        placeholder="
-                        Ingrese las instrucciones generales
-                        para el paciente...
-                    "
+                        placeholder="Ingrese las instrucciones generales para el paciente..."
                         rows={4}
                         className="
-                        w-full
-                        px-3 py-2.5
-                        border border-slate-200
-                        rounded-lg
-                        text-sm
-                        outline-none
-                        focus:border-blue-500
-                        focus:ring-2
-                        focus:ring-blue-500/10
-                        resize-none
-                    "
+                            w-full
+                            px-3 py-2.5
+                            border border-slate-200
+                            rounded-lg
+                            text-sm
+                            outline-none
+                            resize-none
+                            focus:border-blue-500
+                            focus:ring-2
+                            focus:ring-blue-500/10
+                        "
                     />
 
                 </div>
