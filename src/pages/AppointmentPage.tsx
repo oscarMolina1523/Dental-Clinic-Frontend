@@ -320,16 +320,16 @@ const AppointmentPage: React.FC = () => {
 
                 return;
             }
+        }
 
-            if (!selectedAppointment.isInvoiced) {
-                setToast({
-                    type: "error",
-                    message:
-                        "Debe generar la factura antes de marcar como completada.",
-                });
+        if (!selectedAppointment.isInvoiced) {
+            setToast({
+                type: "error",
+                message:
+                    "Debe generar la factura antes de marcar como completada.",
+            });
 
-                return;
-            }
+            return;
         }
 
         // ============================================================
