@@ -22,9 +22,6 @@ interface CreateMedicalPrescriptionDrawerProps {
     onDiagnosisChange: (
         diagnosis: string
     ) => void;
-    onObservationChange: (
-        observations: string
-    ) => void;
     clinicalProgressId: string;
 }
 
@@ -34,7 +31,6 @@ const MedicalPrescriptionSection: React.FC<
     appointment,
     onChange,
     onDiagnosisChange,
-    onObservationChange,
     clinicalProgressId
 }) => {
 
@@ -53,7 +49,7 @@ const MedicalPrescriptionSection: React.FC<
             date: appointment?.startAppointmentTime
                 ? new Date(appointment.startAppointmentTime)
                 : new Date(),
-            generalInstructions: appointment?.clinicalNotes || "",
+            generalInstructions: "",
         });
 
         const [diagnosis, setDiagnosis] =
@@ -169,10 +165,6 @@ const MedicalPrescriptionSection: React.FC<
             };
 
             setForm(newForm);
-
-            if (name === "generalInstructions") {
-                onObservationChange(value);
-            }
 
             updateParent(
                 newForm,

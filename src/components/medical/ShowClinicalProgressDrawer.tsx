@@ -346,10 +346,9 @@ const ShowClinicalProgressDrawer: React.FC<
                                   <CalendarDays className="w-4 h-4 text-blue-500" />
 
                                   <h4 className="text-sm font-semibold text-slate-700">
-                                    Progreso clínico
+                                    Registro clínico por <strong>{item.medicalPrescription?.medicalPrescription.dentistFullName} </strong>
                                   </h4>
                                 </div>
-
                                 <div
                                   className="
                                   rounded-lg
@@ -360,73 +359,113 @@ const ShowClinicalProgressDrawer: React.FC<
                                 "
                                 >
                                   <p className="text-sm text-slate-600 whitespace-pre-wrap">
-                                    {item.clinicalProgress.observations ??
+                                    <strong>Notas clinicas: </strong>{item.clinicalProgress.observations ||
+                                      "Sin descripción."}
+                                  </p>
+                                </div>
+                                <div
+                                  className="
+                                  rounded-lg
+                                  bg-slate-50
+                                  border
+                                  border-slate-100
+                                  p-4
+                                "
+                                >
+                                  <p className="text-sm text-slate-600 whitespace-pre-wrap">
+                                    <strong>Diagnosticos: </strong>{item.clinicalProgress.diagnosis ||
+                                      "Sin descripción."}
+                                  </p>
+                                </div>
+                                <div
+                                  className="
+                                  rounded-lg
+                                  bg-slate-50
+                                  border
+                                  border-slate-100
+                                  p-4
+                                "
+                                >
+                                  <p className="text-sm text-slate-600 whitespace-pre-wrap">
+                                    <strong>Instrucciones generales: </strong>{item.medicalPrescription?.medicalPrescription.generalInstructions ||
                                       "Sin descripción."}
                                   </p>
                                 </div>
                               </section>
 
                               {/* Medical Prescription */}
-                              {item.medicalPrescription && (
-                                <section>
-                                  <div className="flex items-center gap-2 mb-3">
-                                    <Pill className="w-4 h-4 text-emerald-500" />
+                              {item.medicalPrescription &&
+                                item.medicalPrescription.details?.some(
+                                  (detail) =>
+                                    detail.medicine?.trim() ||
+                                    detail.dose?.trim() ||
+                                    detail.frequency?.trim() ||
+                                    detail.duration?.trim()
+                                ) && (
+                                  <section>
+                                    <div className="flex items-center gap-2 mb-3">
+                                      <Pill className="w-4 h-4 text-emerald-500" />
 
-                                    <h4 className="text-sm font-semibold text-slate-700">
-                                      Receta médica
-                                    </h4>
-                                  </div>
+                                      <h4 className="text-sm font-semibold text-slate-700">
+                                        Receta médica
+                                      </h4>
+                                    </div>
 
-                                  <div className="rounded-lg border border-slate-200 overflow-hidden">
+                                    <div className="rounded-lg border border-slate-200 overflow-hidden">
 
-                                    {item.medicalPrescription.details
-                                      ?.length > 0 ? (
-                                      <div className="divide-y divide-slate-100">
+                                      {item.medicalPrescription.details
+                                        ?.length > 0 ? (
+                                        <div className="divide-y divide-slate-100">
 
-                                        {item.medicalPrescription.details.map(
-                                          (detail) => (
-                                            <div
-                                              key={detail.id}
-                                              className="p-4"
-                                            >
-                                              <p className="text-sm font-medium text-slate-700">
-                                                {detail.medicine}
-                                              </p>
+                                          {item.medicalPrescription.details.map(
+                                            (detail) => (
+                                              <div
+                                                key={detail.id}
+                                                className="p-4"
+                                              >
+                                                <p className="text-sm font-medium text-slate-700">
+                                                  <strong>Medicina: </strong>{detail.medicine || "no se registro medicina"}
+                                                </p>
 
-                                              <p className="text-xs text-slate-500 mt-1">
-                                                {detail.dose}
-                                              </p>
+                                                <p className="text-xs text-slate-500 mt-1">
+                                                  <strong>Dosis: </strong>{detail.dose || "no se registro dosis"}
+                                                </p>
 
-                                              <p className="text-xs text-slate-500 mt-1">
-                                                {detail.frequency}
-                                              </p>
-                                            </div>
-                                          )
-                                        )}
+                                                <p className="text-xs text-slate-500 mt-1">
+                                                  <strong>Frequencia: </strong>{detail.frequency || "no se registro frequencia"}
+                                                </p>
+                                                <p className="text-xs text-slate-500 mt-1">
+                                                  <strong>Duración: </strong>{detail.duration || "no se registro duración"}
+                                                </p>
+                                              </div>
+                                            )
+                                          )}
 
-                                      </div>
-                                    ) : (
-                                      <p className="p-4 text-sm text-slate-400">
-                                        Sin detalles de receta.
-                                      </p>
-                                    )}
+                                        </div>
+                                      ) : (
+                                        <p className="p-4 text-sm text-slate-400">
+                                          Sin detalles de receta.
+                                        </p>
+                                      )}
 
-                                  </div>
-                                </section>
-                              )}
+                                    </div>
+                                  </section>
+                                )}
 
                               {/* Dental Chart */}
                               {item.dentalChart && (
                                 <section>
                                   <div className="flex items-center gap-2 mb-3">
                                     <Stethoscope className="w-4 h-4 text-violet-500" />
-
                                     <h4 className="text-sm font-semibold text-slate-700">
                                       Odontograma
                                     </h4>
                                   </div>
 
                                   <div className="rounded-lg border border-slate-200 p-4">
+                                    <p className="text-xs text-slate-500 mt-1">
+                                      <strong>Observaciones: </strong>{item.dentalChart.dentalChart.observations || "no se agregaron observaciones"}
+                                    </p>
                                     {item.dentalChart.details?.length ? (
                                       <div className="space-y-2">
                                         {item.dentalChart.details.map(
@@ -435,23 +474,33 @@ const ShowClinicalProgressDrawer: React.FC<
                                               key={detail.id}
                                               className="
                                               flex
-                                              items-center
+                                              flex-col
+                                              items-start
                                               justify-between
                                               rounded-lg
                                               bg-slate-50
                                               p-3
                                             "
                                             >
-                                              <span className="text-sm text-slate-600">
-                                                Pieza{" "}
-                                                {detail.toothNumber}
-                                              </span>
+                                              <div className="flex flex-row justify-between w-full">
+                                                <span className="text-sm text-slate-600">
+                                                  Diente # {" "}
+                                                  {detail.toothNumber}
+                                                </span>
+                                                <span className="text-sm text-slate-600">
+                                                  Cara {" "}
+                                                  {detail.face}
+                                                </span>
 
-                                              <span className="text-xs text-slate-500">
-                                                {dentalChartStatusSpanishOptions.find(
-                                                  (option) => option.value === detail.toothStatus
-                                                )?.label}
-                                              </span>
+                                                <span className="text-xs text-slate-500">
+                                                  {dentalChartStatusSpanishOptions.find(
+                                                    (option) => option.value === detail.toothStatus
+                                                  )?.label}
+                                                </span>
+                                              </div>
+                                              <p className="text-xs text-slate-500 mt-1">
+                                                <strong>Observaciones: </strong>{detail.notes || "no se agregaron observaciones"}
+                                              </p>
                                             </div>
                                           )
                                         )}
@@ -475,6 +524,9 @@ const ShowClinicalProgressDrawer: React.FC<
                                       Archivo adjunto
                                     </h4>
                                   </div>
+                                  <p className="text-xs text-slate-500 my-1">
+                                    <strong>Descripción: </strong>{item.patientAttachment.description || "no se agrego descripción"}
+                                  </p>
 
                                   <div className="rounded-lg border border-slate-200 overflow-hidden">
                                     <img src={item.patientAttachment.fileUrl} alt={item.patientAttachment.fileName} className="w-full h-full object-cover" />
