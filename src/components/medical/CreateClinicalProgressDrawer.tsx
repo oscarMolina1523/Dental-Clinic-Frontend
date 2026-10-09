@@ -473,6 +473,7 @@ const CreateClinicalProgressDrawer: React.FC<
                 );
             }
         };
+        
         return (
             <>
                 {toast && (
@@ -554,12 +555,6 @@ const CreateClinicalProgressDrawer: React.FC<
                                 setClinicalProgress((prev) => ({
                                     ...prev,
                                     diagnosis,
-                                }));
-                            }}
-                            onObservationChange={(observations) => {
-                                setClinicalProgress((prev) => ({
-                                    ...prev,
-                                    observations,
                                 }));
                             }}
                             clinicalProgressId={clinicalProgressId}
