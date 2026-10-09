@@ -8,7 +8,7 @@ import SearchInput from "../shared/Table/SearchInput";
 import { useAppointments, useMarkReminderAsSent } from "../hooks/useAppointment";
 import type AppointmentModel from "../models/AppointmentModel";
 import CreateAppointmentDrawer from "../components/appointment/CreateAppointmentDrawer";
-import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawet";
+import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawer";
 import Toast from "../shared/Toast";
 import useAppointmentPage from "../components/appointment/useAppointmentPage";
 import CreateClinicalProgressDrawer from "../components/medical/CreateClinicalProgressDrawer";
