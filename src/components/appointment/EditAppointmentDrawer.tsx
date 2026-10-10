@@ -7,6 +7,9 @@ import { AppointmentGeneralInfo } from "./editAppointmentDrawer/AppointmentGener
 import { AppointmentClinicalNotesSection } from "./editAppointmentDrawer/AppointmentClinicalNotesSection";
 import { AppointmentServicesSection } from "./editAppointmentDrawer/AppointmentServiceSection";
 import { useEditAppointmentDrawer } from "./editAppointmentDrawer/useEditAppointmentDrawer";
+import { useCreateInvoiceWithPayment } from "../../hooks/useInvoicesPayment";
+import type { CreateInvoiceWithPaymentDto } from "../../models/InvoicePaymentModel";
+import type { InvoiceDto } from "../../models/InvoiceModel";
 
 export interface TreatmentPlanDetailState extends TreatmentPlanDetailDto {
     id?: string;
@@ -26,6 +29,11 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
 }) => {
 
     const {
+        mutate: createInvoiceWithPayment,
+        isPending: isLoadingInvoiceWithPayment,
+    } = useCreateInvoiceWithPayment();
+
+    const {
         form,
         dentistSpecialities,
         selectedTreatments,
@@ -42,6 +50,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         isLoadingUsers,
         treatments,
         isLoadingTreatments,
+        appointmentDetails,
         isLoadingAppointmentDetails,
         isPending,
         isStartingTreatment,
@@ -74,6 +83,86 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         handleClinicalNoteChange,
         handleRemoveClinicalNote,
     } = useEditAppointmentDrawer(appointment, onHide);
+
+
+    const handleSubmitInvoice = () => {
+        const patientId = appointment?.patientId || "";
+        const patientFullName = appointment?.patientFullName || "";
+
+        const treatmentId = appointment?.treatmentId
+            ? String(appointment.treatmentId)
+            : undefined;
+
+        const treatmentPlanId = !treatmentId && appointment?.treatmentPlanId
+            ? String(appointment.treatmentPlanId)
+            : undefined;
+
+        let totalAmount = 0;
+
+        if (treatmentId) {
+            // Si proviene de un tratamiento individual -> treatment.basePrice
+            totalAmount = Number(
+                appointmentDetails?.treatment?.basePrice ?? 0
+            );
+        } else if (treatmentPlanId) {
+            // Si proviene de un plan de tratamiento -> treatmentPlan.totalAmount
+            totalAmount = treatmentDetails
+                .filter(detail => detail.status !== "CANCELLED")
+                .reduce(
+                    (total, detail) => total + Number(detail.subtotal ?? 0),
+                    0
+                );
+        }
+
+        const invoice: InvoiceDto = {
+            patientId,
+            patientFullName,
+            treatmentId: treatmentId ?? undefined,
+            treatmentPlanId: treatmentPlanId ?? undefined,
+            totalAmount,
+            paidAmount: 0,
+            pendingAmount: totalAmount,
+            status: "PENDING",
+        };
+
+        const data: CreateInvoiceWithPaymentDto = {
+            invoice,
+            payment: {
+                amount: 0,
+                payment_method: "CASH",
+                served_by: "system",
+                payment_date: new Date().toString(),
+            },
+        };
+
+        createInvoiceWithPayment(data, {
+            onSuccess: () => {
+                setToast({
+                    type: "success",
+                    message:
+                        "Factura y pago creados correctamente.",
+                });
+
+                setTimeout(() => {
+                    onHide();
+                }, 1000);
+
+                handleMarkAsInvoiced();
+
+            },
+            onError: (error) => {
+                setToast({
+                    type: "error",
+                    message:
+                        error.message ||
+                        "No se pudo crear la factura y el pago.",
+                });
+            },
+        });
+
+        return;
+
+    };
 
     return (
         <>
@@ -177,7 +266,8 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                         onCompleteTreatment={handleCompleteTreatment}
                         onCancelTreatment={handleCancelTreatment}
                         onRemoveTreatment={handleRemoveTreatment}
-                        onMarkAsInvoiced={handleMarkAsInvoiced}
+                        handleSubmitInvoice={handleSubmitInvoice}
+                        isLoadingInvoiceWithPayment={isLoadingInvoiceWithPayment}
                     />
 
                     <AppointmentClinicalNotesSection

@@ -1021,6 +1021,7 @@ export const useEditAppointmentDrawer = (
         isLoadingUsers,
         treatments,
         isLoadingTreatments,
+        appointmentDetails,
         isLoadingAppointmentDetails,
         // Estados de carga de mutaciones
         isPending,

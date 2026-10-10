@@ -20,7 +20,9 @@ interface AppointmentServicesSectionProps {
     onCompleteTreatment: (detailId?: string) => void;
     onCancelTreatment: (detailId?: string) => void;
     onRemoveTreatment: (treatmentId: string) => void;
-    onMarkAsInvoiced: () => void;
+
+    handleSubmitInvoice: () => void;
+    isLoadingInvoiceWithPayment: boolean;
 }
 
 export const AppointmentServicesSection: React.FC<AppointmentServicesSectionProps> = ({
@@ -40,7 +42,9 @@ export const AppointmentServicesSection: React.FC<AppointmentServicesSectionProp
     onCompleteTreatment,
     onCancelTreatment,
     onRemoveTreatment,
-    onMarkAsInvoiced,
+
+    handleSubmitInvoice,
+    isLoadingInvoiceWithPayment
 }) => {
     return (
         <>
@@ -350,10 +354,11 @@ export const AppointmentServicesSection: React.FC<AppointmentServicesSectionProp
                     {canMarkAsInvoiced && (
                         <button
                             type="button"
-                            onClick={onMarkAsInvoiced}
+                            onClick={handleSubmitInvoice}
                             disabled={
                                 isPending ||
-                                isMarkingAsInvoiced
+                                isMarkingAsInvoiced ||
+                                isLoadingInvoiceWithPayment
                             }
                             className="
                                         px-4 py-2.5
