@@ -47,7 +47,7 @@ const ShowDetailsInvoiceDrawer: React.FC<
             isError: isPaymentPlanError,
             error: paymentPlanError,
         } = usePaymentPlanById(
-            invoice?.status !== "PAID"
+            invoice?.status !== "PAID" && invoice?.hasInstallment
                 ? invoice?.id
                 : undefined
         );

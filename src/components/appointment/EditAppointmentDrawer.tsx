@@ -123,6 +123,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
             paidAmount: 0,
             pendingAmount: totalAmount,
             status: "PENDING",
+            hasInstallment: false
         };
 
         const data: CreateInvoiceWithPaymentDto = {

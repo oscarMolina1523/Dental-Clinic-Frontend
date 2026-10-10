@@ -14,6 +14,8 @@ export default class Invoice extends BaseModel {
   pendingAmount: number;
   status: InvoiceStatus;
 
+  hasInstallment: boolean;
+
   constructor({
     id,
     patientId,
@@ -25,6 +27,7 @@ export default class Invoice extends BaseModel {
     paidAmount,
     pendingAmount,
     status,
+    hasInstallment
   }: {
     id: string;
     patientId: string;
@@ -36,6 +39,7 @@ export default class Invoice extends BaseModel {
     paidAmount: number;
     pendingAmount: number;
     status: InvoiceStatus;
+    hasInstallment: boolean;
   }) {
     super(id);
 
@@ -48,6 +52,7 @@ export default class Invoice extends BaseModel {
     this.paidAmount = paidAmount;
     this.pendingAmount = pendingAmount;
     this.status = status;
+    this.hasInstallment = hasInstallment;
   }
 }
 
@@ -60,4 +65,5 @@ export interface InvoiceDto {
   paidAmount: number;
   pendingAmount: number;
   status: InvoiceStatus;
+  hasInstallment: boolean;
 }
