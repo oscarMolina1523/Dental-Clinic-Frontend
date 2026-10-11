@@ -155,7 +155,8 @@ const RegisterPaymentDrawer: React.FC<
             paymentPlanDetails?.installments?.filter(
                 (installment) =>
                     Number(installment.paidAmount || 0) <
-                    Number(installment.amount || 0)
+                    Number(installment.amount || 0) +
+                    Number(installment.lateFeeAmount || 0)
             ) || [];
 
         /*
@@ -164,17 +165,16 @@ const RegisterPaymentDrawer: React.FC<
          * =========================================================
          */
 
+
         const pendingAmount = selectedInstallment
             ? Math.max(
-                Number(
-                    selectedInstallment.amount || 0
-                ) -
-                Number(
-                    selectedInstallment.paidAmount || 0
-                ),
+                Number(selectedInstallment.amount || 0) +
+                Number(selectedInstallment.lateFeeAmount || 0) -
+                Number(selectedInstallment.paidAmount || 0),
                 0
             )
             : 0;
+
 
         /*
          * =========================================================
@@ -299,6 +299,9 @@ const RegisterPaymentDrawer: React.FC<
                     ? Math.max(
                         Number(
                             installment.amount || 0
+                        ) +
+                        Number(
+                            installment.lateFeeAmount || 0
                         ) -
                         Number(
                             installment.paidAmount ||
@@ -494,15 +497,28 @@ const RegisterPaymentDrawer: React.FC<
                 return;
             }
 
-            if (
-                numericAmount > pendingAmount
-            ) {
+
+            const hasLateFee =
+                Number(selectedInstallment.lateFeeAmount || 0) > 0;
+
+            // Si tiene mora, debe pagar el saldo completo.
+            // Si no tiene mora, puede realizar pagos parciales.
+            if (hasLateFee && numericAmount !== pendingAmount) {
                 showToast(
                     "error",
-                    "El pago de la cuota no puede ser mayor al pago pendiente."
+                    `Esta cuota tiene mora. Debe pagar el saldo completo de ${formatCurrency(pendingAmount)}.`
                 );
                 return;
             }
+
+            if (numericAmount > pendingAmount) {
+                showToast(
+                    "error",
+                    "El pago no puede ser mayor al saldo pendiente."
+                );
+                return;
+            }
+
 
             if (!paymentMethod) {
                 showToast(
@@ -567,7 +583,7 @@ const RegisterPaymentDrawer: React.FC<
                 onHide={cleanForm}
                 title="Registrar pago"
                 description="Seleccione la cuota y registre el pago"
-                width="w-80 md:w-112.5"
+                width="w-80 md:w-200"
             >
                 {toast && (
                     <Toast
@@ -741,12 +757,12 @@ const RegisterPaymentDrawer: React.FC<
 
                         <div>
                             <h3 className="
-                            text-sm
-                            font-semibold
-                            text-slate-800
-                            mb-4
-                        ">
-                                Información de la factura
+                                text-sm
+                                font-semibold
+                                text-slate-800
+                                mb-4
+                            ">
+                                Información de la factura - {invoice.invoiceNumber}
                             </h3>
 
                             <div className="
@@ -756,24 +772,25 @@ const RegisterPaymentDrawer: React.FC<
                             p-4
                             space-y-4
                         ">
-                                <div>
-                                    <label className="
+                                <div className="flex flex-col md:flex-row gap-2 w-full">
+                                    <div className="flex-1">
+                                        <label className="
                                     block
                                     text-xs
                                     font-medium
                                     text-slate-600
                                     mb-1
                                 ">
-                                        Factura
-                                    </label>
+                                            Paciente
+                                        </label>
 
-                                    <input
-                                        type="text"
-                                        value={
-                                            invoice.invoiceNumber
-                                        }
-                                        disabled
-                                        className="
+                                        <input
+                                            type="text"
+                                            value={
+                                                invoice.patientFullName
+                                            }
+                                            disabled
+                                            className="
                                         w-full
                                         px-3
                                         py-2.5
@@ -785,62 +802,30 @@ const RegisterPaymentDrawer: React.FC<
                                         text-slate-500
                                         outline-none
                                     "
-                                    />
-                                </div>
+                                        />
+                                    </div>
 
-                                <div>
-                                    <label className="
+                                    <div className="flex-1">
+                                        <label className="
                                     block
                                     text-xs
                                     font-medium
                                     text-slate-600
                                     mb-1
                                 ">
-                                        Paciente
-                                    </label>
+                                            Saldo pendiente de factura
+                                        </label>
 
-                                    <input
-                                        type="text"
-                                        value={
-                                            invoice.patientFullName
-                                        }
-                                        disabled
-                                        className="
-                                        w-full
-                                        px-3
-                                        py-2.5
-                                        border
-                                        border-slate-200
-                                        rounded-lg
-                                        text-sm
-                                        bg-slate-50
-                                        text-slate-500
-                                        outline-none
-                                    "
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="
-                                    block
-                                    text-xs
-                                    font-medium
-                                    text-slate-600
-                                    mb-1
-                                ">
-                                        Saldo pendiente de factura
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        value={formatCurrency(
-                                            Number(
-                                                invoice.pendingAmount ||
-                                                0
-                                            )
-                                        )}
-                                        disabled
-                                        className="
+                                        <input
+                                            type="text"
+                                            value={formatCurrency(
+                                                Number(
+                                                    invoice.pendingAmount ||
+                                                    0
+                                                )
+                                            )}
+                                            disabled
+                                            className="
                                         w-full
                                         px-3
                                         py-2.5
@@ -853,7 +838,8 @@ const RegisterPaymentDrawer: React.FC<
                                         font-semibold
                                         outline-none
                                     "
-                                    />
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -906,6 +892,10 @@ const RegisterPaymentDrawer: React.FC<
                                             Math.max(
                                                 Number(
                                                     installment.amount ||
+                                                    0
+                                                ) +
+                                                Number(
+                                                    installment.lateFeeAmount ||
                                                     0
                                                 ) -
                                                 Number(
@@ -961,24 +951,25 @@ const RegisterPaymentDrawer: React.FC<
                                 p-4
                                 space-y-4
                             ">
-                                    <div>
-                                        <label className="
+                                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                                        <div className="flex-1">
+                                            <label className="
                                         block
                                         text-xs
                                         font-medium
                                         text-slate-600
                                         mb-1
                                     ">
-                                            Cuota
-                                        </label>
+                                                Cuota
+                                            </label>
 
-                                        <input
-                                            type="text"
-                                            value={
-                                                selectedInstallment.installmentNumber
-                                            }
-                                            disabled
-                                            className="
+                                            <input
+                                                type="text"
+                                                value={
+                                                    selectedInstallment.installmentNumber
+                                                }
+                                                disabled
+                                                className="
                                             w-full
                                             px-3
                                             py-2.5
@@ -990,30 +981,30 @@ const RegisterPaymentDrawer: React.FC<
                                             text-slate-500
                                             outline-none
                                         "
-                                        />
-                                    </div>
+                                            />
+                                        </div>
 
-                                    <div>
-                                        <label className="
+                                        <div className="flex-1">
+                                            <label className="
                                         block
                                         text-xs
                                         font-medium
                                         text-slate-600
                                         mb-1
                                     ">
-                                            Monto de la cuota
-                                        </label>
+                                                Monto de la cuota
+                                            </label>
 
-                                        <input
-                                            type="text"
-                                            value={formatCurrency(
-                                                Number(
-                                                    selectedInstallment.amount ||
-                                                    0
-                                                )
-                                            )}
-                                            disabled
-                                            className="
+                                            <input
+                                                type="text"
+                                                value={formatCurrency(
+                                                    Number(
+                                                        selectedInstallment.amount ||
+                                                        0
+                                                    )
+                                                )}
+                                                disabled
+                                                className="
                                             w-full
                                             px-3
                                             py-2.5
@@ -1025,30 +1016,30 @@ const RegisterPaymentDrawer: React.FC<
                                             text-slate-500
                                             outline-none
                                         "
-                                        />
-                                    </div>
+                                            />
+                                        </div>
 
-                                    <div>
-                                        <label className="
+                                        <div className="flex-1">
+                                            <label className="
                                         block
                                         text-xs
                                         font-medium
                                         text-slate-600
                                         mb-1
                                     ">
-                                            Monto pagado
-                                        </label>
+                                                Monto por mora
+                                            </label>
 
-                                        <input
-                                            type="text"
-                                            value={formatCurrency(
-                                                Number(
-                                                    selectedInstallment.paidAmount ||
-                                                    0
-                                                )
-                                            )}
-                                            disabled
-                                            className="
+                                            <input
+                                                type="text"
+                                                value={formatCurrency(
+                                                    Number(
+                                                        selectedInstallment.lateFeeAmount ||
+                                                        0
+                                                    )
+                                                )}
+                                                disabled
+                                                className="
                                             w-full
                                             px-3
                                             py-2.5
@@ -1060,27 +1051,63 @@ const RegisterPaymentDrawer: React.FC<
                                             text-slate-500
                                             outline-none
                                         "
-                                        />
+                                            />
+                                        </div>
                                     </div>
-
-                                    <div>
-                                        <label className="
+                                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                                        <div className="flex-1">
+                                            <label className="
                                         block
                                         text-xs
                                         font-medium
                                         text-slate-600
                                         mb-1
                                     ">
-                                            Saldo pendiente
-                                        </label>
+                                                Monto pagado
+                                            </label>
 
-                                        <input
-                                            type="text"
-                                            value={formatCurrency(
-                                                pendingAmount
-                                            )}
-                                            disabled
-                                            className="
+                                            <input
+                                                type="text"
+                                                value={formatCurrency(
+                                                    Number(
+                                                        selectedInstallment.paidAmount ||
+                                                        0
+                                                    )
+                                                )}
+                                                disabled
+                                                className="
+                                            w-full
+                                            px-3
+                                            py-2.5
+                                            border
+                                            border-slate-200
+                                            rounded-lg
+                                            text-sm
+                                            bg-slate-50
+                                            text-slate-500
+                                            outline-none
+                                        "
+                                            />
+                                        </div>
+
+                                        <div className="flex-1">
+                                            <label className="
+                                        block
+                                        text-xs
+                                        font-medium
+                                        text-slate-600
+                                        mb-1
+                                    ">
+                                                Saldo pendiente
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                value={formatCurrency(
+                                                    pendingAmount
+                                                )}
+                                                disabled
+                                                className="
                                             w-full
                                             px-3
                                             py-2.5
@@ -1093,33 +1120,33 @@ const RegisterPaymentDrawer: React.FC<
                                             font-semibold
                                             outline-none
                                         "
-                                        />
-                                    </div>
+                                            />
+                                        </div>
 
-                                    <div>
-                                        <label className="
+                                        <div className="flex-1">
+                                            <label className="
                                         block
                                         text-xs
                                         font-medium
                                         text-slate-600
                                         mb-1
                                     ">
-                                            Fecha de vencimiento
-                                        </label>
+                                                Fecha de vencimiento
+                                            </label>
 
-                                        <input
-                                            type="text"
-                                            value={
-                                                selectedInstallment.dueDate
-                                                    ? new Date(
-                                                        selectedInstallment.dueDate
-                                                    ).toLocaleDateString(
-                                                        "es-NI"
-                                                    )
-                                                    : "N/A"
-                                            }
-                                            disabled
-                                            className="
+                                            <input
+                                                type="text"
+                                                value={
+                                                    selectedInstallment.dueDate
+                                                        ? new Date(
+                                                            selectedInstallment.dueDate
+                                                        ).toLocaleDateString(
+                                                            "es-NI"
+                                                        )
+                                                        : "N/A"
+                                                }
+                                                disabled
+                                                className="
                                             w-full
                                             px-3
                                             py-2.5
@@ -1131,52 +1158,53 @@ const RegisterPaymentDrawer: React.FC<
                                             text-slate-500
                                             outline-none
                                         "
-                                        />
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         )}
 
                         {/* =================================================
-                        DATOS DEL PAGO
-                    ================================================= */}
+                            DATOS DEL PAGO
+                        ================================================= */}
 
                         {selectedInstallment && (
                             <div>
                                 <h3 className="
-                                text-sm
-                                font-semibold
-                                text-slate-800
-                                mb-4
-                            ">
+                                    text-sm
+                                    font-semibold
+                                    text-slate-800
+                                    mb-4
+                                    ">
                                     Datos del pago
                                 </h3>
-
                                 <div className="space-y-4">
-                                    <div>
-                                        <label className="
+                                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                                        <div className="flex-1">
+                                            <label className="
                                         block
                                         text-sm
                                         font-medium
                                         text-slate-700
                                         mb-2
                                     ">
-                                            Monto a pagar
-                                        </label>
+                                                Monto a pagar (C$)
+                                            </label>
 
-                                        <input
-                                            type="number"
-                                            min="0.01"
-                                            max={pendingAmount}
-                                            step="0.01"
-                                            value={amount}
-                                            onChange={(event) =>
-                                                setAmount(
-                                                    event.target.value
-                                                )
-                                            }
-                                            disabled={isPending}
-                                            className="
+                                            <input
+                                                type="number"
+                                                min="0.01"
+                                                max={pendingAmount}
+                                                step="0.01"
+                                                value={amount}
+                                                onChange={(event) =>
+                                                    setAmount(
+                                                        event.target.value
+                                                    )
+                                                }
+                                                disabled={isPending}
+                                                className="
                                             w-full
                                             px-3
                                             py-2.5
@@ -1189,43 +1217,43 @@ const RegisterPaymentDrawer: React.FC<
                                             outline-none
                                             focus:border-[#001D4A]
                                         "
-                                        />
+                                            />
 
-                                        <p className="
+                                            <p className="
                                         text-xs
                                         text-slate-500
                                         mt-1
                                     ">
-                                            Máximo permitido:{" "}
-                                            {formatCurrency(
-                                                pendingAmount
-                                            )}
-                                        </p>
-                                    </div>
+                                                Máximo permitido:{" "}
+                                                {formatCurrency(
+                                                    pendingAmount
+                                                )}
+                                            </p>
+                                        </div>
 
-                                    <div>
-                                        <label className="
+                                        <div className="flex-1">
+                                            <label className="
                                         block
                                         text-sm
                                         font-medium
                                         text-slate-700
                                         mb-2
                                     ">
-                                            Método de pago
-                                        </label>
+                                                Método de pago
+                                            </label>
 
-                                        <select
-                                            value={
-                                                paymentMethod
-                                            }
-                                            onChange={(event) =>
-                                                setPaymentMethod(
-                                                    event.target
-                                                        .value as PaymentMethods
-                                                )
-                                            }
-                                            disabled={isPending}
-                                            className="
+                                            <select
+                                                value={
+                                                    paymentMethod
+                                                }
+                                                onChange={(event) =>
+                                                    setPaymentMethod(
+                                                        event.target
+                                                            .value as PaymentMethods
+                                                    )
+                                                }
+                                                disabled={isPending}
+                                                className="
                                             w-full
                                             px-3
                                             py-2.5
@@ -1238,23 +1266,60 @@ const RegisterPaymentDrawer: React.FC<
                                             outline-none
                                             focus:border-[#001D4A]
                                         "
-                                        >
-                                            <option value="">
-                                                Seleccione un método
-                                            </option>
+                                            >
+                                                <option value="">
+                                                    Seleccione un método
+                                                </option>
 
-                                            <option value="CASH">
-                                                Efectivo
-                                            </option>
+                                                <option value="CASH">
+                                                    Efectivo
+                                                </option>
 
-                                            <option value="CARD">
-                                                Tarjeta
-                                            </option>
+                                                <option value="CARD">
+                                                    Tarjeta
+                                                </option>
 
-                                            <option value="TRANSFER">
-                                                Transferencia
-                                            </option>
-                                        </select>
+                                                <option value="TRANSFER">
+                                                    Transferencia
+                                                </option>
+                                            </select>
+                                        </div>
+
+                                        <div className="flex-1">
+                                            <label className="
+                                        block
+                                        text-sm
+                                        font-medium
+                                        text-slate-700
+                                        mb-2
+                                    ">
+                                                Fecha del pago
+                                            </label>
+
+                                            <input
+                                                type="date"
+                                                value={paymentDate}
+                                                onChange={(event) =>
+                                                    setPaymentDate(
+                                                        event.target.value
+                                                    )
+                                                }
+                                                disabled
+                                                className="
+                                            w-full
+                                            px-3
+                                            py-2.5
+                                            border
+                                            border-slate-200
+                                            rounded-lg
+                                            text-sm
+                                            bg-white
+                                            text-slate-700
+                                            outline-none
+                                            focus:border-[#001D4A]
+                                        "
+                                            />
+                                        </div>
                                     </div>
 
                                     {paymentMethod === "TRANSFER" && (
@@ -1335,41 +1400,7 @@ const RegisterPaymentDrawer: React.FC<
                                     />
                                 </div> */}
 
-                                    <div>
-                                        <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                            Fecha del pago
-                                        </label>
 
-                                        <input
-                                            type="date"
-                                            value={paymentDate}
-                                            onChange={(event) =>
-                                                setPaymentDate(
-                                                    event.target.value
-                                                )
-                                            }
-                                            disabled={isPending}
-                                            className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-white
-                                            text-slate-700
-                                            outline-none
-                                            focus:border-[#001D4A]
-                                        "
-                                        />
-                                    </div>
                                 </div>
                             </div>
                         )}
