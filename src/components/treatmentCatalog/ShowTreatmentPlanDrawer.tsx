@@ -204,7 +204,7 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                     mb-2
                                 "
                                 >
-                                    Dentista
+                                    Especialista
                                 </label>
 
                                 <input
