@@ -105,16 +105,16 @@ const InvoicesPage: React.FC = () => {
     );
 
     const columns: TableColumn<typeof invoices[number]>[] = [
-        {
-            key: "invoiceNumber",
-            header: "Número de factura",
-            className: "w-40 md:w-60",
-            render: (invoice: Invoice) => (
-                <span className="text-sm text-slate-500">
-                    {invoice.invoiceNumber}
-                </span>
-            ),
-        },
+        // {
+        //     key: "invoiceNumber",
+        //     header: "Número de factura",
+        //     className: "w-40 md:w-60",
+        //     render: (invoice: Invoice) => (
+        //         <span className="text-sm text-slate-500">
+        //             {invoice.invoiceNumber}
+        //         </span>
+        //     ),
+        // },
         {
             key: "patientFullName",
             header: "Paciente",

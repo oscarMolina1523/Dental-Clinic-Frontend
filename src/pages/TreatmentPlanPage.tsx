@@ -156,19 +156,19 @@ const TreatmentPlanPage: React.FC = () => {
 
 
     const columns: TableColumn<typeof treatments[number]>[] = [
-        {
-            key: "code",
-            header: "Código",
-            className: "pl-2 w-40 md:w-60",
-            render: (treatment: TreatmentPlanOrchestratorResponse) => (
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-slate-800">
-                        {treatment.treatmentPlan.code}
-                    </span>
+        // {
+        //     key: "code",
+        //     header: "Código",
+        //     className: "pl-2 w-40 md:w-60",
+        //     render: (treatment: TreatmentPlanOrchestratorResponse) => (
+        //         <div className="flex items-center gap-3">
+        //             <span className="text-sm font-semibold text-slate-800">
+        //                 {treatment.treatmentPlan.code}
+        //             </span>
 
-                </div>
-            ),
-        },
+        //         </div>
+        //     ),
+        // },
         {
             key: "patientFullName",
             header: "Paciente",

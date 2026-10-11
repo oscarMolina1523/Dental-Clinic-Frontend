@@ -178,6 +178,27 @@ const RegisterPaymentDrawer: React.FC<
 
         /*
          * =========================================================
+         * VALIDAR SI SE PUEDE PAGAR LA CUOTA SELECCIONADA
+         * =========================================================
+         */
+
+        const getUnpaidPreviousInstallment = (
+            installment: Installment
+        ): Installment | undefined => {
+            return paymentPlanDetails?.installments
+                ?.filter(
+                    (item) =>
+                        item.installmentNumber <
+                        installment.installmentNumber
+                )
+                .find(
+                    (item) =>
+                        Number(item.paidAmount || 0) <
+                        Number(item.amount || 0)
+                );
+        };
+        /*
+         * =========================================================
          * CUANDO CAMBIA LA FACTURA
          * =========================================================
          */
@@ -248,6 +269,26 @@ const RegisterPaymentDrawer: React.FC<
                     (item) =>
                         item.id === installmentId
                 ) || null;
+
+            if (!installment) {
+                setSelectedInstallment(null);
+                setAmount("");
+                return;
+            }
+
+            const unpaidPrevious =
+                getUnpaidPreviousInstallment(installment);
+
+            if (unpaidPrevious) {
+                showToast(
+                    "error",
+                    `No puedes pagar la cuota ${installment.installmentNumber} sin completar primero la cuota ${unpaidPrevious.installmentNumber}.`
+                );
+
+                setSelectedInstallment(null);
+                setAmount("");
+                return;
+            }
 
             setSelectedInstallment(
                 installment
