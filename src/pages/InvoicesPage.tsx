@@ -216,7 +216,7 @@ const InvoicesPage: React.FC = () => {
                 setSelectedInvoice(invoice);
                 setIsRegisterPaymentOpen(true);
             },
-            hidden: () => !canWrite,
+            hidden: (invoice) => invoice.status == "PAID" || invoice.status == "CANCELLED" || !canWrite,
         },
     ];
 

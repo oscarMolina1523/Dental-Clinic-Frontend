@@ -12,7 +12,7 @@ export const invoiceStatusSpanishOptions: {
     { value: "PENDING", label: "Pendiente" },
     { value: "PARTIALLY_PAID", label: "Pago parcial" },
     { value: "PAID", label: "Pagada" },
-    { value: "CANCELLED", label: "Cancelada" },
+    { value: "CANCELLED", label: "Abortada" },
 ];
 
 export const invoiceStatusColors: Record<
