@@ -61,7 +61,7 @@ export const AppointmentGeneralInfo: React.FC<AppointmentGeneralInfoProps> = ({
                                 ? "Cargando pacientes..."
                                 : "Seleccione un paciente"
                         }
-                        searchPlaceholder="Buscar paciente por nombre..."
+                        searchPlaceholder="Buscar paciente por nombres..."
                         noResultsMessage="No se encontraron pacientes."
                         disabled={isLoadingPatients}
                         onChange={onPatientChange}
