@@ -456,7 +456,7 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
             paidAmount,
             pendingAmount,
             status,
-            hasInstallment: Boolean(form.installmentId?.trim()),
+            hasInstallment: Boolean(form.isInstallmentPayment),
         };
 
         // ==========================================

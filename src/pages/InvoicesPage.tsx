@@ -201,8 +201,7 @@ const InvoicesPage: React.FC = () => {
         {
             label: "Cancelar Factura",
             hidden: (invoice) =>
-                invoice.status == "PAID" ||
-                invoice.status == "CANCELLED" || !canWrite,
+                invoice.status !== "PENDING"  || !canWrite,
             icon: <Ban className="w-4 h-4" />,
             onClick: (invoice) => {
                 setSelectedInvoice(invoice);
