@@ -2,7 +2,7 @@
 import React from "react";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import type { TreatmentPlanOrchestratorResponse } from "../../models/TreatmentPlanOrchestratorModel";
-import { treatmentPlanDetailStatusSpanishOptions, treatmentPlanStatusSpanishOptions } from "../../utils/treatmentPlanStatus.enum";
+import { treatmentPlanDetailStatusSpanishOptions } from "../../utils/treatmentPlanStatus.enum";
 
 interface ShowTreatmentPlanDrawerProps {
     isOpen: boolean;
@@ -17,11 +17,11 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
 }) => {
     const treatmentPlan = treatment?.treatmentPlan;
 
-    const subtotal =
-        treatment?.details?.reduce(
-            (total, detail) => total + Number(detail.subtotal || 0),
-            0
-        ) ?? 0;
+    // const subtotal =
+    //     treatment?.details?.reduce(
+    //         (total, detail) => total + Number(detail.subtotal || 0),
+    //         0
+    //     ) ?? 0;
 
 
     return (
@@ -48,38 +48,58 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
             <GenericDrawer
                 isOpen={isOpen}
                 onHide={onHide}
-                title="Detalle del Plan de Tratamiento"
-                description="Información completa del plan de tratamiento"
-                width="w-80 md:w-112.5"
+                title="Detalle del Paquete de servicios"
+                description="Información completa del paquete de servicios"
+                width="w-80 md:w-200"
             >
                 {!treatmentPlan ? (
                     <div className="text-sm text-slate-500">
-                        No hay información del plan de tratamiento.
+                        No hay información del paquete de servicios.
                     </div>
                 ) : (
                     <div className="space-y-5">
+                        <div className="flex items-center gap-4">
+                            <div className="flex-1 h-px bg-slate-200" />
 
-                        {/* =================================================
-                            CÓDIGO
-                        ================================================= */}
-                        <div>
-                            <label
-                                className="
+                            <div className="flex flex-col items-center">
+                                <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                                    Información del paquete de servicios
+                                </h2>
+                                <p
+                                    className="
+                                                        text-xs
+                                                        text-slate-500
+                                                        mt-1
+                                                    "
+                                >
+                                    Información del paquete de servicios.
+                                </p>
+                            </div>
+
+                            <div className="flex-1 h-px bg-slate-200" />
+                        </div>
+                        <div className="flex flex-col md:flex-row gap-2 w-full">
+                            {/* =================================================
+                                CÓDIGO
+                            ================================================= */}
+                            <div className="flex-1">
+                                <label
+                                    className="
                                     block
                                     text-sm
                                     font-medium
                                     text-slate-700
                                     mb-2
                                 "
-                            >
-                                Código
-                            </label>
+                                >
+                                    Código
+                                </label>
 
-                            <input
-                                type="text"
-                                value={treatmentPlan.code || ""}
-                                disabled
-                                className="
+                                <input
+                                    type="text"
+                                    value={treatmentPlan.code || ""}
+                                    disabled
+                                    className="
                                     w-full
                                     px-3 py-2.5
                                     border border-slate-200
@@ -89,30 +109,42 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                     text-slate-500
                                     outline-none
                                 "
-                            />
-                        </div>
+                                />
+                            </div>
 
-                        {/* =================================================
-                            PACIENTE
-                        ================================================= */}
-                        <div>
-                            <label
-                                className="
+                            {/* =================================================
+                                FECHA DE CREACIÓN
+                            ================================================= */}
+                            <div className="flex-1">
+                                <label
+                                    className="
                                     block
                                     text-sm
                                     font-medium
                                     text-slate-700
                                     mb-2
                                 "
-                            >
-                                Paciente
-                            </label>
+                                >
+                                    Fecha de creación
+                                </label>
 
-                            <input
-                                type="text"
-                                value={treatment.treatmentPlan.patientFullName || "N/A"}
-                                disabled
-                                className="
+                                <input
+                                    type="text"
+                                    value={
+                                        treatmentPlan.createdAt
+                                            ? new Date(
+                                                treatmentPlan.createdAt
+                                            ).toLocaleString("es-NI", {
+                                                day: "2-digit",
+                                                month: "2-digit",
+                                                year: "numeric",
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            })
+                                            : "N/A"
+                                    }
+                                    disabled
+                                    className="
                                     w-full
                                     px-3 py-2.5
                                     border border-slate-200
@@ -122,30 +154,31 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                     text-slate-500
                                     outline-none
                                 "
-                            />
+                                />
+                            </div>
                         </div>
-
-                        {/* =================================================
-                            DENTISTA
-                        ================================================= */}
-                        <div>
-                            <label
-                                className="
+                        <div className="flex flex-col md:flex-row gap-2 w-full">
+                            {/* =================================================
+                                PACIENTE
+                            ================================================= */}
+                            <div className="flex-1">
+                                <label
+                                    className="
                                     block
                                     text-sm
                                     font-medium
                                     text-slate-700
                                     mb-2
                                 "
-                            >
-                                Dentista
-                            </label>
+                                >
+                                    Paciente
+                                </label>
 
-                            <input
-                                type="text"
-                                value={treatment.treatmentPlan.dentistFullName || "N/A"}
-                                disabled
-                                className="
+                                <input
+                                    type="text"
+                                    value={treatment.treatmentPlan.patientFullName || "N/A"}
+                                    disabled
+                                    className="
                                     w-full
                                     px-3 py-2.5
                                     border border-slate-200
@@ -155,32 +188,30 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                     text-slate-500
                                     outline-none
                                 "
-                            />
-                        </div>
+                                />
+                            </div>
 
-                        {/* =================================================
-                            ESTADO
-                        ================================================= */}
-                        <div>
-                            <label
-                                className="
+                            {/* =================================================
+                                DENTISTA
+                            ================================================= */}
+                            <div className="flex-1">
+                                <label
+                                    className="
                                     block
                                     text-sm
                                     font-medium
                                     text-slate-700
                                     mb-2
                                 "
-                            >
-                                Estado
-                            </label>
+                                >
+                                    Dentista
+                                </label>
 
-                            <input
-                                type="text"
-                                value={treatmentPlanStatusSpanishOptions.find(
-                                    (option) => option.value === treatmentPlan.status
-                                )?.label || "N/A"}
-                                disabled
-                                className="
+                                <input
+                                    type="text"
+                                    value={treatment.treatmentPlan.dentistFullName || "N/A"}
+                                    disabled
+                                    className="
                                     w-full
                                     px-3 py-2.5
                                     border border-slate-200
@@ -190,58 +221,53 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                     text-slate-500
                                     outline-none
                                 "
-                            />
+                                />
+                            </div>
                         </div>
 
-                        {/* =================================================
-                            FECHA DE CREACIÓN
-                        ================================================= */}
                         <div>
                             <label
                                 className="
-                                    block
-                                    text-sm
-                                    font-medium
-                                    text-slate-700
-                                    mb-2
-                                "
+                                            block
+                                            text-sm
+                                            font-medium
+                                            text-slate-700
+                                            mb-2
+                                        "
                             >
-                                Fecha de creación
+                                Total
                             </label>
 
                             <input
                                 type="text"
                                 value={
-                                    treatmentPlan.createdAt
-                                        ? new Date(
-                                            treatmentPlan.createdAt
-                                        ).toLocaleString("es-NI", {
-                                            day: "2-digit",
-                                            month: "2-digit",
-                                            year: "numeric",
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                        })
-                                        : "N/A"
+                                    treatmentPlan.totalAmount != null
+                                        ? `C$ ${Number(
+                                            treatmentPlan.totalAmount
+                                        ).toFixed(2)}`
+                                        : "C$ 0.00"
                                 }
                                 disabled
                                 className="
-                                    w-full
-                                    px-3 py-2.5
-                                    border border-slate-200
-                                    rounded-lg
-                                    text-sm
-                                    bg-slate-50
-                                    text-slate-500
-                                    outline-none
-                                "
+                                            w-full
+                                            px-3 py-2.5
+                                            border border-slate-200
+                                            rounded-lg
+                                            text-sm
+                                            font-semibold
+                                            bg-slate-50
+                                            text-slate-700
+                                            outline-none
+                                        "
                             />
                         </div>
+
+
 
                         {/* =================================================
                             RESUMEN ECONÓMICO
                         ================================================= */}
-                        <div
+                        {/* <div
                             className="
                                 border-t
                                 border-slate-100
@@ -266,14 +292,14 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                         mt-1
                                     "
                                 >
-                                    Información económica del plan de tratamiento.
+                                    Información económica del paquete de servicios.
                                 </p>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-4"> */}
 
-                                {/* SUBTOTAL */}
-                                <div>
+                        {/* SUBTOTAL */}
+                        {/* <div>
                                     <label
                                         className="
                                             block
@@ -301,10 +327,10 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                             outline-none
                                         "
                                     />
-                                </div>
+                                </div> */}
 
-                                {/* DESCUENTO */}
-                                <div>
+                        {/* DESCUENTO */}
+                        {/* <div>
                                     <label
                                         className="
                                             block
@@ -338,48 +364,13 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                             outline-none
                                         "
                                     />
-                                </div>
+                                </div> */}
 
-                                {/* TOTAL */}
-                                <div>
-                                    <label
-                                        className="
-                                            block
-                                            text-sm
-                                            font-medium
-                                            text-slate-700
-                                            mb-2
-                                        "
-                                    >
-                                        Total
-                                    </label>
+                        {/* TOTAL */}
 
-                                    <input
-                                        type="text"
-                                        value={
-                                            treatmentPlan.totalAmount != null
-                                                ? `C$ ${Number(
-                                                    treatmentPlan.totalAmount
-                                                ).toFixed(2)}`
-                                                : "C$ 0.00"
-                                        }
-                                        disabled
-                                        className="
-                                            w-full
-                                            px-3 py-2.5
-                                            border border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            font-semibold
-                                            bg-slate-50
-                                            text-slate-700
-                                            outline-none
-                                        "
-                                    />
-                                </div>
 
-                            </div>
-                        </div>
+                        {/* </div>
+                        </div> */}
 
                         {/* =================================================
                             TRATAMIENTOS
@@ -391,26 +382,25 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                 pt-5
                             "
                         >
-                            <div className="mb-4">
-                                <h3
-                                    className="
-                                        text-sm
-                                        font-semibold
-                                        text-slate-800
-                                    "
-                                >
-                                    Tratamientos
-                                </h3>
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="flex-1 h-px bg-slate-200" />
 
-                                <p
-                                    className="
-                                        text-xs
-                                        text-slate-500
-                                        mt-1
-                                    "
-                                >
-                                    Tratamientos incluidos en este plan.
-                                </p>
+                                <div className="flex flex-col items-center">
+                                    <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                                        Servicios
+                                    </h2>
+                                    <p
+                                        className="
+                                                        text-xs
+                                                        text-slate-500
+                                                        mt-1
+                                                    "
+                                    >
+                                        Servicios incluidos en el paquete
+                                    </p>
+                                </div>
+
+                                <div className="flex-1 h-px bg-slate-200" />
                             </div>
 
                             <div className="space-y-5">
@@ -446,28 +436,29 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                                     </span>
                                                 </div>
 
-                                                {/* TRATAMIENTO */}
-                                                <div>
-                                                    <label
-                                                        className="
+                                                <div className="flex flex-col md:flex-row gap-2 w-full">
+                                                    {/* TRATAMIENTO */}
+                                                    <div className="flex-1">
+                                                        <label
+                                                            className="
                                                             block
                                                             text-sm
                                                             font-medium
                                                             text-slate-700
                                                             mb-2
                                                         "
-                                                    >
-                                                        Tratamiento
-                                                    </label>
+                                                        >
+                                                            Tratamiento
+                                                        </label>
 
-                                                    <input
-                                                        type="text"
-                                                        value={
-                                                            detail.treatmentName ||
-                                                            "N/A"
-                                                        }
-                                                        disabled
-                                                        className="
+                                                        <input
+                                                            type="text"
+                                                            value={
+                                                                detail.treatmentName ||
+                                                                "N/A"
+                                                            }
+                                                            disabled
+                                                            className="
                                                             w-full
                                                             px-3 py-2.5
                                                             border border-slate-200
@@ -477,11 +468,84 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                                             text-slate-500
                                                             outline-none
                                                         "
-                                                    />
+                                                        />
+                                                    </div>
+
+                                                    {/* PRECIO UNITARIO */}
+                                                    <div className="flex-1">
+                                                        <label
+                                                            className="
+                                                            block
+                                                            text-sm
+                                                            font-medium
+                                                            text-slate-700
+                                                            mb-2
+                                                        "
+                                                        >
+                                                            Precio unitario
+                                                        </label>
+
+                                                        <input
+                                                            type="text"
+                                                            value={
+                                                                detail.unitPrice != null
+                                                                    ? `C$ ${Number(
+                                                                        detail.unitPrice
+                                                                    ).toFixed(2)}`
+                                                                    : "C$ 0.00"
+                                                            }
+                                                            disabled
+                                                            className="
+                                                            w-full
+                                                            px-3 py-2.5
+                                                            border border-slate-200
+                                                            rounded-lg
+                                                            text-sm
+                                                            bg-slate-50
+                                                            text-slate-500
+                                                            outline-none
+                                                        "
+                                                        />
+                                                    </div>
+
+                                                    {/* ESTADO */}
+                                                    <div className="flex-1">
+                                                        <label
+                                                            className="
+                                                            block
+                                                            text-sm
+                                                            font-medium
+                                                            text-slate-700
+                                                            mb-2
+                                                        "
+                                                        >
+                                                            Estado
+                                                        </label>
+
+                                                        <input
+                                                            type="text"
+                                                            value={
+                                                                treatmentPlanDetailStatusSpanishOptions.find(
+                                                                    (option) => option.value === detail.status
+                                                                )?.label || "N/A"
+                                                            }
+                                                            disabled
+                                                            className="
+                                                            w-full
+                                                            px-3 py-2.5
+                                                            border border-slate-200
+                                                            rounded-lg
+                                                            text-sm
+                                                            bg-slate-50
+                                                            text-slate-500
+                                                            outline-none
+                                                        "
+                                                        />
+                                                    </div>
                                                 </div>
 
                                                 {/* DIENTE */}
-                                                <div>
+                                                {/* <div>
                                                     <label
                                                         className="
                                                             block
@@ -515,10 +579,10 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                                             outline-none
                                                         "
                                                     />
-                                                </div>
+                                                </div> */}
 
                                                 {/* CANTIDAD */}
-                                                <div>
+                                                {/* <div>
                                                     <label
                                                         className="
                                                             block
@@ -552,47 +616,12 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                                             outline-none
                                                         "
                                                     />
-                                                </div>
+                                                </div> */}
 
-                                                {/* PRECIO UNITARIO */}
-                                                <div>
-                                                    <label
-                                                        className="
-                                                            block
-                                                            text-sm
-                                                            font-medium
-                                                            text-slate-700
-                                                            mb-2
-                                                        "
-                                                    >
-                                                        Precio unitario
-                                                    </label>
 
-                                                    <input
-                                                        type="text"
-                                                        value={
-                                                            detail.unitPrice != null
-                                                                ? `C$ ${Number(
-                                                                    detail.unitPrice
-                                                                ).toFixed(2)}`
-                                                                : "C$ 0.00"
-                                                        }
-                                                        disabled
-                                                        className="
-                                                            w-full
-                                                            px-3 py-2.5
-                                                            border border-slate-200
-                                                            rounded-lg
-                                                            text-sm
-                                                            bg-slate-50
-                                                            text-slate-500
-                                                            outline-none
-                                                        "
-                                                    />
-                                                </div>
 
                                                 {/* SUBTOTAL */}
-                                                <div>
+                                                {/* <div>
                                                     <label
                                                         className="
                                                             block
@@ -626,43 +655,7 @@ const ShowTreatmentPlanDrawer: React.FC<ShowTreatmentPlanDrawerProps> = ({
                                                             outline-none
                                                         "
                                                     />
-                                                </div>
-
-                                                {/* ESTADO */}
-                                                <div>
-                                                    <label
-                                                        className="
-                                                            block
-                                                            text-sm
-                                                            font-medium
-                                                            text-slate-700
-                                                            mb-2
-                                                        "
-                                                    >
-                                                        Estado
-                                                    </label>
-
-                                                    <input
-                                                        type="text"
-                                                        value={
-                                                            treatmentPlanDetailStatusSpanishOptions.find(
-                                                                (option) => option.value === detail.status
-                                                            )?.label || "N/A"
-                                                        }
-                                                        disabled
-                                                        className="
-                                                            w-full
-                                                            px-3 py-2.5
-                                                            border border-slate-200
-                                                            rounded-lg
-                                                            text-sm
-                                                            bg-slate-50
-                                                            text-slate-500
-                                                            outline-none
-                                                        "
-                                                    />
-                                                </div>
-
+                                                </div> */}
                                             </div>
                                         )
                                     )

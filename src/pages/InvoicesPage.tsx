@@ -312,10 +312,10 @@ const InvoicesPage: React.FC = () => {
             <CreateInvoiceDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
             <ConfirmModal
                 isOpen={isCancelModalOpen}
-                title={`¿Estás seguro de cancelar a esta factura?`}
+                title={`¿Estás seguro de abortar a esta factura?`}
                 description="Esta acción no se puede deshacer. Todos los datos asociados a este paciente se perderán permanentemente."
                 confirmText={isCanceling ? "Ejecutando..." : "Confirmar"}
-                cancelText="Cancelar"
+                cancelText="Abortar"
                 onConfirm={handleCancelInvoiceConfirm}
                 onCancel={() => {
                     setIsCancelModalOpen(false);
