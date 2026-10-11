@@ -368,6 +368,9 @@ const ReportsPage: React.FC = () => {
     >();
 
     invoices.forEach((invoice) => {
+      // Las facturas canceladas no representan deuda.
+      if (invoice.status === "CANCELLED") return;
+
       const existing = patientMap.get(
         invoice.patientId
       );
