@@ -1,21 +1,32 @@
 import type { JSX } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
+import { useRolePermissions } from "../hooks/useRolePermitions";
 
 interface ProtectedRouteProps {
-  children: JSX.Element;
+    children: JSX.Element;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  // Aquí obtienes el token, puede ser de localStorage, context o redux
-  const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("authToken");
+    const location = useLocation();
+    const { permissions, role } = useRolePermissions();
 
-  if (!token) {
-    // Si no hay token, redirige a login
-    return <Navigate to="/auth/login" replace />;
-  }
+    if (!token) {
+        return <Navigate to="/auth/login" replace />;
+    }
 
-  // Si hay token, renderiza el componente hijo
-  return children;
+    if (!role) {
+        return <Navigate to="/auth/login" replace />;
+    }
+
+    const currentPath = location.pathname.replace(/\/+$/, "") || "/";
+
+    // Validar que el usuario tenga permiso para la ruta actual.
+    if (currentPath !== "/" && !permissions.includes(currentPath)) {
+        return <Navigate to="/patients" replace />;
+    }
+
+    return children;
 };
 
 export default ProtectedRoute;
