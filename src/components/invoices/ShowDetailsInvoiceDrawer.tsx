@@ -5,6 +5,9 @@ import type Payment from "../../models/PaymentModel";
 import type Installment from "../../models/InstallmentModel";
 import { usePaymentPlanById } from "../../hooks/usePaymentPlanOrchestrator";
 import { invoiceStatusSpanishOptions } from "../../utils/invoiceStatus.enum";
+import { PaymentPlanStatusSpanishOptions } from "../../utils/paymentPlanStatus.enum";
+import { InstallmentStatusSpanishOptions } from "../../utils/installmentStatus.enum";
+import { PaymentMehodsSpanishOptions } from "../../utils/paymentMethodsStatus.enum";
 
 interface ShowDetailsInvoiceDrawerProps {
     isOpen: boolean;
@@ -47,7 +50,7 @@ const ShowDetailsInvoiceDrawer: React.FC<
             isError: isPaymentPlanError,
             error: paymentPlanError,
         } = usePaymentPlanById(
-            invoice?.status !== "PAID"
+            invoice?.status !== "PAID" && invoice?.hasInstallment
                 ? invoice?.id
                 : undefined
         );
@@ -72,15 +75,15 @@ const ShowDetailsInvoiceDrawer: React.FC<
                 />
 
                 {/* =================================================
-                DRAWER
-            ================================================= */}
+                    DRAWER
+                ================================================= */}
 
                 <GenericDrawer
                     isOpen={isOpen}
                     onHide={onHide}
                     title="Detalle de Factura"
                     description="Información de la factura y pagos"
-                    width="w-80 md:w-112.5"
+                    width="w-80 md:w-200"
                 >
 
                     {!invoice ? (
@@ -94,46 +97,46 @@ const ShowDetailsInvoiceDrawer: React.FC<
                         <div className="space-y-5">
 
                             {/* =================================================
-                            INFORMACIÓN DE LA FACTURA
-                        ================================================= */}
+                                INFORMACIÓN DE LA FACTURA
+                            ================================================= */}
 
                             <div>
 
-                                <h3
-                                    className="
-                                    text-sm
-                                    font-semibold
-                                    text-slate-800
-                                    mb-4
-                                "
-                                >
-                                    Información de la factura
-                                </h3>
+                                <div className="flex items-center gap-4 my-6">
+                                    <div className="flex-1 h-px bg-slate-200" />
+
+                                    <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                                        Información de la Factura
+                                    </h2>
+
+                                    <div className="flex-1 h-px bg-slate-200" />
+                                </div>
 
                                 <div className="space-y-4">
 
-                                    {/* NÚMERO DE FACTURA */}
+                                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                                        {/* NÚMERO DE FACTURA */}
 
-                                    <div>
-                                        <label
-                                            className="
+                                        <div className="flex-1">
+                                            <label
+                                                className="
                                             block
                                             text-sm
                                             font-medium
                                             text-slate-700
                                             mb-2
                                         "
-                                        >
-                                            Número de factura
-                                        </label>
+                                            >
+                                                Número de factura
+                                            </label>
 
-                                        <input
-                                            type="text"
-                                            value={
-                                                invoice.invoiceNumber || ""
-                                            }
-                                            disabled
-                                            className="
+                                            <input
+                                                type="text"
+                                                value={
+                                                    invoice.invoiceNumber || ""
+                                                }
+                                                disabled
+                                                className="
                                             w-full
                                             px-3 py-2.5
                                             border border-slate-200
@@ -143,31 +146,69 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             text-slate-500
                                             outline-none
                                         "
-                                        />
+                                            />
+                                        </div>
+
+                                        {/* ESTADO */}
+
+                                        <div className="flex-1">
+                                            <label
+                                                className="
+                                            block
+                                            text-sm
+                                            font-medium
+                                            text-slate-700
+                                            mb-2
+                                        "
+                                            >
+                                                Estado
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                value={
+                                                    invoiceStatusSpanishOptions.find(
+                                                        (option) => option.value === invoice.status
+                                                    )?.label || ""
+                                                }
+                                                disabled
+                                                className="
+                                            w-full
+                                            px-3 py-2.5
+                                            border border-slate-200
+                                            rounded-lg
+                                            text-sm
+                                            bg-slate-50
+                                            text-slate-500
+                                            outline-none
+                                        "
+                                            />
+                                        </div>
                                     </div>
 
-                                    {/* PACIENTE */}
+                                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                                        {/* PACIENTE */}
 
-                                    <div>
-                                        <label
-                                            className="
+                                        <div>
+                                            <label
+                                                className="
                                             block
                                             text-sm
                                             font-medium
                                             text-slate-700
                                             mb-2
                                         "
-                                        >
-                                            Paciente
-                                        </label>
+                                            >
+                                                Paciente
+                                            </label>
 
-                                        <input
-                                            type="text"
-                                            value={
-                                                invoice.patientFullName || ""
-                                            }
-                                            disabled
-                                            className="
+                                            <input
+                                                type="text"
+                                                value={
+                                                    invoice.patientFullName || ""
+                                                }
+                                                disabled
+                                                className="
                                             w-full
                                             px-3 py-2.5
                                             border border-slate-200
@@ -177,34 +218,34 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             text-slate-500
                                             outline-none
                                         "
-                                        />
-                                    </div>
+                                            />
+                                        </div>
 
-                                    {/* TOTAL */}
+                                        {/* TOTAL */}
 
-                                    <div>
-                                        <label
-                                            className="
+                                        <div>
+                                            <label
+                                                className="
                                             block
                                             text-sm
                                             font-medium
                                             text-slate-700
                                             mb-2
                                         "
-                                        >
-                                            Total
-                                        </label>
+                                            >
+                                                Total a pagar
+                                            </label>
 
-                                        <input
-                                            type="text"
-                                            value={Number(
-                                                invoice.totalAmount || 0
-                                            ).toLocaleString("es-NI", {
-                                                style: "currency",
-                                                currency: "NIO",
-                                            })}
-                                            disabled
-                                            className="
+                                            <input
+                                                type="text"
+                                                value={Number(
+                                                    invoice.totalAmount || 0
+                                                ).toLocaleString("es-NI", {
+                                                    style: "currency",
+                                                    currency: "NIO",
+                                                })}
+                                                disabled
+                                                className="
                                             w-full
                                             px-3 py-2.5
                                             border border-slate-200
@@ -214,34 +255,34 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             text-slate-500
                                             outline-none
                                         "
-                                        />
-                                    </div>
+                                            />
+                                        </div>
 
-                                    {/* PAGADO */}
+                                        {/* PAGADO */}
 
-                                    <div>
-                                        <label
-                                            className="
+                                        <div>
+                                            <label
+                                                className="
                                             block
                                             text-sm
                                             font-medium
                                             text-slate-700
                                             mb-2
                                         "
-                                        >
-                                            Monto pagado
-                                        </label>
+                                            >
+                                                Monto pagado
+                                            </label>
 
-                                        <input
-                                            type="text"
-                                            value={Number(
-                                                invoice.paidAmount || 0
-                                            ).toLocaleString("es-NI", {
-                                                style: "currency",
-                                                currency: "NIO",
-                                            })}
-                                            disabled
-                                            className="
+                                            <input
+                                                type="text"
+                                                value={Number(
+                                                    invoice.paidAmount || 0
+                                                ).toLocaleString("es-NI", {
+                                                    style: "currency",
+                                                    currency: "NIO",
+                                                })}
+                                                disabled
+                                                className="
                                             w-full
                                             px-3 py-2.5
                                             border border-slate-200
@@ -251,34 +292,34 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             text-slate-500
                                             outline-none
                                         "
-                                        />
-                                    </div>
+                                            />
+                                        </div>
 
-                                    {/* PENDIENTE */}
+                                        {/* PENDIENTE */}
 
-                                    <div>
-                                        <label
-                                            className="
+                                        <div>
+                                            <label
+                                                className="
                                             block
                                             text-sm
                                             font-medium
                                             text-slate-700
                                             mb-2
                                         "
-                                        >
-                                            Monto pendiente
-                                        </label>
+                                            >
+                                                Monto pendiente
+                                            </label>
 
-                                        <input
-                                            type="text"
-                                            value={Number(
-                                                invoice.pendingAmount || 0
-                                            ).toLocaleString("es-NI", {
-                                                style: "currency",
-                                                currency: "NIO",
-                                            })}
-                                            disabled
-                                            className="
+                                            <input
+                                                type="text"
+                                                value={Number(
+                                                    invoice.pendingAmount || 0
+                                                ).toLocaleString("es-NI", {
+                                                    style: "currency",
+                                                    currency: "NIO",
+                                                })}
+                                                disabled
+                                                className="
                                             w-full
                                             px-3 py-2.5
                                             border border-slate-200
@@ -288,51 +329,16 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             text-slate-500
                                             outline-none
                                         "
-                                        />
-                                    </div>
-
-                                    {/* ESTADO */}
-
-                                    <div>
-                                        <label
-                                            className="
-                                            block
-                                            text-sm
-                                            font-medium
-                                            text-slate-700
-                                            mb-2
-                                        "
-                                        >
-                                            Estado
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            value={
-                                                invoiceStatusSpanishOptions.find(
-                                                    (option) => option.value === invoice.status
-                                                )?.label || ""
-                                            }
-                                            disabled
-                                            className="
-                                            w-full
-                                            px-3 py-2.5
-                                            border border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-slate-50
-                                            text-slate-500
-                                            outline-none
-                                        "
-                                        />
+                                            />
+                                        </div>
                                     </div>
 
                                 </div>
                             </div>
 
                             {/* =================================================
-                            FACTURA PAGADA
-                        ================================================= */}
+                                FACTURA PAGADA
+                            ================================================= */}
 
                             {isPaid && (
 
@@ -381,8 +387,8 @@ const ShowDetailsInvoiceDrawer: React.FC<
                             )}
 
                             {/* =================================================
-                            CARGANDO PLAN
-                        ================================================= */}
+                                CARGANDO PLAN
+                            ================================================= */}
 
                             {!isPaid &&
                                 isLoadingPaymentPlan && (
@@ -409,8 +415,8 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                 )}
 
                             {/* =================================================
-                            ERROR
-                        ================================================= */}
+                                ERROR
+                            ================================================= */}
 
                             {!isPaid &&
                                 isPaymentPlanError && (
@@ -461,8 +467,8 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                 )}
 
                             {/* =================================================
-                            FACTURA SIN PLAN
-                        ================================================= */}
+                                FACTURA SIN PLAN
+                            ================================================= */}
 
                             {!isPaid &&
                                 !isLoadingPaymentPlan &&
@@ -503,8 +509,8 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                 )}
 
                             {/* =================================================
-                            PLAN DE CUOTAS
-                        ================================================= */}
+                                PLAN DE CUOTAS
+                            ================================================= */}
 
                             {!isPaid &&
                                 paymentPlanDetails && (
@@ -517,31 +523,28 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                         space-y-5
                                     "
                                     >
+                                        <div className="flex items-center gap-4 my-6">
+                                            <div className="flex-1 h-px bg-slate-200" />
 
-                                        <div>
+                                            <div className="flex flex-col items-center">
+                                                <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                                                    Información del plan de cuotas
+                                                </h2>
+                                                <p
+                                                    className="
+                                                        text-xs
+                                                        text-slate-500
+                                                        mt-1
+                                                    "
+                                                >
+                                                    Información del plan de
+                                                    pago asociado a la factura.
+                                                </p>
+                                            </div>
 
-                                            <h3
-                                                className="
-                                                text-sm
-                                                font-semibold
-                                                text-slate-800
-                                            "
-                                            >
-                                                Plan de cuotas
-                                            </h3>
-
-                                            <p
-                                                className="
-                                                text-xs
-                                                text-slate-500
-                                                mt-1
-                                            "
-                                            >
-                                                Información del plan de
-                                                pago asociado a la factura.
-                                            </p>
-
+                                            <div className="flex-1 h-px bg-slate-200" />
                                         </div>
+
 
                                         {/* DATOS DEL PLAN */}
 
@@ -554,32 +557,32 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             space-y-4
                                         "
                                         >
-
-                                            <div>
-                                                <label
-                                                    className="
+                                            <div className="flex flex-col md:flex-row gap-2 w-full">
+                                                <div className="flex-1">
+                                                    <label
+                                                        className="
                                                     block
                                                     text-sm
                                                     font-medium
                                                     text-slate-700
                                                     mb-2
                                                 "
-                                                >
-                                                    Total del plan
-                                                </label>
+                                                    >
+                                                        Total del plan
+                                                    </label>
 
-                                                <input
-                                                    type="text"
-                                                    value={Number(
-                                                        paymentPlanDetails
-                                                            .paymentPlan
-                                                            .totalAmount || 0
-                                                    ).toLocaleString("es-NI", {
-                                                        style: "currency",
-                                                        currency: "NIO",
-                                                    })}
-                                                    disabled
-                                                    className="
+                                                    <input
+                                                        type="text"
+                                                        value={Number(
+                                                            paymentPlanDetails
+                                                                .paymentPlan
+                                                                .totalAmount || 0
+                                                        ).toLocaleString("es-NI", {
+                                                            style: "currency",
+                                                            currency: "NIO",
+                                                        })}
+                                                        disabled
+                                                        className="
                                                     w-full
                                                     px-3 py-2.5
                                                     border border-slate-200
@@ -589,32 +592,94 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                                     text-slate-500
                                                     outline-none
                                                 "
-                                                />
+                                                    />
+                                                </div>
+
+                                                <div className="flex-1">
+                                                    <label
+                                                        className="
+                                                    block
+                                                    text-sm
+                                                    font-medium
+                                                    text-slate-700
+                                                    mb-2
+                                                "
+                                                    >
+                                                        Número de cuotas
+                                                    </label>
+
+                                                    <input
+                                                        type="text"
+                                                        value={
+                                                            paymentPlanDetails
+                                                                .paymentPlan
+                                                                .numberOfInstallments ??
+                                                            ""
+                                                        }
+                                                        disabled
+                                                        className="
+                                                    w-full
+                                                    px-3 py-2.5
+                                                    border border-slate-200
+                                                    rounded-lg
+                                                    text-sm
+                                                    bg-slate-50
+                                                    text-slate-500
+                                                    outline-none
+                                                "
+                                                    />
+                                                </div>
+
+                                                <div className="flex-1">
+                                                    <label
+                                                        className="
+                                                    block
+                                                    text-sm
+                                                    font-medium
+                                                    text-slate-700
+                                                    mb-2
+                                                "
+                                                    >
+                                                        Frecuencia
+                                                    </label>
+
+                                                    <input
+                                                        type="text"
+                                                        value={`Cada ${paymentPlanDetails.paymentPlan.frequencyDays ?? ""} días`}
+                                                        disabled
+                                                        className="
+                                                    w-full
+                                                    px-3 py-2.5
+                                                    border border-slate-200
+                                                    rounded-lg
+                                                    text-sm
+                                                    bg-slate-50
+                                                    text-slate-500
+                                                    outline-none
+                                                "
+                                                    />
+                                                </div>
                                             </div>
 
-                                            <div>
-                                                <label
-                                                    className="
+                                            <div className="flex flex-col md:flex-row gap-2 w-full">
+                                                <div className="flex-1">
+                                                    <label
+                                                        className="
                                                     block
                                                     text-sm
                                                     font-medium
                                                     text-slate-700
                                                     mb-2
                                                 "
-                                                >
-                                                    Número de cuotas
-                                                </label>
+                                                    >
+                                                        Interés
+                                                    </label>
 
-                                                <input
-                                                    type="text"
-                                                    value={
-                                                        paymentPlanDetails
-                                                            .paymentPlan
-                                                            .numberOfInstallments ??
-                                                        ""
-                                                    }
-                                                    disabled
-                                                    className="
+                                                    <input
+                                                        type="text"
+                                                        value={`${paymentPlanDetails.paymentPlan.interestRate ?? 0}%`}
+                                                        disabled
+                                                        className="
                                                     w-full
                                                     px-3 py-2.5
                                                     border border-slate-200
@@ -624,27 +689,33 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                                     text-slate-500
                                                     outline-none
                                                 "
-                                                />
-                                            </div>
+                                                    />
+                                                </div>
 
-                                            <div>
-                                                <label
-                                                    className="
+                                                <div className="flex-1">
+                                                    <label
+                                                        className="
                                                     block
                                                     text-sm
                                                     font-medium
                                                     text-slate-700
                                                     mb-2
                                                 "
-                                                >
-                                                    Frecuencia
-                                                </label>
+                                                    >
+                                                        Estado del plan
+                                                    </label>
 
-                                                <input
-                                                    type="text"
-                                                    value={`Cada ${paymentPlanDetails.paymentPlan.frequencyDays ?? ""} días`}
-                                                    disabled
-                                                    className="
+                                                    <input
+                                                        type="text"
+                                                        value={
+                                                            PaymentPlanStatusSpanishOptions.find(
+                                                                (option) => option.value === paymentPlanDetails
+                                                                    .paymentPlan
+                                                                    .status
+                                                            )?.label || ""
+                                                        }
+                                                        disabled
+                                                        className="
                                                     w-full
                                                     px-3 py-2.5
                                                     border border-slate-200
@@ -654,101 +725,38 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                                     text-slate-500
                                                     outline-none
                                                 "
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label
-                                                    className="
-                                                    block
-                                                    text-sm
-                                                    font-medium
-                                                    text-slate-700
-                                                    mb-2
-                                                "
-                                                >
-                                                    Interés
-                                                </label>
-
-                                                <input
-                                                    type="text"
-                                                    value={`${paymentPlanDetails.paymentPlan.interestRate ?? 0}%`}
-                                                    disabled
-                                                    className="
-                                                    w-full
-                                                    px-3 py-2.5
-                                                    border border-slate-200
-                                                    rounded-lg
-                                                    text-sm
-                                                    bg-slate-50
-                                                    text-slate-500
-                                                    outline-none
-                                                "
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label
-                                                    className="
-                                                    block
-                                                    text-sm
-                                                    font-medium
-                                                    text-slate-700
-                                                    mb-2
-                                                "
-                                                >
-                                                    Estado del plan
-                                                </label>
-
-                                                <input
-                                                    type="text"
-                                                    value={
-                                                        paymentPlanDetails
-                                                            .paymentPlan
-                                                            .status || ""
-                                                    }
-                                                    disabled
-                                                    className="
-                                                    w-full
-                                                    px-3 py-2.5
-                                                    border border-slate-200
-                                                    rounded-lg
-                                                    text-sm
-                                                    bg-slate-50
-                                                    text-slate-500
-                                                    outline-none
-                                                "
-                                                />
+                                                    />
+                                                </div>
                                             </div>
 
                                         </div>
 
                                         {/* =================================================
-                                        CUOTAS
-                                    ================================================= */}
+                                            CUOTAS
+                                        ================================================= */}
 
                                         <div>
 
-                                            <h3
-                                                className="
-                                                text-sm
-                                                font-semibold
-                                                text-slate-800
-                                                mb-1
-                                            "
-                                            >
-                                                Cuotas
-                                            </h3>
+                                            <div className="flex items-center gap-4 my-6">
+                                                <div className="flex-1 h-px bg-slate-200" />
 
-                                            <p
-                                                className="
-                                                text-xs
-                                                text-slate-500
-                                                mb-4
-                                            "
-                                            >
-                                                Cuotas asociadas al plan de pago.
-                                            </p>
+                                                <div className="flex flex-col items-center">
+                                                    <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                                                        Cuotas
+                                                    </h2>
+                                                    <p
+                                                        className="
+                                                        text-xs
+                                                        text-slate-500
+                                                        mt-1
+                                                    "
+                                                    >
+                                                        Cuotas asociadas al plan de pago.
+                                                    </p>
+                                                </div>
+
+                                                <div className="flex-1 h-px bg-slate-200" />
+                                            </div>
 
                                             <div className="space-y-4">
 
@@ -806,41 +814,125 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                                                         "
                                                                         >
                                                                             {
-                                                                                installment
-                                                                                    .status
+                                                                                InstallmentStatusSpanishOptions.find(
+                                                                                    (option) => option.value === installment
+                                                                                        .status
+                                                                                )?.label || ""
                                                                             }
                                                                         </span>
 
                                                                     </div>
 
-                                                                    <div>
+                                                                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                                                                        <div className="flex-1">
 
-                                                                        <label
-                                                                            className="
+                                                                            <label
+                                                                                className="
                                                                             block
                                                                             text-xs
                                                                             font-medium
                                                                             text-slate-600
                                                                             mb-1
                                                                         "
-                                                                        >
-                                                                            Monto
-                                                                        </label>
+                                                                            >
+                                                                                Monto
+                                                                            </label>
 
-                                                                        <input
-                                                                            type="text"
-                                                                            value={Number(
-                                                                                installment
-                                                                                    .amount || 0
-                                                                            ).toLocaleString(
-                                                                                "es-NI",
-                                                                                {
-                                                                                    style: "currency",
-                                                                                    currency: "NIO",
+                                                                            <input
+                                                                                type="text"
+                                                                                value={Number(
+                                                                                    installment
+                                                                                        .amount || 0
+                                                                                ).toLocaleString(
+                                                                                    "es-NI",
+                                                                                    {
+                                                                                        style: "currency",
+                                                                                        currency: "NIO",
+                                                                                    }
+                                                                                )}
+                                                                                disabled
+                                                                                className="
+                                                                            w-full
+                                                                            px-3 py-2
+                                                                            border border-slate-200
+                                                                            rounded-lg
+                                                                            text-sm
+                                                                            bg-slate-50
+                                                                            text-slate-500
+                                                                            outline-none
+                                                                        "
+                                                                            />
+
+                                                                        </div>
+
+                                                                        <div className="flex-1">
+
+                                                                            <label
+                                                                                className="
+                                                                            block
+                                                                            text-xs
+                                                                            font-medium
+                                                                            text-slate-600
+                                                                            mb-1
+                                                                        "
+                                                                            >
+                                                                                Pagado
+                                                                            </label>
+
+                                                                            <input
+                                                                                type="text"
+                                                                                value={Number(
+                                                                                    installment
+                                                                                        .paidAmount || 0
+                                                                                ).toLocaleString(
+                                                                                    "es-NI",
+                                                                                    {
+                                                                                        style: "currency",
+                                                                                        currency: "NIO",
+                                                                                    }
+                                                                                )}
+                                                                                disabled
+                                                                                className="
+                                                                            w-full
+                                                                            px-3 py-2
+                                                                            border border-slate-200
+                                                                            rounded-lg
+                                                                            text-sm
+                                                                            bg-slate-50
+                                                                            text-slate-500
+                                                                            outline-none
+                                                                        "
+                                                                            />
+
+                                                                        </div>
+
+                                                                        <div className="flex-1">
+
+                                                                            <label
+                                                                                className="
+                                                                            block
+                                                                            text-xs
+                                                                            font-medium
+                                                                            text-slate-600
+                                                                            mb-1
+                                                                        "
+                                                                            >
+                                                                                Fecha Limite de pago
+                                                                            </label>
+
+                                                                            <input
+                                                                                type="text"
+                                                                                value={
+                                                                                    installment.dueDate
+                                                                                        ? new Date(
+                                                                                            installment.dueDate
+                                                                                        ).toLocaleDateString(
+                                                                                            "es-NI"
+                                                                                        )
+                                                                                        : "N/A"
                                                                                 }
-                                                                            )}
-                                                                            disabled
-                                                                            className="
+                                                                                disabled
+                                                                                className="
                                                                             w-full
                                                                             px-3 py-2
                                                                             border border-slate-200
@@ -850,89 +942,9 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                                                             text-slate-500
                                                                             outline-none
                                                                         "
-                                                                        />
+                                                                            />
 
-                                                                    </div>
-
-                                                                    <div>
-
-                                                                        <label
-                                                                            className="
-                                                                            block
-                                                                            text-xs
-                                                                            font-medium
-                                                                            text-slate-600
-                                                                            mb-1
-                                                                        "
-                                                                        >
-                                                                            Pagado
-                                                                        </label>
-
-                                                                        <input
-                                                                            type="text"
-                                                                            value={Number(
-                                                                                installment
-                                                                                    .paidAmount || 0
-                                                                            ).toLocaleString(
-                                                                                "es-NI",
-                                                                                {
-                                                                                    style: "currency",
-                                                                                    currency: "NIO",
-                                                                                }
-                                                                            )}
-                                                                            disabled
-                                                                            className="
-                                                                            w-full
-                                                                            px-3 py-2
-                                                                            border border-slate-200
-                                                                            rounded-lg
-                                                                            text-sm
-                                                                            bg-slate-50
-                                                                            text-slate-500
-                                                                            outline-none
-                                                                        "
-                                                                        />
-
-                                                                    </div>
-
-                                                                    <div>
-
-                                                                        <label
-                                                                            className="
-                                                                            block
-                                                                            text-xs
-                                                                            font-medium
-                                                                            text-slate-600
-                                                                            mb-1
-                                                                        "
-                                                                        >
-                                                                            Fecha de vencimiento
-                                                                        </label>
-
-                                                                        <input
-                                                                            type="text"
-                                                                            value={
-                                                                                installment.dueDate
-                                                                                    ? new Date(
-                                                                                        installment.dueDate
-                                                                                    ).toLocaleDateString(
-                                                                                        "es-NI"
-                                                                                    )
-                                                                                    : "N/A"
-                                                                            }
-                                                                            disabled
-                                                                            className="
-                                                                            w-full
-                                                                            px-3 py-2
-                                                                            border border-slate-200
-                                                                            rounded-lg
-                                                                            text-sm
-                                                                            bg-slate-50
-                                                                            text-slate-500
-                                                                            outline-none
-                                                                        "
-                                                                        />
-
+                                                                        </div>
                                                                     </div>
 
                                                                 </div>
@@ -961,31 +973,30 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                         </div>
 
                                         {/* =================================================
-                                        PAGOS
-                                    ================================================= */}
+                                            PAGOS
+                                        ================================================= */}
 
                                         <div>
+                                            <div className="flex items-center gap-4 my-6">
+                                                <div className="flex-1 h-px bg-slate-200" />
 
-                                            <h3
-                                                className="
-                                                text-sm
-                                                font-semibold
-                                                text-slate-800
-                                                mb-1
-                                            "
-                                            >
-                                                Pagos registrados
-                                            </h3>
+                                                <div className="flex flex-col items-center">
+                                                    <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                                                        Pagos registrados
+                                                    </h2>
+                                                    <p
+                                                        className="
+                                                        text-xs
+                                                        text-slate-500
+                                                        mt-1
+                                                    "
+                                                    >
+                                                        Pagos realizados sobre esta factura.
+                                                    </p>
+                                                </div>
 
-                                            <p
-                                                className="
-                                                text-xs
-                                                text-slate-500
-                                                mb-4
-                                            "
-                                            >
-                                                Pagos realizados sobre esta factura.
-                                            </p>
+                                                <div className="flex-1 h-px bg-slate-200" />
+                                            </div>
 
                                             <div className="space-y-4">
 
@@ -1011,32 +1022,67 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                                                 "
                                                                 >
 
-                                                                    <div>
-                                                                        <label
-                                                                            className="
+                                                                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                                                                        <div className="flex-1">
+                                                                            <label
+                                                                                className="
                                                                             block
                                                                             text-xs
                                                                             font-medium
                                                                             text-slate-600
                                                                             mb-1
                                                                         "
-                                                                        >
-                                                                            Monto
-                                                                        </label>
+                                                                            >
+                                                                                Monto
+                                                                            </label>
 
-                                                                        <input
-                                                                            type="text"
-                                                                            value={Number(
-                                                                                payment.amount || 0
-                                                                            ).toLocaleString(
-                                                                                "es-NI",
-                                                                                {
-                                                                                    style: "currency",
-                                                                                    currency: "NIO",
+                                                                            <input
+                                                                                type="text"
+                                                                                value={Number(
+                                                                                    payment.amount || 0
+                                                                                ).toLocaleString(
+                                                                                    "es-NI",
+                                                                                    {
+                                                                                        style: "currency",
+                                                                                        currency: "NIO",
+                                                                                    }
+                                                                                )}
+                                                                                disabled
+                                                                                className="
+                                                                            w-full
+                                                                            px-3 py-2
+                                                                            border border-slate-200
+                                                                            rounded-lg
+                                                                            text-sm
+                                                                            bg-slate-50
+                                                                            text-slate-500
+                                                                            outline-none
+                                                                        "
+                                                                            />
+                                                                        </div>
+
+                                                                        <div className="flex-1">
+                                                                            <label
+                                                                                className="
+                                                                            block
+                                                                            text-xs
+                                                                            font-medium
+                                                                            text-slate-600
+                                                                            mb-1
+                                                                        "
+                                                                            >
+                                                                                Método de pago
+                                                                            </label>
+
+                                                                            <input
+                                                                                type="text"
+                                                                                value={
+                                                                                    PaymentMehodsSpanishOptions.find(
+                                                                                        (option) => option.value === payment.payment_method
+                                                                                    )?.label || ""
                                                                                 }
-                                                                            )}
-                                                                            disabled
-                                                                            className="
+                                                                                disabled
+                                                                                className="
                                                                             w-full
                                                                             px-3 py-2
                                                                             border border-slate-200
@@ -1046,30 +1092,30 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                                                             text-slate-500
                                                                             outline-none
                                                                         "
-                                                                        />
-                                                                    </div>
+                                                                            />
+                                                                        </div>
 
-                                                                    <div>
-                                                                        <label
-                                                                            className="
+                                                                        <div className="flex-1">
+                                                                            <label
+                                                                                className="
                                                                             block
                                                                             text-xs
                                                                             font-medium
                                                                             text-slate-600
                                                                             mb-1
                                                                         "
-                                                                        >
-                                                                            Método de pago
-                                                                        </label>
+                                                                            >
+                                                                                Referencia
+                                                                            </label>
 
-                                                                        <input
-                                                                            type="text"
-                                                                            value={
-                                                                                payment.payment_method ||
-                                                                                ""
-                                                                            }
-                                                                            disabled
-                                                                            className="
+                                                                            <input
+                                                                                type="text"
+                                                                                value={
+                                                                                    payment.transaction_reference ||
+                                                                                    "N/A"
+                                                                                }
+                                                                                disabled
+                                                                                className="
                                                                             w-full
                                                                             px-3 py-2
                                                                             border border-slate-200
@@ -1079,30 +1125,35 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                                                             text-slate-500
                                                                             outline-none
                                                                         "
-                                                                        />
-                                                                    </div>
+                                                                            />
+                                                                        </div>
 
-                                                                    <div>
-                                                                        <label
-                                                                            className="
+                                                                        <div className="flex-1">
+                                                                            <label
+                                                                                className="
                                                                             block
                                                                             text-xs
                                                                             font-medium
                                                                             text-slate-600
                                                                             mb-1
                                                                         "
-                                                                        >
-                                                                            Referencia
-                                                                        </label>
+                                                                            >
+                                                                                Fecha del pago
+                                                                            </label>
 
-                                                                        <input
-                                                                            type="text"
-                                                                            value={
-                                                                                payment.transaction_reference ||
-                                                                                "N/A"
-                                                                            }
-                                                                            disabled
-                                                                            className="
+                                                                            <input
+                                                                                type="text"
+                                                                                value={
+                                                                                    payment.payment_date
+                                                                                        ? new Date(
+                                                                                            payment.payment_date
+                                                                                        ).toLocaleDateString(
+                                                                                            "es-NI"
+                                                                                        )
+                                                                                        : "N/A"
+                                                                                }
+                                                                                disabled
+                                                                                className="
                                                                             w-full
                                                                             px-3 py-2
                                                                             border border-slate-200
@@ -1112,45 +1163,8 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                                                             text-slate-500
                                                                             outline-none
                                                                         "
-                                                                        />
-                                                                    </div>
-
-                                                                    <div>
-                                                                        <label
-                                                                            className="
-                                                                            block
-                                                                            text-xs
-                                                                            font-medium
-                                                                            text-slate-600
-                                                                            mb-1
-                                                                        "
-                                                                        >
-                                                                            Fecha
-                                                                        </label>
-
-                                                                        <input
-                                                                            type="text"
-                                                                            value={
-                                                                                payment.payment_date
-                                                                                    ? new Date(
-                                                                                        payment.payment_date
-                                                                                    ).toLocaleDateString(
-                                                                                        "es-NI"
-                                                                                    )
-                                                                                    : "N/A"
-                                                                            }
-                                                                            disabled
-                                                                            className="
-                                                                            w-full
-                                                                            px-3 py-2
-                                                                            border border-slate-200
-                                                                            rounded-lg
-                                                                            text-sm
-                                                                            bg-slate-50
-                                                                            text-slate-500
-                                                                            outline-none
-                                                                        "
-                                                                        />
+                                                                            />
+                                                                        </div>
                                                                     </div>
 
                                                                 </div>

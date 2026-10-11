@@ -105,7 +105,7 @@ const ShowDetailsMedicalPrescriptionDrawer: React.FC<
                                     mb-2
                                 "
                             >
-                                Dentista
+                                Especialista
                             </label>
 
                             <input

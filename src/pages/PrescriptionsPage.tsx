@@ -84,7 +84,7 @@ const PrescriptionsPage: React.FC = () => {
 
         {
             key: "dentistFullName",
-            header: "Dentista",
+            header: "Especialista",
             className:"w-50 md:w-60",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">

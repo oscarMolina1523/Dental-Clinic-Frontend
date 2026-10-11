@@ -51,6 +51,7 @@ export const rolePermissions: Record<string, string[]> = {
         "/treatments",
         "/treatment-plan",
         "/inventories",
+        "/inventory-lotes",
     ],
 
     // RECEPTIONIST

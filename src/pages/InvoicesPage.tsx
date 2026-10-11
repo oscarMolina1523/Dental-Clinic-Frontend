@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Ban, Eye, Pencil, Plus } from "lucide-react";
+import { Ban, Eye, Pencil} from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -105,16 +105,16 @@ const InvoicesPage: React.FC = () => {
     );
 
     const columns: TableColumn<typeof invoices[number]>[] = [
-        {
-            key: "invoiceNumber",
-            header: "Número de factura",
-            className: "w-40 md:w-60",
-            render: (invoice: Invoice) => (
-                <span className="text-sm text-slate-500">
-                    {invoice.invoiceNumber}
-                </span>
-            ),
-        },
+        // {
+        //     key: "invoiceNumber",
+        //     header: "Número de factura",
+        //     className: "w-40 md:w-60",
+        //     render: (invoice: Invoice) => (
+        //         <span className="text-sm text-slate-500">
+        //             {invoice.invoiceNumber}
+        //         </span>
+        //     ),
+        // },
         {
             key: "patientFullName",
             header: "Paciente",
@@ -201,8 +201,7 @@ const InvoicesPage: React.FC = () => {
         {
             label: "Cancelar Factura",
             hidden: (invoice) =>
-                invoice.status == "PAID" ||
-                invoice.status == "CANCELLED" || !canWrite,
+                invoice.status !== "PENDING"  || !canWrite,
             icon: <Ban className="w-4 h-4" />,
             onClick: (invoice) => {
                 setSelectedInvoice(invoice);
@@ -216,7 +215,7 @@ const InvoicesPage: React.FC = () => {
                 setSelectedInvoice(invoice);
                 setIsRegisterPaymentOpen(true);
             },
-            hidden: () => !canWrite,
+            hidden: (invoice) => invoice.status == "PAID" || invoice.status == "CANCELLED" || !canWrite,
         },
     ];
 
@@ -271,13 +270,13 @@ const InvoicesPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar Factura..."
                     />
-                    <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                    {/* <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
                             ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
                             : "bg-slate-300 cursor-not-allowed opacity-70"
                         }`}>
                         <Plus className="w-4 h-4" />
                         <span>Nueva Factura</span>
-                    </button>
+                    </button> */}
                 </div>
 
                 {/* Tabla de Facturas */}
@@ -313,10 +312,10 @@ const InvoicesPage: React.FC = () => {
             <CreateInvoiceDrawer isOpen={isCreateDrawerOpen} onHide={() => setIsCreateDrawerOpen(false)} />
             <ConfirmModal
                 isOpen={isCancelModalOpen}
-                title={`¿Estás seguro de cancelar a esta factura?`}
+                title={`¿Estás seguro de abortar a esta factura?`}
                 description="Esta acción no se puede deshacer. Todos los datos asociados a este paciente se perderán permanentemente."
                 confirmText={isCanceling ? "Ejecutando..." : "Confirmar"}
-                cancelText="Cancelar"
+                cancelText="Abortar"
                 onConfirm={handleCancelInvoiceConfirm}
                 onCancel={() => {
                     setIsCancelModalOpen(false);

@@ -308,7 +308,7 @@ const MedicalPrescriptionSection: React.FC<
                     text-slate-700
                     mb-2
                 ">
-                        Dentista
+                        Especialista
                     </label>
 
                     <input

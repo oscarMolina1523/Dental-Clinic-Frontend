@@ -44,7 +44,6 @@ const TreatmentCatalogPage: React.FC = () => {
 
     const searchFields: (keyof TreatmentCatalogModel)[] = [
         "name",
-        "code",
         "basePrice",
         "estimatedDurationMinutes",
         "active",
@@ -102,15 +101,14 @@ const TreatmentCatalogPage: React.FC = () => {
                 </div>
             ),
         },
-
         {
-            key: "code",
-            header: "CÓDIGO",
+            key: "description",
+            header: "Descripción",
             className: "w-20 md:w-80",
             render: (treatment: TreatmentCatalogModel) => (
-                <span className="text-sm text-slate-500">
-                    {treatment.code}
-                </span>
+                <p className="text-sm text-slate-500">
+                    {treatment.description}
+                </p>
             ),
         },
         {

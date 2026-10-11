@@ -8,7 +8,7 @@ import SearchInput from "../shared/Table/SearchInput";
 import { useAppointments, useMarkReminderAsSent } from "../hooks/useAppointment";
 import type AppointmentModel from "../models/AppointmentModel";
 import CreateAppointmentDrawer from "../components/appointment/CreateAppointmentDrawer";
-import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawet";
+import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawer";
 import Toast from "../shared/Toast";
 import useAppointmentPage from "../components/appointment/useAppointmentPage";
 import CreateClinicalProgressDrawer from "../components/medical/CreateClinicalProgressDrawer";
@@ -18,6 +18,7 @@ import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 import { useAppointmentOrchestratorById } from "../hooks/useAppointmentOrchestrator";
 
 const AppointmentPage: React.FC = () => {
+    const { role, user} = useRolePermissions();
     const {
         data: appointments = [],
         isLoading
@@ -73,7 +74,6 @@ const AppointmentPage: React.FC = () => {
         selectedAppointment?.id || ""
     );
 
-    const { role } = useRolePermissions();
     const markReminderAsSentMutation = useMarkReminderAsSent();
 
     const isViewer = role === UserRole.Viewer;
@@ -91,12 +91,23 @@ const AppointmentPage: React.FC = () => {
         "reminderSent",
     ];
 
+
+    const filteredAppointments = useMemo(() => {
+        if (role === UserRole.Admin) {
+            return appointments;
+        }
+
+        return appointments.filter(
+            (appointment) => appointment.dentistId === user?.id
+        );
+    }, [appointments, role, user?.roleId]);
+
     const {
         search,
         setSearch,
         filteredData,
     } = useTableSearch<AppointmentModel>({
-        data: appointments,
+        data: filteredAppointments,
         fields: searchFields,
         delay: 800,
     });
@@ -173,7 +184,7 @@ const AppointmentPage: React.FC = () => {
         },
         {
             key: "dentistFullName",
-            header: "Dentista",
+            header: "Especialista",
             className: "pl-2 w-40 md:w-60",
             render: (appointment: AppointmentModel) => (
                 <div className="flex items-center gap-3">

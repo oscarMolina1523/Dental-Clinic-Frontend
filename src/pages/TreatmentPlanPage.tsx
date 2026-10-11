@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Trash2, Menu, XCircle, Check, Play, CheckCircle2, Send, X, Eye } from "lucide-react";
+import { XCircle, Check, Play, CheckCircle2, Send, X, Eye } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -9,7 +9,7 @@ import { useDeleteTreatmentPlanOrchestrator, useTreatmentPlansOrchestrator } fro
 import type { TreatmentPlanOrchestratorResponse } from "../models/TreatmentPlanOrchestratorModel";
 import CreateTreatmentPlanDrawer from "../components/treatmentCatalog/CreateTreatmentPlanDrawer";
 import ConfirmModal from "../shared/ConfirmModal";
-import { treatmentPlanStatusColors, treatmentPlanStatusSpanishOptions, type TreatmentPlanStatus } from "../utils/treatmentPlanStatus.enum";
+import { treatmentPlanStatusSpanishOptions, type TreatmentPlanStatus } from "../utils/treatmentPlanStatus.enum";
 import { useAcceptTreatmentPlan, useCancelTreatmentPlan, useCompleteTreatmentPlan, useProposeTreatmentPlan, useStartTreatmentPlan } from "../hooks/useTreatmentPlan";
 import ShowTreatmentPlanDrawer from "../components/treatmentCatalog/ShowTreatmentPlanDrawer";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
@@ -48,7 +48,6 @@ const TreatmentPlanPage: React.FC = () => {
     const searchFields: SearchField<TreatmentPlanOrchestratorResponse>[] = [
         "treatmentPlan.patientFullName",
         "treatmentPlan.dentistFullName",
-        "treatmentPlan.status",
         "treatmentPlan.totalAmount",
     ];
 
@@ -157,19 +156,19 @@ const TreatmentPlanPage: React.FC = () => {
 
 
     const columns: TableColumn<typeof treatments[number]>[] = [
-        {
-            key: "code",
-            header: "Código",
-            className: "pl-2 w-40 md:w-60",
-            render: (treatment: TreatmentPlanOrchestratorResponse) => (
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-slate-800">
-                        {treatment.treatmentPlan.code}
-                    </span>
+        // {
+        //     key: "code",
+        //     header: "Código",
+        //     className: "pl-2 w-40 md:w-60",
+        //     render: (treatment: TreatmentPlanOrchestratorResponse) => (
+        //         <div className="flex items-center gap-3">
+        //             <span className="text-sm font-semibold text-slate-800">
+        //                 {treatment.treatmentPlan.code}
+        //             </span>
 
-                </div>
-            ),
-        },
+        //         </div>
+        //     ),
+        // },
         {
             key: "patientFullName",
             header: "Paciente",
@@ -186,7 +185,7 @@ const TreatmentPlanPage: React.FC = () => {
 
         {
             key: "dentistFullName",
-            header: "Dentista",
+            header: "Especialista",
             className: "w-40 md:w-50",
             render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
@@ -195,34 +194,12 @@ const TreatmentPlanPage: React.FC = () => {
             ),
         },
         {
-            key: "status",
-            header: "Estado",
-            className: "w-20 md:w-30",
-            render: (treatment: TreatmentPlanOrchestratorResponse) => {
-                const status = treatment.treatmentPlan.status;
-
-                const label = treatmentPlanStatusSpanishOptions.find(
-                    (option) => option.value === status
-                )?.label;
-
-                const colors = treatmentPlanStatusColors[status];
-
-                return (
-                    <div className="flex items-center gap-3">
-                        <span className={`text-sm font-semibold ${colors.text}`}>
-                            {label}
-                        </span>
-                    </div>
-                );
-            },
-        },
-        {
             key: "totalAmount",
             header: "Monto total",
             className: "w-30 text-center md:text-left",
             render: (treatment: TreatmentPlanOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
-                    {treatment.treatmentPlan.totalAmount}
+                    C$ {treatment.treatmentPlan.totalAmount}
                 </span>
             ),
         },
@@ -255,31 +232,31 @@ const TreatmentPlanPage: React.FC = () => {
             hidden: () => !canWrite,
         },
 
-        {
-            label: "Cambios de estados",
-            icon: <Menu className="w-4 h-4 text-amber-600" />,
-            onClick: (treatment) => {
-                setSelectedTreatment(treatment);
-                setIsStatusModalOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
-            },
-            hidden: (treatment) => {
-                const status = treatment.treatmentPlan.status;
+        // {
+        //     label: "Cambios de estados",
+        //     icon: <Menu className="w-4 h-4 text-amber-600" />,
+        //     onClick: (treatment) => {
+        //         setSelectedTreatment(treatment);
+        //         setIsStatusModalOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+        //     },
+        //     hidden: (treatment) => {
+        //         const status = treatment.treatmentPlan.status;
 
-                return (
-                    status === "COMPLETED" ||
-                    status === "CANCELLED" || !canWrite
-                );
-            },
-        },
-        {
-            label: "Eliminar paquete clínico",
-            icon: <Trash2 className="w-4 h-4" />,
-            onClick: (treatment) => {
-                setSelectedTreatment(treatment);
-                setIsDeleteModalOpen(true);
-            },
-            hidden: () => !canWrite,
-        },
+        //         return (
+        //             status === "COMPLETED" ||
+        //             status === "CANCELLED" || !canWrite
+        //         );
+        //     },
+        // },
+        // {
+        //     label: "Eliminar paquete clínico",
+        //     icon: <Trash2 className="w-4 h-4" />,
+        //     onClick: (treatment) => {
+        //         setSelectedTreatment(treatment);
+        //         setIsDeleteModalOpen(true);
+        //     },
+        //     hidden: () => !canWrite,
+        // },
     ];
 
     const handleSearch = (value: string) => {
@@ -329,13 +306,13 @@ const TreatmentPlanPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar paquete clínico..."
                     />
-                    <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                    {/* <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
                             ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
                             : "bg-slate-300 cursor-not-allowed opacity-70"
                         }`}>
                         <Plus className="w-4 h-4" />
                         <span>Nuevo paquete clínico</span>
-                    </button>
+                    </button> */}
                 </div>
 
                 {/* Tabla de paquete clínicos */}

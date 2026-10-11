@@ -69,5 +69,5 @@ export const treatmentPlanDetailStatusSpanishOptions: {
     { value: "PENDING", label: "Pendiente" },
     { value: "IN_PROGRESS", label: "En progreso" },
     { value: "COMPLETED", label: "Completado" },
-    { value: "CANCELLED", label: "Cancelado" },
+    { value: "CANCELLED", label: "Abortado" },
 ];
