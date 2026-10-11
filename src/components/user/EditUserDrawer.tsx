@@ -6,6 +6,7 @@ import User from "../../models/UserModel";
 import useImageUpload from "../../hooks/useImageUpload";
 import { SPECIALTIES, type Specialty } from "../../utils/specialtiesData.enum";
 import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
+import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
 
 interface EditUserDrawerProps {
     isOpen: boolean;
@@ -158,6 +159,14 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
             return;
         }
 
+        if (!validatePhoneNumber(form.phoneNumber)) {
+            showToast(
+                "error",
+                "Ingrese un número de teléfono válido de 8 dígitos del usuario."
+            );
+            return;
+        }
+
         try {
 
             let imageUrl = form.image;
@@ -179,8 +188,6 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
 
                 imageUrl = uploadedImageUrl;
             }
-
-            console.log("image Url", imageUrl);
 
 
             updateUser(

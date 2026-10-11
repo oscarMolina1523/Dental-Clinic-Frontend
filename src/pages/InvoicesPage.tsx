@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Ban, Eye, Pencil, Plus } from "lucide-react";
+import { Ban, Eye, Pencil} from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -270,13 +270,13 @@ const InvoicesPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar Factura..."
                     />
-                    <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
+                    {/* <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
                             ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
                             : "bg-slate-300 cursor-not-allowed opacity-70"
                         }`}>
                         <Plus className="w-4 h-4" />
                         <span>Nueva Factura</span>
-                    </button>
+                    </button> */}
                 </div>
 
                 {/* Tabla de Facturas */}

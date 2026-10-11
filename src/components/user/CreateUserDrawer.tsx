@@ -108,7 +108,7 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
         if (!validatePhoneNumber(phone)) {
             showToast(
                 "error",
-                "Ingrese un número de teléfono válido de 8 dígitos del paciente."
+                "Ingrese un número de teléfono válido de 8 dígitos del usuario."
             );
             return;
         }

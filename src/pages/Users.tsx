@@ -95,7 +95,7 @@ const UsersPage: React.FC = () => {
     {
       key: "name",
       header: "Nombre",
-      className: "pl-2 w-50 md:w-70",
+      className: "pl-2 w-50 md:w-60",
       render: (user: UserModel) => (
         <div className="flex items-center gap-3">
 
@@ -116,7 +116,7 @@ const UsersPage: React.FC = () => {
     {
       key: "phone",
       header: "Teléfono",
-      className: "w-40",
+      className: "w-30",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {user.phoneNumber}
@@ -127,7 +127,7 @@ const UsersPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
-      className: "w-50 md:w-60",
+      className: "w-50 md:w-50",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {user.email}
@@ -137,7 +137,7 @@ const UsersPage: React.FC = () => {
     {
       key: "specialties",
       header: "Especialidades",
-      className: "w-50 md:w-60",
+      className: "w-50 md:w-60 pr-2",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500 break-words whitespace-normal">
           {user.specialties ?? "N/A"} 
@@ -147,7 +147,7 @@ const UsersPage: React.FC = () => {
     {
       key: "roleId",
       header: "Role",
-      className: "w-40",
+      className: "w-30 pl-2",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500">
           {getRoleName(user.roleId) ?? "Cargando..."}
