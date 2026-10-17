@@ -65,8 +65,10 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
     } = useUsers();
 
     const dentists = users.filter(
-        (user) => roleNames[user.roleId] === UserRole.Dentist //hace referencia al rol de dentista
+        (user) => roleNames[user.roleId] === UserRole.Dentist && user.active //hace referencia al rol de dentista
     );
+
+    const validPatients = patients.filter((patient) => patient.active);
 
     const [selectedTreatments, setSelectedTreatments] = useState<
         TreatmentCatalogModel[]
@@ -686,7 +688,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                             <SearchableSelect<PatientModel>
                                 label="Pacientes"
                                 value={form.patientId}
-                                items={patients}
+                                items={validPatients}
                                 getOptionValue={(patient) => patient.id}
                                 getOptionLabel={(patient) =>
                                     `${patient.name} ${patient.lastName}`
