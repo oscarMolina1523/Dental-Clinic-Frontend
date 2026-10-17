@@ -13,6 +13,8 @@ import { useTreatments } from "../../hooks/useTreatmentsCatalog";
 import { useAddAppointmentOrchestrator } from "../../hooks/useAppointmentOrchestrator";
 import type TreatmentCatalogModel from "../../models/TreatmentCatalogModel";
 import type { TreatmentPlanDetailDto } from "../../models/TreatmentPlanDetailsModel";
+import type AppointmentModel from "../../models/AppointmentModel";
+import { useAppointments } from "../../hooks/useAppointment";
 
 const getLocalDateTime = () => {
     const now = new Date();
@@ -48,6 +50,7 @@ interface CreateAppointmentProps {
 }
 
 const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onHide }) => {
+    const {data: appointments} = useAppointments();
     const { mutate: addAppointment, isPending } = useAddAppointmentOrchestrator();
     const {
         data: treatments = [],
@@ -120,6 +123,39 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         cancelationNotes: "",
         reminderSent: false,
     });
+
+    const hasScheduleConflict = (
+        dentistId: string,
+        startTime: Date,
+        endTime: Date,
+        appointments: AppointmentModel[]
+    ): boolean => {
+        return appointments.some((appointment) => {
+            // Solo validar las citas del mismo especialista.
+            if (String(appointment.dentistId) !== dentistId) {
+                return false;
+            }
+
+            // Las citas canceladas no deben bloquear el horario.
+            if (appointment.status === "CANCELLED") {
+                return false;
+            }
+
+            const existingStart = new Date(
+                appointment.startAppointmentTime
+            );
+
+            const existingEnd = new Date(
+                appointment.endAppointmentTime
+            );
+
+            // Detectar cualquier superposición de horarios.
+            return (
+                startTime < existingEnd &&
+                endTime > existingStart
+            );
+        });
+    };
 
     const [toast, setToast] = useState<{
         type: "success" | "error";
@@ -374,6 +410,32 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         const status = form.status;
         const cancelationNotes = form.cancelationNotes.trim();
         const reminderSent = form.reminderSent;
+
+        const startDate = localDateTimeToDate(startAppointmentTime);
+        const endDate = localDateTimeToDate(endAppointmentTime);
+
+        if (endDate <= startDate) {
+            showToast(
+                "error",
+                "La fecha y hora de finalización debe ser posterior al inicio."
+            );
+            return;
+        }
+
+        const hasConflict = hasScheduleConflict(
+            dentistId,
+            startDate,
+            endDate,
+            appointments ?? []
+        );
+
+        if (hasConflict) {
+            showToast(
+                "error",
+                `No se puede asignar la cita porque ${dentistFullName} ya tiene ese horario ocupado. Seleccione otro horario disponible o asigne la cita a otro especialista.`
+            );
+            return;
+        }
 
         // ============================================================
         // VALIDACIONES

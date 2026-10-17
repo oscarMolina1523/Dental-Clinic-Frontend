@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { TreatmentPlanDetailDto } from "../../../models/TreatmentPlanDetailsModel";
 import type Appointment from "../../../models/AppointmentModel";
 import { useTreatments } from "../../../hooks/useTreatmentsCatalog";
-import { useMarkAsInvoiced } from "../../../hooks/useAppointment";
+import { useAppointments, useMarkAsInvoiced } from "../../../hooks/useAppointment";
 import { useAppointmentOrchestratorById, useUpdateAppointmentOrchestrator } from "../../../hooks/useAppointmentOrchestrator";
 import { useCancelTreatmentPlanDetail, useCompleteTreatmentPlanDetail, useStartTreatmentPlanDetail } from "../../../hooks/useTreatmentPlanDetails";
 import { usePatients } from "../../../hooks/usePatients";
@@ -22,6 +22,12 @@ export const useEditAppointmentDrawer = (
     appointment: Appointment | null,
     onHide: () => void
 ) => {
+    const {
+        data: appointments,
+        isLoading: isLoadingAppointments,
+        isError: isErrorAppointments,
+    } = useAppointments();
+
     const {
         data: treatmentsComplete = [],
         isLoading: isLoadingTreatments,
@@ -842,6 +848,54 @@ export const useEditAppointmentDrawer = (
             showToast(
                 "error",
                 "La fecha y hora de finalización debe ser posterior a la fecha y hora de inicio."
+            );
+            return;
+        }
+
+        if (isLoadingAppointments || isErrorAppointments || !appointments) {
+            showToast(
+                "error",
+                "No se pudieron verificar los horarios disponibles. Intente nuevamente."
+            );
+            return;
+        }
+
+        const hasConflict = appointments.some((existingAppointment) => {
+            // Excluir la cita que estamos editando.
+            if (
+                String(existingAppointment.id) === String(appointment.id)
+            ) {
+                return false;
+            }
+
+            // Solo hay conflicto si pertenece al mismo dentista.
+            if (
+                String(existingAppointment.dentistId) !== String(form.dentistId)
+            ) {
+                return false;
+            }
+
+            // Ignorar las citas canceladas.
+            if (existingAppointment.status === "CANCELLED") {
+                return false;
+            }
+
+            const existingStart = new Date(
+                existingAppointment.startAppointmentTime
+            );
+
+            const existingEnd = new Date(
+                existingAppointment.endAppointmentTime
+            );
+
+            // Detectar si los intervalos se cruzan.
+            return startDate < existingEnd && endDate > existingStart;
+        });
+
+        if (hasConflict) {
+            showToast(
+                "error",
+                `El especialista ${form.dentistFullName} ya tiene una cita en ese horario. Seleccione otro horario o un especialista disponible.`
             );
             return;
         }
