@@ -69,6 +69,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
     );
 
     const validPatients = patients.filter((patient) => patient.active);
+    const validTreatments = treatments.filter((treatment) => treatment.active);
 
     const [selectedTreatments, setSelectedTreatments] = useState<
         TreatmentCatalogModel[]
@@ -778,7 +779,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                         <SearchableSelect<TreatmentCatalogModel>
                             label="servicios"
                             value={""}
-                            items={treatments}
+                            items={validTreatments}
                             getOptionValue={(treatment) => treatment.id}
                             getOptionLabel={(treatment) =>
                                 `${treatment.name} - ${treatment.description}`

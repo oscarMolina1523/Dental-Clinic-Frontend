@@ -23,9 +23,11 @@ export const useEditAppointmentDrawer = (
     onHide: () => void
 ) => {
     const {
-        data: treatments = [],
+        data: treatmentsComplete = [],
         isLoading: isLoadingTreatments,
     } = useTreatments();
+
+    const treatments = treatmentsComplete.filter((treatment) => treatment.active);
 
     const {
         mutate: markAsInvoiced,
