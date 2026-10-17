@@ -4,7 +4,7 @@ import { autoTable } from "jspdf-autotable";
 import type { MedicalPrescriptionOrchestratorResponse } from "../models/MedicalPrescriptionOrchestratorModel";
 import logoClinica from "../assets/logo.webp";
 
-const loadImageAsBase64 = (url: string): Promise<string> => {
+export const loadImageAsBase64 = (url: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         const image = new Image();
 

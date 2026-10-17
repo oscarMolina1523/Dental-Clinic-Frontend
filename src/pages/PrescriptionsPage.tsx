@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Eye } from "lucide-react";
+import { Eye, FileDown } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -10,6 +10,7 @@ import { useMedicalPrescriptionsOrchestrator } from "../hooks/useMedicalPrescrip
 import type { MedicalPrescriptionOrchestratorResponse } from "../models/MedicalPrescriptionOrchestratorModel";
 import ShowDetailsMedicalPrescriptionDrawer from "../components/medical/ShowDetailsMedicalPrescriptionDrawer";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
+import { exportMedicalPrescriptionPdf } from "../services/medicalPrescriptionPdf";
 
 const PrescriptionsPage: React.FC = () => {
     const {
@@ -85,7 +86,7 @@ const PrescriptionsPage: React.FC = () => {
         {
             key: "dentistFullName",
             header: "Especialista",
-            className:"w-50 md:w-60",
+            className: "w-50 md:w-60",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {prescription.medicalPrescription.dentistFullName}
@@ -128,6 +129,14 @@ const PrescriptionsPage: React.FC = () => {
                 setSelectedPrescription(prescription);
                 setIsDetailsDrawerOpen(true);
             },
+
+        },
+        {
+            label: "Exportar receta a PDF",
+            icon: <FileDown className="w-4 h-4" />,
+            onClick: (prescription) => {
+                void exportMedicalPrescriptionPdf(prescription);
+            },
         },
     ];
 
@@ -143,7 +152,7 @@ const PrescriptionsPage: React.FC = () => {
 
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 ">
                 {/* Encabezado */}
                 <div className="flex items-center justify-between pb-6 mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
@@ -181,7 +190,7 @@ const PrescriptionsPage: React.FC = () => {
                     totalItems={totalItems}
                     itemsPerPage={ITEMS_PER_PAGE}
                     onPageChange={setCurrentPage}
-                    label="Productos"
+                    label="Recetas"
                 />
             </div>
 
