@@ -152,13 +152,13 @@ const LotesPage: React.FC = () => {
 
   const actions: TableAction<typeof inventoryLotes[number]>[] = [
     {
-      label: "Credenciales y Seguridad",
+      label: "Marcar como vencido",
       icon: <Watch className="w-4 h-4 text-amber-600" />,
       onClick: (lote) => {
         setSelectedLote(lote);
         setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
       },
-      hidden: () => !canWrite,
+      hidden: (lote) => !canWrite || !lote.dueDate,
     },
     {
       label: "Editar Lote",
