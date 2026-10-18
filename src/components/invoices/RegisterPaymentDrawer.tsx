@@ -752,8 +752,8 @@ const RegisterPaymentDrawer: React.FC<
                         className="space-y-5"
                     >
                         {/* =================================================
-                        FACTURA
-                    ================================================= */}
+                            FACTURA
+                        ================================================= */}
 
                         <div>
                             <h3 className="
@@ -845,8 +845,8 @@ const RegisterPaymentDrawer: React.FC<
                         </div>
 
                         {/* =================================================
-                        SELECCIONAR CUOTA
-                    ================================================= */}
+                            SELECCIONAR CUOTA
+                        ================================================= */}
 
                         <div>
                             <label className="
@@ -930,8 +930,8 @@ const RegisterPaymentDrawer: React.FC<
                         </div>
 
                         {/* =================================================
-                        INFORMACIÓN DE LA CUOTA
-                    ================================================= */}
+                            INFORMACIÓN DE LA CUOTA
+                        ================================================= */}
 
                         {selectedInstallment && (
                             <div>
@@ -1362,52 +1362,13 @@ const RegisterPaymentDrawer: React.FC<
                                             />
                                         </div>
                                     )}
-
-                                    {/* <div>
-                                    <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                        Atendido por
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        value={servedBy}
-                                        onChange={(event) =>
-                                            setServedBy(
-                                                event.target.value
-                                            )
-                                        }
-                                        placeholder="Usuario que registra el pago"
-                                        disabled={isPending}
-                                        className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-white
-                                            text-slate-700
-                                            outline-none
-                                            focus:border-[#001D4A]
-                                        "
-                                    />
-                                </div> */}
-
-
                                 </div>
                             </div>
                         )}
 
                         {/* =================================================
-                        ERROR
-                    ================================================= */}
+                            ERROR
+                        ================================================= */}
 
                         {isError && (
                             <div className="
