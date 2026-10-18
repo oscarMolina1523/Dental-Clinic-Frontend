@@ -147,7 +147,7 @@ export const exportInvoicePdf = async (
     };
 
     addInfo("N.º de factura:", textOrDefault(invoice.invoiceNumber));
-    addInfo("Paciente:", textOrDefault(invoice.patientFullName));
+    addInfo("Deudor:", textOrDefault(invoice.patientFullName));
     addInfo("Estado:", invoiceStatus);
 
     // Resumen económico

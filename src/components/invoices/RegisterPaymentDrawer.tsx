@@ -781,7 +781,7 @@ const RegisterPaymentDrawer: React.FC<
                                     text-slate-600
                                     mb-1
                                 ">
-                                            Paciente
+                                            Deudor
                                         </label>
 
                                         <input

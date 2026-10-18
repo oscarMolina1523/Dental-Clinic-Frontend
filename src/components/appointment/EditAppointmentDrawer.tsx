@@ -10,6 +10,7 @@ import { useEditAppointmentDrawer } from "./editAppointmentDrawer/useEditAppoint
 import { useCreateInvoiceWithPayment } from "../../hooks/useInvoicesPayment";
 import type { CreateInvoiceWithPaymentDto } from "../../models/InvoicePaymentModel";
 import type { InvoiceDto } from "../../models/InvoiceModel";
+import { usePatientById } from "../../hooks/usePatients";
 
 export interface TreatmentPlanDetailState extends TreatmentPlanDetailDto {
     id?: string;
@@ -27,6 +28,12 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     onHide,
     appointment,
 }) => {
+
+    const patientId = appointment?.patientId || "";
+
+    const {
+        data: patientData
+    } = usePatientById(patientId);
 
     const {
         mutate: createInvoiceWithPayment,
@@ -86,8 +93,19 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
 
 
     const handleSubmitInvoice = () => {
-        const patientId = appointment?.patientId || "";
-        const patientFullName = appointment?.patientFullName || "";
+        if (!patientData) {
+            setToast({
+                type: "error",
+                message: "No se pudieron obtener los datos del paciente.",
+            });
+            return;
+        }
+
+
+        const patientFullName = patientData.isSelfPayer
+            ? `${patientData.name} ${patientData.lastName}`.trim()
+            : patientData.payerName;
+        // const patientFullName = appointment?.patientFullName || "";
 
         const treatmentId = appointment?.treatmentId
             ? String(appointment.treatmentId)
