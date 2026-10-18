@@ -8,6 +8,8 @@ import { invoiceStatusSpanishOptions } from "../../utils/invoiceStatus.enum";
 import { PaymentPlanStatusSpanishOptions } from "../../utils/paymentPlanStatus.enum";
 import { InstallmentStatusSpanishOptions } from "../../utils/installmentStatus.enum";
 import { PaymentMehodsSpanishOptions } from "../../utils/paymentMethodsStatus.enum";
+import { exportInvoicePdf } from "../../services/invoicePdf";
+import { FileDown } from "lucide-react";
 
 interface ShowDetailsInvoiceDrawerProps {
     isOpen: boolean;
@@ -96,6 +98,27 @@ const ShowDetailsInvoiceDrawer: React.FC<
 
                         <div className="space-y-5">
 
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (invoice) {
+                                        exportInvoicePdf(invoice, paymentPlanDetails ?? null);
+                                    }
+                                }}
+                                disabled={!invoice || isLoadingPaymentPlan}
+                                className="
+                                    inline-flex w-full items-center justify-center gap-2
+                                    rounded-lg bg-teal-700 px-4 py-3
+                                    text-sm font-semibold text-white
+                                    transition-colors hover:bg-teal-800
+                                    disabled:cursor-not-allowed disabled:opacity-50
+                                    focus:outline-none focus:ring-2
+                                    focus:ring-teal-500 focus:ring-offset-2
+                                "
+                            >
+                                <FileDown size={18} />
+                                Exportar factura a PDF
+                            </button>
                             {/* =================================================
                                 INFORMACIÓN DE LA FACTURA
                             ================================================= */}
@@ -199,7 +222,7 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             mb-2
                                         "
                                             >
-                                                Paciente
+                                                Deudor
                                             </label>
 
                                             <input

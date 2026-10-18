@@ -687,17 +687,17 @@ const ReportsPage: React.FC = () => {
           <div className="mb-6 flex items-start justify-between">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
-                Pacientes con pagos pendientes
+                Deudor con pagos pendientes
               </h2>
 
               <p className="text-sm text-slate-500">
-                Pacientes con mayor saldo pendiente
+                Deudores con mayor saldo pendiente
               </p>
             </div>
 
             <div className="rounded-lg bg-red-50 px-3 py-2">
               <span className="text-xs font-medium text-red-600">
-                {patientsWithDebt.length} pacientes
+                {patientsWithDebt.length} deudores
               </span>
             </div>
           </div>
@@ -705,14 +705,14 @@ const ReportsPage: React.FC = () => {
           <div className="overflow-x-auto">
             {patientsWithDebt.length === 0 ? (
               <div className="flex h-[300px] items-center justify-center text-sm text-slate-400">
-                No hay pacientes con pagos pendientes
+                No hay deudores con pagos pendientes
               </div>
             ) : (
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 text-left">
                     <th className="pb-3 font-medium text-slate-500">
-                      Paciente
+                      Deudor
                     </th>
 
                     <th className="pb-3 text-center font-medium text-slate-500">

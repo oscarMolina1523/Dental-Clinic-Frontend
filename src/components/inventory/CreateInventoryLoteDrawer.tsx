@@ -6,10 +6,13 @@ import { useInventoryLotes } from "../../hooks/useInventorylotes";
 import type InventoryLoteModel from "../../models/InventoryLote";
 import { useCreateInventoryLote } from "../../hooks/useInventoryOrchestrator";
 import type { CreateInventoryOrchestratorRequest } from "../../models/InventoryOrchestratorModel";
-import { useSuppliers } from "../../hooks/useSupplier";
+import { useAddSupplier, useDeleteSupplier, useSuppliers } from "../../hooks/useSupplier";
 import type ProductModel from "../../models/ProductModel";
 import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
 import type SupplierModel from "../../models/SupplierModel";
+import type { SupplierDTO } from "../../models/SupplierModel";
+import { Check, Plus, Trash2, X } from "lucide-react";
+import ConfirmModal from "../../shared/ConfirmModal";
 
 interface CreateInventoryLoteProps {
     isOpen: boolean;
@@ -17,6 +20,27 @@ interface CreateInventoryLoteProps {
 }
 
 const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen, onHide }) => {
+    const {
+        mutate: addSupplier,
+        isPending: isAddingSupplier,
+    } = useAddSupplier();
+
+    const {
+        mutate: deleteSupplier,
+        isPending: isDeletingSupplier,
+    } = useDeleteSupplier();
+
+    const [isCreatingSupplier, setIsCreatingSupplier] = useState(false);
+
+    const [newSupplier, setNewSupplier] = useState<SupplierDTO>({
+        name: "",
+        contact: "",
+        phone: "",
+        email: "",
+    });
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
     const { mutate: addLote, isPending } = useCreateInventoryLote();
     const {
         data: inventoryLotes = []
@@ -100,6 +124,113 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
         }));
     };
 
+    const handleCreateSupplier = () => {
+        const supplierData: SupplierDTO = {
+            name: newSupplier.name.trim(),
+            contact: newSupplier.email.trim(),
+            phone: newSupplier.phone.trim(),
+            email: newSupplier.email.trim(),
+        };
+
+        if (!supplierData.name) {
+            showToast("error", "El nombre del proveedor es obligatorio.");
+            return;
+        }
+
+        if (!supplierData.phone) {
+            showToast("error", "El teléfono del proveedor es obligatorio.");
+            return;
+        }
+
+        if (!supplierData.email) {
+            showToast("error", "El correo electrónico es obligatorio.");
+            return;
+        }
+
+        addSupplier(supplierData, {
+            onSuccess: (supplier) => {
+                showToast(
+                    "success",
+                    "El proveedor se creó correctamente."
+                );
+
+                setNewSupplier({
+                    name: "",
+                    contact: "",
+                    phone: "",
+                    email: "",
+                });
+
+                setIsCreatingSupplier(false);
+
+                // Seleccionar automáticamente el proveedor creado.
+                if (supplier?.id) {
+                    setForm((prev) => ({
+                        ...prev,
+                        supplierId: String(supplier.id),
+                    }));
+                }
+            },
+            onError: (error) => {
+                showToast(
+                    "error",
+                    error.message || "No se pudo crear el proveedor."
+                );
+            },
+        });
+    };
+
+    const handleDeleteSupplier = () => {
+        if (!form.supplierId) {
+            showToast(
+                "error",
+                "Debe seleccionar un proveedor para eliminar."
+            );
+            return;
+        }
+
+        const selectedSupplier = suppliers.find(
+            (supplier) => String(supplier.id) === form.supplierId
+        );
+
+        if (!selectedSupplier) {
+            showToast("error", "No se encontró el proveedor seleccionado.");
+            return;
+        }
+
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleDeleteSupplierConfirm = () => {
+        const supplierId = form.supplierId;
+
+        if (!supplierId) return;
+
+        deleteSupplier(supplierId, {
+            onSuccess: () => {
+                showToast(
+                    "success",
+                    "El proveedor se eliminó correctamente."
+                );
+
+                setForm((prev) => ({
+                    ...prev,
+                    supplierId: "",
+                }));
+
+                setIsDeleteModalOpen(false);
+            },
+            onError: (error) => {
+                showToast(
+                    "error",
+                    error.message || "No se pudo eliminar el proveedor."
+                );
+
+                setIsDeleteModalOpen(false);
+            },
+        });
+    };
+
     const handleSubmit = () => {
         const productId = form.productId.trim();
         const productName = form.productName.trim();
@@ -158,7 +289,7 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
 
         const data: CreateInventoryOrchestratorRequest = { productId, productName, supplierId, loteNumber, quantity, entryDate, userId, observation };
         // SOLO agregamos dueDate si el usuario seleccionó una fecha 
-        if (form.dueDate) { data.dueDate = dueDate; }   
+        if (form.dueDate) { data.dueDate = dueDate; }
 
         addLote(
             data,
@@ -277,7 +408,7 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                             onChange={handleProductChange} />
                     </div>
 
-                    <div>
+                    {/* <div>
                         <SearchableSelect<SupplierModel>
                             label="Proveedores"
                             value={form.supplierId}
@@ -295,6 +426,172 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                             noResultsMessage="No se encontraron proveedores."
                             disabled={isLoadingSuppliers}
                             onChange={handleSupplierChange} />
+                    </div> */}
+
+                    <div>
+                        <SearchableSelect<SupplierModel>
+                            label="Proveedores"
+                            value={form.supplierId}
+                            items={suppliers}
+                            getOptionValue={(supplier) => String(supplier.id)}
+                            getOptionLabel={(supplier) => supplier.name}
+                            placeholder={
+                                isLoadingSuppliers
+                                    ? "Cargando proveedores..."
+                                    : "Seleccione un proveedor"
+                            }
+                            searchPlaceholder="Buscar proveedor por nombre..."
+                            noResultsMessage="No se encontraron proveedores."
+                            disabled={isLoadingSuppliers}
+                            onChange={handleSupplierChange}
+                            labelActions={
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setIsCreatingSupplier((prev) => !prev);
+                                            setNewSupplier({
+                                                name: "",
+                                                contact: "",
+                                                phone: "",
+                                                email: "",
+                                            });
+                                        }}
+                                        disabled={isAddingSupplier || isDeletingSupplier}
+                                        className="
+                        p-1.5 rounded-md text-blue-600
+                        hover:bg-blue-50 transition-colors
+                        cursor-pointer disabled:opacity-50
+                    "
+                                        title="Nuevo proveedor"
+                                    >
+                                        {isCreatingSupplier ? (
+                                            <X className="h-4 w-4" />
+                                        ) : (
+                                            <Plus className="h-4 w-4" />
+                                        )}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleDeleteSupplier}
+                                        disabled={
+                                            !form.supplierId ||
+                                            isDeletingSupplier ||
+                                            isAddingSupplier
+                                        }
+                                        className="
+                        p-1.5 rounded-md text-red-600
+                        hover:bg-red-50 transition-colors
+                        cursor-pointer disabled:opacity-40
+                        disabled:cursor-not-allowed
+                    "
+                                        title="Eliminar proveedor"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            }
+                        />
+
+                        {isCreatingSupplier && (
+                            <div className="space-y-2 mt-3 p-3 border border-slate-200 rounded-lg">
+                                <p className="text-sm font-medium text-slate-700">
+                                    Nuevo proveedor
+                                </p>
+
+                                <input
+                                    type="text"
+                                    value={newSupplier.name}
+                                    onChange={(e) =>
+                                        setNewSupplier((prev) => ({
+                                            ...prev,
+                                            name: e.target.value,
+                                        }))
+                                    }
+                                    placeholder="Nombre del proveedor"
+                                    disabled={isAddingSupplier}
+                                    className="
+                    w-full px-3 py-2 border border-slate-200
+                    rounded-lg text-sm outline-none
+                    focus:border-blue-500 focus:ring-2
+                    focus:ring-blue-500/10 disabled:bg-slate-50
+                "
+                                />
+
+                                <input
+                                    type="tel"
+                                    value={newSupplier.phone}
+                                    onChange={(e) =>
+                                        setNewSupplier((prev) => ({
+                                            ...prev,
+                                            phone: e.target.value,
+                                        }))
+                                    }
+                                    placeholder="Teléfono"
+                                    disabled={isAddingSupplier}
+                                    className="
+                                        w-full px-3 py-2 border border-slate-200
+                                        rounded-lg text-sm outline-none
+                                        focus:border-blue-500 focus:ring-2
+                                        focus:ring-blue-500/10 disabled:bg-slate-50
+                                    "
+                                />
+
+                                <input
+                                    type="email"
+                                    value={newSupplier.email}
+                                    onChange={(e) =>
+                                        setNewSupplier((prev) => ({
+                                            ...prev,
+                                            email: e.target.value,
+                                        }))
+                                    }
+                                    placeholder="Correo electrónico"
+                                    disabled={isAddingSupplier}
+                                    className="
+                                        w-full px-3 py-2 border border-slate-200
+                                        rounded-lg text-sm outline-none
+                                        focus:border-blue-500 focus:ring-2
+                                        focus:ring-blue-500/10 disabled:bg-slate-50
+                                    "
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            handleCreateSupplier();
+                                        }
+                                    }}
+                                />
+
+                                <div className="flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={handleCreateSupplier}
+                                        disabled={
+                                            isAddingSupplier ||
+                                            !newSupplier.name.trim() ||
+                                            !newSupplier.phone.trim() ||
+                                            !newSupplier.email.trim()
+                                        }
+                                        className="
+                                            flex items-center gap-2 px-3 py-2
+                                            rounded-lg bg-[#001D4A] text-white
+                                            hover:bg-[#00285f] transition-colors
+                                            cursor-pointer disabled:opacity-50
+                                            disabled:cursor-not-allowed
+                                        "
+                                        title="Guardar proveedor"
+                                    >
+                                        <Check className="h-4 w-4" />
+                                        <span className="text-sm">
+                                            {isAddingSupplier
+                                                ? "Guardando..."
+                                                : "Guardar proveedor"}
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div>
@@ -396,6 +693,22 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                     </div>
                 </div>
             </GenericDrawer>
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                title={`¿Estás seguro de eliminar el proveedor "${suppliers.find(
+                    (supplier) =>
+                        String(supplier.id) === form.supplierId
+                )?.name ?? ""
+                    }"?`}
+                description="Esta acción no se puede deshacer. Si el proveedor está asociado a lotes de inventario, el backend podría impedir su eliminación."
+                confirmText={
+                    isDeletingSupplier ? "Eliminando..." : "Eliminar"
+                }
+                cancelText="Cancelar"
+                onConfirm={handleDeleteSupplierConfirm}
+                onCancel={() => setIsDeleteModalOpen(false)}
+            />
         </>
     );
 }
