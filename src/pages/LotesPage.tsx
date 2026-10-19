@@ -157,8 +157,9 @@ const LotesPage: React.FC = () => {
       onClick: (lote) => {
         setSelectedLote(lote);
         setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+        console.log("wuantity", lote.quantity)
       },
-      hidden: (lote) => !canWrite || !lote.dueDate,
+      hidden: (lote) => !canWrite || !lote.dueDate || lote.quantity == 0,
     },
     {
       label: "Editar Lote",
@@ -167,7 +168,7 @@ const LotesPage: React.FC = () => {
         setSelectedLote(lote);
         setIsEditDrawerOpen(true);
       },
-      hidden: () => !canWrite,
+      hidden: (lote) => !canWrite || lote.quantity == 0,
     },
   ];
 
@@ -193,9 +194,9 @@ const LotesPage: React.FC = () => {
             placeholder="Buscar lote..."
           />
           <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
-                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
-                            : "bg-slate-300 cursor-not-allowed opacity-70"
-                        }`}>
+            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+            : "bg-slate-300 cursor-not-allowed opacity-70"
+            }`}>
             <Plus className="w-4 h-4" />
             <span>Nuevo Lote</span>
           </button>
@@ -216,6 +217,11 @@ const LotesPage: React.FC = () => {
               actions={actions}
               getRowId={(lote) => lote.id}
               emptyMessage="No hay Lotes registrados."
+              getRowClassName={(lote) =>
+                lote.quantity === 0
+                  ? "bg-red-100 hover:bg-red-200"
+                  : ""
+              }
             />
           )}
         </div>

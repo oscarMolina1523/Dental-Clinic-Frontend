@@ -6,6 +6,7 @@ import type {
 const DataTable = <T,>({
     data,
     columns,
+    getRowClassName,
     getRowId,
     actions,
     loading = false,
@@ -75,7 +76,8 @@ const DataTable = <T,>({
 
                             <tr
                                 key={getRowId(item)}
-                                className="hover:bg-slate-50/60 transition-colors"
+                                className={`transition-colors ${getRowClassName?.(item) ?? "hover:bg-slate-50/60"
+                                    }`}
                             >
 
                                 {columns.map((column) => (

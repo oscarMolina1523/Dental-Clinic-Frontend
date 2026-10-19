@@ -34,6 +34,8 @@ export interface DataTableProps<T> {
     data: T[];
     columns: TableColumn<T>[];
 
+    getRowClassName?: (row: T) => string;
+
     /**
      * Identificador único de cada fila.
      */
