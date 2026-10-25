@@ -4,6 +4,7 @@ export default class TreatmentCatalogModel extends BaseModel {
   code?: string;
   name: string;
   description?: string;
+  specialities: string;
   basePrice: number;
   estimatedDurationMinutes: number;
   active: boolean;
@@ -13,6 +14,7 @@ export default class TreatmentCatalogModel extends BaseModel {
     code,
     name,
     description,
+    specialities,
     basePrice,
     estimatedDurationMinutes,
     active,
@@ -21,6 +23,7 @@ export default class TreatmentCatalogModel extends BaseModel {
     code?: string;
     name: string;
     description?: string;
+    specialities: string;
     basePrice: number;
     estimatedDurationMinutes: number;
     active: boolean;
@@ -29,6 +32,7 @@ export default class TreatmentCatalogModel extends BaseModel {
     this.code = code;
     this.name = name;
     this.description = description;
+    this.specialities = specialities;
     this.basePrice = basePrice;
     this.estimatedDurationMinutes = estimatedDurationMinutes;
     this.active = active;
@@ -38,6 +42,7 @@ export default class TreatmentCatalogModel extends BaseModel {
 export interface CreateTreatmentCatalogDTO {
   name: string;
   description?: string;
+  specialities: string;
   basePrice: number;
   estimatedDurationMinutes: number;
 }
@@ -45,4 +50,5 @@ export interface CreateTreatmentCatalogDTO {
 export interface UpdateTreatmentCatalogDTO {
   name: string;
   description?: string;
+  specialities: string;
 }
