@@ -21,8 +21,8 @@ import { getRoleName, useRolePermissions } from "../hooks/useRolePermitions";
 
 // Lista de elementos de navegación con sus íconos
 const navItems = [
-  { id: "patients", label: "Pacientes", icon: Users },
   { id: "agenda", label: "Agenda", icon: Calendar },
+  { id: "patients", label: "Pacientes", icon: Users },
   { id: "prescriptions", label: "Recetas", icon: Pill },
   { id: "medical-progress", label: "Expedientes", icon: FileText },
   { id: "treatments", label: "Servicios", icon: ClipboardList },

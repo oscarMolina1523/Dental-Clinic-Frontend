@@ -47,7 +47,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/patients"/>
+        element: <Navigate to="/agenda"/>
       },
       {
         path: "reports",
