@@ -583,11 +583,11 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                                                                     )
                                                                 }
                                                                 className="
-                                            text-blue-500
-                                            hover:text-red-500
-                                            cursor-pointer
-                                            font-medium
-                                        "
+                                                                    text-blue-500
+                                                                    hover:text-red-500
+                                                                    cursor-pointer
+                                                                    font-medium
+                                                                "
                                                             >
                                                                 ×
                                                             </button>

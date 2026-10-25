@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import { useAddTreatment } from "../../hooks/useTreatmentsCatalog";
+import { SPECIALTIES, type Specialty } from "../../utils/specialtiesData.enum";
+import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
 
 interface CreateTreatmentCatalogProps {
     isOpen: boolean;
@@ -16,6 +18,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
         description: "",
         basePrice: 0,
         estimatedDurationMinutes: 0,
+        specialities: ""
     });
 
     const [toast, setToast] = useState<{
@@ -39,6 +42,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
             description: "",
             basePrice: 0,
             estimatedDurationMinutes: 0,
+            specialities: ""
         });
 
         onHide();
@@ -55,9 +59,47 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
         }));
     };
 
+    const handleRemoveSpecialty = (specialtyId: string) => {
+        setForm((prev) => {
+            const specialities = prev.specialities
+                .split(",")
+                .map((item) => item.trim())
+                .filter((item) => item && item !== specialtyId);
+
+            return {
+                ...prev,
+                specialities: specialities.join(","),
+            };
+        });
+    };
+
+    const handleSpecialtyChange = (specialty: Specialty) => {
+        setForm((prev) => {
+            const currentSpecialities = prev.specialities
+                ? prev.specialities
+                    .split(",")
+                    .map((item) => item.trim())
+                    .filter(Boolean)
+                : [];
+
+            if (currentSpecialities.includes(specialty.id)) {
+                return prev;
+            }
+
+            return {
+                ...prev,
+                specialities: [
+                    ...currentSpecialities,
+                    specialty.id,
+                ].join(","),
+            };
+        });
+    };
+
     const handleSubmit = () => {
         const name = form.name.trim();
         const description = form.description.trim();
+        const specialities = form.specialities.trim();
         const basePrice = form.basePrice;
         const estimatedDurationMinutes = form.estimatedDurationMinutes;
 
@@ -91,7 +133,8 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
                 name,
                 description,
                 basePrice,
-                estimatedDurationMinutes
+                estimatedDurationMinutes,
+                specialities
             },
             {
                 onSuccess: () => {
@@ -114,6 +157,17 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
             }
         );
     };
+
+    const selectedSpecialties = form?.specialities
+        ? form.specialities
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [];
+
+    const availableSpecialties = SPECIALTIES.filter(
+        (specialty) => !selectedSpecialties.includes(specialty.id)
+    );
 
     return (
         <>
@@ -143,7 +197,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
                 onHide={onHide}
                 title="Nuevo Servicio"
                 description="Registra un nuevo servicio"
-                width="w-80 md:w-112.5"
+                width="w-80 md:w-200"
                 footer={
                     <>
                         <button
@@ -188,19 +242,19 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
             >
                 {/* BODY DEL CREATE */}
                 <div className="space-y-5">
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Nombre
+                            </label>
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombre
-                        </label>
-
-                        <input
-                            type="text"
-                            name="name"
-                            value={form.name}
-                            onChange={handleChange}
-                            placeholder="Ingrese el nombre completo"
-                            className="
+                            <input
+                                type="text"
+                                name="name"
+                                value={form.name}
+                                onChange={handleChange}
+                                placeholder="Ingrese el nombre completo"
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -211,7 +265,81 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                            />
+                        </div>
+
+                        <div className="flex-1 flex-wrap gap-2">
+                            <SearchableSelect<Specialty>
+                                label="Especialidades"
+                                value=""
+                                items={availableSpecialties}
+                                getOptionValue={(specialty) => specialty.id}
+                                getOptionLabel={(specialty) => specialty.name}
+                                placeholder="Seleccione una especialidad"
+                                searchPlaceholder="Buscar especialidad..."
+                                noResultsMessage="No se encontraron especialidades."
+                                onChange={handleSpecialtyChange}
+                            />
+
+                            {/* Especialidades seleccionadas */}
+                            {selectedSpecialties.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-3">
+                                    {selectedSpecialties.map((specialtyId) => {
+                                        const specialty = SPECIALTIES.find(
+                                            (item) => item.id === specialtyId
+                                        );
+
+                                        if (!specialty) return null;
+
+                                        return (
+                                            <div
+                                                key={specialty.id}
+                                                className="
+                                                                                            inline-flex
+                                                                                            items-center
+                                                                                            gap-2
+                                                                                            px-3
+                                                                                            py-1.5
+                                                                                            bg-blue-50
+                                                                                            border
+                                                                                            border-blue-100
+                                                                                            rounded-lg
+                                                                                            text-sm
+                                                                                            text-blue-700
+                                                                                        "
+                                            >
+                                                <span>
+                                                    {specialty.name}
+                                                </span>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        handleRemoveSpecialty(
+                                                            specialty.id
+                                                        )
+                                                    }
+                                                    className="
+                                                                                                text-blue-500
+                                                                                                hover:text-red-500
+                                                                                                cursor-pointer
+                                                                                                font-medium
+                                                                                            "
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+
+                            {selectedSpecialties.length === 0 && (
+                                <p className="mt-2 text-xs text-slate-400">
+                                    Seleccione una o más especialidades.
+                                </p>
+                            )}
+                        </div>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">

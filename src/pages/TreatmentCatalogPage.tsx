@@ -104,17 +104,27 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "description",
             header: "Descripción",
+            className: "w-20 md:w-60",
+            render: (treatment: TreatmentCatalogModel) => (
+                <p className="text-sm text-slate-500 whitespace-normal break-words">
+                    {treatment.description}
+                </p>
+            ),
+        },
+        {
+            key: "specialities",
+            header: "Especialidades",
             className: "w-20 md:w-80",
             render: (treatment: TreatmentCatalogModel) => (
-                <p className="text-sm text-slate-500">
-                    {treatment.description}
+                <p className="text-sm text-slate-500 whitespace-normal break-words pr-4">
+                    {treatment.specialities}
                 </p>
             ),
         },
         {
             key: "basePrice",
             header: "Precio",
-            className: "w-20 md:w-40",
+            className: "w-20",
             render: (treatment: TreatmentCatalogModel) => (
                 <span className="text-sm text-slate-500">
                     {`C$ ${treatment.basePrice}`}
@@ -124,7 +134,7 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "estimatedDurationMinutes",
             header: "Duración",
-            className: "w-20 md:w-40",
+            className: "w-20",
             render: (treatment: TreatmentCatalogModel) => (
                 <span className="text-sm text-slate-500">
                     {`${treatment.estimatedDurationMinutes} .min`}
@@ -134,7 +144,7 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "active",
             header: "Estado",
-            className: "w-20 md:w-60",
+            className: "w-20",
             render: (treatment: TreatmentCatalogModel) => (
                 treatment.active ? (
                     <span className="text-emerald-500 font-medium text-sm">
