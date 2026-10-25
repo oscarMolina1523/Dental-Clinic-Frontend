@@ -101,7 +101,7 @@ const MedicalPrescriptionSection: React.FC<
 
             setForm(newForm);
 
-            setDiagnosis( appointment?.diagnosis || "");
+            setDiagnosis(appointment?.diagnosis || "");
             // onDiagnosisChange("");
 
             setDetails([
@@ -260,28 +260,27 @@ const MedicalPrescriptionSection: React.FC<
 
         return (
             <div className="space-y-5">
+                <div className="flex flex-col md:flex-row gap-2 w-full">
+                    {/* =================================================
+                        DATOS DEL PACIENTE
+                    ================================================= */}
+                    <div className="flex-1">
 
-                {/* =================================================
-                DATOS DEL PACIENTE
-            ================================================= */}
-
-                <div>
-
-                    <label className="
+                        <label className="
                     block
                     text-sm
                     font-medium
                     text-slate-700
                     mb-2
                 ">
-                        Paciente
-                    </label>
+                            Paciente
+                        </label>
 
-                    <input
-                        type="text"
-                        value={form.patientFullName}
-                        disabled
-                        className="
+                        <input
+                            type="text"
+                            value={form.patientFullName}
+                            disabled
+                            className="
                         w-full
                         px-3 py-2.5
                         border border-slate-200
@@ -291,31 +290,30 @@ const MedicalPrescriptionSection: React.FC<
                         text-slate-500
                         outline-none
                     "
-                    />
+                        />
 
-                </div>
+                    </div>
 
-                {/* =================================================
-                DENTISTA
-            ================================================= */}
+                    {/* =================================================
+                        DENTISTA
+                    ================================================= */}
+                    <div className="flex-1">
 
-                <div>
-
-                    <label className="
+                        <label className="
                     block
                     text-sm
                     font-medium
                     text-slate-700
                     mb-2
                 ">
-                        Especialista
-                    </label>
+                            Especialista
+                        </label>
 
-                    <input
-                        type="text"
-                        value={form.dentistFullName}
-                        disabled
-                        className="
+                        <input
+                            type="text"
+                            value={form.dentistFullName}
+                            disabled
+                            className="
                         w-full
                         px-3 py-2.5
                         border border-slate-200
@@ -325,40 +323,39 @@ const MedicalPrescriptionSection: React.FC<
                         text-slate-500
                         outline-none
                     "
-                    />
+                        />
 
-                </div>
+                    </div>
 
-                {/* =================================================
-                FECHA
-            ================================================= */}
+                    {/* =================================================
+                        FECHA
+                    ================================================= */}
+                    <div className="flex-1">
 
-                <div>
-
-                    <label className="
+                        <label className="
                     block
                     text-sm
                     font-medium
                     text-slate-700
                     mb-2
                 ">
-                        Fecha
-                    </label>
+                            Fecha
+                        </label>
 
-                    <input
-                        type="text"
-                        value={form.date.toLocaleString(
-                            "es-NI",
-                            {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                            }
-                        )}
-                        disabled
-                        className="
+                        <input
+                            type="text"
+                            value={form.date.toLocaleString(
+                                "es-NI",
+                                {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                }
+                            )}
+                            disabled
+                            className="
                         w-full
                         px-3 py-2.5
                         border border-slate-200
@@ -368,8 +365,9 @@ const MedicalPrescriptionSection: React.FC<
                         text-slate-500
                         outline-none
                     "
-                    />
+                        />
 
+                    </div>
                 </div>
 
                 {/* =================================================
@@ -410,8 +408,8 @@ const MedicalPrescriptionSection: React.FC<
                 </div>
 
                 {/* =================================================
-                INSTRUCCIONES GENERALES
-            ================================================= */}
+                    INSTRUCCIONES GENERALES
+                ================================================= */}
 
                 <div>
 
@@ -449,43 +447,41 @@ const MedicalPrescriptionSection: React.FC<
 
                 </div>
 
-                {/* =================================================
-                MEDICAMENTOS
-            ================================================= */}
+                <div className="flex items-center gap-4 my-6">
+                    <div className="flex-1 h-px bg-slate-200" />
 
-                <div className="
-                border-t
-                border-slate-100
-                pt-5
-            ">
-
-                    <div className="
-                    flex
-                    items-center
-                    justify-between
-                    mb-4
-                ">
-
-                        <div>
-
-                            <h3 className="
-                            text-sm
-                            font-semibold
-                            text-slate-800
-                        ">
-                                Medicamentos
-                            </h3>
-
-                            <p className="
+                    <div className="flex flex-col text-center">
+                        <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                            Medicamentos recetados (opcional)
+                        </h2>
+                        <p className="
                             text-xs
                             text-slate-500
                             mt-1
                         ">
-                                Agrega los medicamentos
-                                de la receta.
-                            </p>
+                            Agrega los medicamentos
+                            de la receta.
+                        </p>
+                    </div>
 
-                        </div>
+
+                    <div className="flex-1 h-px bg-slate-200" />
+                </div>
+                {/* =================================================
+                    MEDICAMENTOS
+                ================================================= */}
+
+                <div className="
+                    border-t
+                    border-slate-100
+                ">
+
+                    <div className="
+                        flex
+                        items-center
+                        justify-end
+                        mb-4
+                    ">
 
                         <button
                             type="button"
@@ -562,183 +558,172 @@ const MedicalPrescriptionSection: React.FC<
                                         )}
 
                                     </div>
+                                    <div className="flex flex-col md:flex-row gap-2 w-full">
 
-                                    {/* MEDICAMENTO */}
+                                        {/* MEDICAMENTO */}
+                                        <div className="flex-1">
 
-                                    <div>
+                                            <label className="
+                                                block
+                                                text-sm
+                                                font-medium
+                                                text-slate-700
+                                                mb-2
+                                            ">
+                                                Medicamento
+                                            </label>
 
-                                        <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                            Medicamento
-                                        </label>
+                                            <input
+                                                type="text"
+                                                value={
+                                                    detail.medicine
+                                                }
+                                                onChange={(e) =>
+                                                    handleDetailChange(
+                                                        index,
+                                                        "medicine",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="Ej. Amoxicilina"
+                                                className="
+                                                    w-full
+                                                    px-3 py-2.5
+                                                    border border-slate-200
+                                                    rounded-lg
+                                                    text-sm
+                                                    outline-none
+                                                    focus:border-blue-500
+                                                    focus:ring-2
+                                                    focus:ring-blue-500/10
+                                                "
+                                            />
 
-                                        <input
-                                            type="text"
-                                            value={
-                                                detail.medicine
-                                            }
-                                            onChange={(e) =>
-                                                handleDetailChange(
-                                                    index,
-                                                    "medicine",
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="
-                                            Ej. Amoxicilina
-                                        "
-                                            className="
-                                            w-full
-                                            px-3 py-2.5
-                                            border border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            outline-none
-                                            focus:border-blue-500
-                                            focus:ring-2
-                                            focus:ring-blue-500/10
-                                        "
-                                        />
+                                        </div>
 
+                                        {/* DOSIS */}
+                                        <div className="flex-1">
+
+                                            <label className="
+                                                block
+                                                text-sm
+                                                font-medium
+                                                text-slate-700
+                                                mb-2
+                                            ">
+                                                Dosis
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                value={
+                                                    detail.dose
+                                                }
+                                                onChange={(e) =>
+                                                    handleDetailChange(
+                                                        index,
+                                                        "dose",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="Ej. 500 mg"
+                                                className="
+                                                    w-full
+                                                    px-3 py-2.5
+                                                    border border-slate-200
+                                                    rounded-lg
+                                                    text-sm
+                                                    outline-none
+                                                    focus:border-blue-500
+                                                    focus:ring-2
+                                                    focus:ring-blue-500/10
+                                                "
+                                            />
+
+                                        </div>
+
+                                        {/* FRECUENCIA */}
+                                        <div className="flex-1">
+
+                                            <label className="
+                                                block
+                                                text-sm
+                                                font-medium
+                                                text-slate-700
+                                                mb-2
+                                            ">
+                                                Frecuencia
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                value={
+                                                    detail.frequency
+                                                }
+                                                onChange={(e) =>
+                                                    handleDetailChange(
+                                                        index,
+                                                        "frequency",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="Ej. Cada 8 horas"
+                                                className="
+                                                    w-full
+                                                    px-3 py-2.5
+                                                    border border-slate-200
+                                                    rounded-lg
+                                                    text-sm
+                                                    outline-none
+                                                    focus:border-blue-500
+                                                    focus:ring-2
+                                                    focus:ring-blue-500/10
+                                                "
+                                            />
+
+                                        </div>
+
+                                        {/* DURACIÓN */}
+                                        <div className="flex-1">
+
+                                            <label className="
+                                                block
+                                                text-sm
+                                                font-medium
+                                                text-slate-700
+                                                mb-2
+                                            ">
+                                                Duración
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                value={
+                                                    detail.duration
+                                                }
+                                                onChange={(e) =>
+                                                    handleDetailChange(
+                                                        index,
+                                                        "duration",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                placeholder="Ej. 7 días"
+                                                className="
+                                                    w-full
+                                                    px-3 py-2.5
+                                                    border border-slate-200
+                                                    rounded-lg
+                                                    text-sm
+                                                    outline-none
+                                                    focus:border-blue-500
+                                                    focus:ring-2
+                                                    focus:ring-blue-500/10
+                                                "
+                                            />
+
+                                        </div>
                                     </div>
-
-                                    {/* DOSIS */}
-
-                                    <div>
-
-                                        <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                            Dosis
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            value={
-                                                detail.dose
-                                            }
-                                            onChange={(e) =>
-                                                handleDetailChange(
-                                                    index,
-                                                    "dose",
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="
-                                            Ej. 500 mg
-                                        "
-                                            className="
-                                            w-full
-                                            px-3 py-2.5
-                                            border border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            outline-none
-                                            focus:border-blue-500
-                                            focus:ring-2
-                                            focus:ring-blue-500/10
-                                        "
-                                        />
-
-                                    </div>
-
-                                    {/* FRECUENCIA */}
-
-                                    <div>
-
-                                        <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                            Frecuencia
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            value={
-                                                detail.frequency
-                                            }
-                                            onChange={(e) =>
-                                                handleDetailChange(
-                                                    index,
-                                                    "frequency",
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="
-                                            Ej. Cada 8 horas
-                                        "
-                                            className="
-                                            w-full
-                                            px-3 py-2.5
-                                            border border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            outline-none
-                                            focus:border-blue-500
-                                            focus:ring-2
-                                            focus:ring-blue-500/10
-                                        "
-                                        />
-
-                                    </div>
-
-                                    {/* DURACIÓN */}
-
-                                    <div>
-
-                                        <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                            Duración
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            value={
-                                                detail.duration
-                                            }
-                                            onChange={(e) =>
-                                                handleDetailChange(
-                                                    index,
-                                                    "duration",
-                                                    e.target.value
-                                                )
-                                            }
-                                            placeholder="
-                                            Ej. 7 días
-                                        "
-                                            className="
-                                            w-full
-                                            px-3 py-2.5
-                                            border border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            outline-none
-                                            focus:border-blue-500
-                                            focus:ring-2
-                                            focus:ring-blue-500/10
-                                        "
-                                        />
-
-                                    </div>
-
                                 </div>
                             )
                         )}

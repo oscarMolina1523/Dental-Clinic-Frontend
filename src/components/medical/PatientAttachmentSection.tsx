@@ -20,131 +20,133 @@ const PatientAttachmentSection: React.FC<
   onChange,
   clinicalProgressId,
 }) => {
-  const { uploadImage } = useImageUpload();
+    const { uploadImage } = useImageUpload();
 
-  const [form, setForm] = useState<PatientAttachmentDto>({
-    clinicalProgressId: "",
-    patientId: "",
-    fileType: "",
-    fileUrl: "",
-    fileName: "",
-    description: "",
-    uploadedBy: "",
-    createdAt: "",
-  });
-
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-
-  useEffect(() => {
-    const hasData =
-      form.fileType.trim() ||
-      form.fileUrl.trim() ||
-      form.fileName.trim() ||
-      form.description.trim();
-
-    if (!hasData) {
-      onChange(null);
-      return;
-    }
-
-    onChange({
-      ...form,
-      clinicalProgressId: clinicalProgressId || "",
-      uploadedBy: "system",
-      patientId:
-        appointment?.patientId || form.patientId,
+    const [form, setForm] = useState<PatientAttachmentDto>({
+      clinicalProgressId: "",
+      patientId: "",
+      fileType: "",
+      fileUrl: "",
+      fileName: "",
+      description: "",
+      uploadedBy: "",
+      createdAt: "",
     });
-  }, [
-    form,
-    appointment,
-    clinicalProgressId,
-    onChange,
-  ]);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value } = e.target;
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
 
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+    useEffect(() => {
+      const hasData =
+        form.fileType.trim() ||
+        form.fileUrl.trim() ||
+        form.fileName.trim() ||
+        form.description.trim();
 
-  const handleFileChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = e.target.files?.[0] || null;
-
-    if (!file) {
-      return;
-    }
-
-    setImageFile(file);
-    setIsUploading(true);
-
-    try {
-      const uploadedImageUrl = await uploadImage(file);
-
-      if (!uploadedImageUrl) {
-        setImageFile(null);
-
+      if (!hasData) {
+        onChange(null);
         return;
       }
 
+      onChange({
+        ...form,
+        clinicalProgressId: clinicalProgressId || "",
+        uploadedBy: "system",
+        patientId:
+          appointment?.patientId || form.patientId,
+      });
+    }, [
+      form,
+      appointment,
+      clinicalProgressId,
+      onChange,
+    ]);
+
+    const handleChange = (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLTextAreaElement
+      >
+    ) => {
+      const { name, value } = e.target;
+
       setForm((prev) => ({
         ...prev,
-        fileUrl: uploadedImageUrl,
-        fileName: file.name,
-        fileType: file.type,
+        [name]: value,
       }));
-    } catch (error) {
-      console.error(
-        "Error al subir archivo:",
-        error
-      );
+    };
 
-      setImageFile(null);
-    } finally {
-      setIsUploading(false);
-    }
-  };
+    const handleFileChange = async (
+      e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+      const file = e.target.files?.[0] || null;
 
-  return (
-    <div className="border-t border-slate-100 pt-5 space-y-5">
+      if (!file) {
+        return;
+      }
 
-      <div>
-        <h3 className="text-sm font-semibold text-slate-800">
-          Adjunto clínico
-        </h3>
+      setImageFile(file);
+      setIsUploading(true);
 
-        <p className="text-xs text-slate-500 mt-1">
-          Esta sección es opcional.
-        </p>
-      </div>
+      try {
+        const uploadedImageUrl = await uploadImage(file);
 
-      {/* IMAGEN */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-2">
-          Imagen
-        </label>
+        if (!uploadedImageUrl) {
+          setImageFile(null);
 
-        <input
-          type="file"
-          id="clinicalAttachment"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileChange}
-          disabled={isUploading}
-        />
+          return;
+        }
 
-        <label
-          htmlFor="clinicalAttachment"
-          className="
+        setForm((prev) => ({
+          ...prev,
+          fileUrl: uploadedImageUrl,
+          fileName: file.name,
+          fileType: file.type,
+        }));
+      } catch (error) {
+        console.error(
+          "Error al subir archivo:",
+          error
+        );
+
+        setImageFile(null);
+      } finally {
+        setIsUploading(false);
+      }
+    };
+
+    return (
+      <div className="border-t border-slate-100 pt-5 space-y-5">
+
+        <div className="flex items-center gap-4 my-6">
+          <div className="flex-1 h-px bg-slate-200" />
+
+          <div className="flex flex-col text-center">
+            <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+              Adjunto clínico (opcional)
+            </h2>
+          </div>
+
+          <div className="flex-1 h-px bg-slate-200" />
+        </div>
+
+        {/* IMAGEN */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Imagen
+          </label>
+
+          <input
+            type="file"
+            id="clinicalAttachment"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+            disabled={isUploading}
+          />
+
+          <label
+            htmlFor="clinicalAttachment"
+            className="
             inline-flex
             items-center
             justify-center
@@ -161,29 +163,29 @@ const PatientAttachmentSection: React.FC<
             hover:bg-slate-200
             disabled:opacity-50
           "
-        >
-          {isUploading
-            ? "Subiendo imagen..."
-            : "Seleccionar imagen"}
-        </label>
+          >
+            {isUploading
+              ? "Subiendo imagen..."
+              : "Seleccionar imagen"}
+          </label>
 
-        <span className="ml-2 text-sm text-slate-500">
-          {imageFile
-            ? imageFile.name
-            : "No se ha seleccionado una imagen"}
-        </span>
+          <span className="ml-2 text-sm text-slate-500">
+            {imageFile
+              ? imageFile.name
+              : "No se ha seleccionado una imagen"}
+          </span>
 
-        {/* PREVIEW */}
-        {imageFile && (
-          <div className="mt-3">
-            <p className="text-xs text-slate-500 mb-2">
-              Vista previa
-            </p>
+          {/* PREVIEW */}
+          {imageFile && (
+            <div className="mt-3">
+              <p className="text-xs text-slate-500 mb-2">
+                Vista previa
+              </p>
 
-            <img
-              src={URL.createObjectURL(imageFile)}
-              alt="Vista previa"
-              className="
+              <img
+                src={URL.createObjectURL(imageFile)}
+                alt="Vista previa"
+                className="
                 w-32
                 h-32
                 rounded-lg
@@ -191,24 +193,24 @@ const PatientAttachmentSection: React.FC<
                 border
                 border-slate-200
               "
-            />
-          </div>
-        )}
-      </div>
+              />
+            </div>
+          )}
+        </div>
 
-      {/* DESCRIPCIÓN */}
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-2">
-          Descripción
-        </label>
+        {/* DESCRIPCIÓN */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Descripción
+          </label>
 
-        <textarea
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          placeholder="Descripción del archivo..."
-          rows={3}
-          className="
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            placeholder="Descripción del archivo..."
+            rows={3}
+            className="
             w-full
             px-3 py-2.5
             border border-slate-200
@@ -220,11 +222,11 @@ const PatientAttachmentSection: React.FC<
             focus:ring-blue-500/10
             resize-none
           "
-        />
-      </div>
+          />
+        </div>
 
-    </div>
-  );
-};
+      </div>
+    );
+  };
 
 export default PatientAttachmentSection;

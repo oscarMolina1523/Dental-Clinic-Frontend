@@ -10,39 +10,6 @@ import type {
 import type { DentalChartDto } from "../../models/DentalChartModel";
 import { dentalChartStatusSpanishOptions, type DentalChartDetailsStatus } from "../../utils/dentalChartStatus.enum";
 
-// const dentalChartStatusOptions: {
-//   value: DentalChartDetailsStatus;
-//   label: string;
-// }[] = [
-//     { value: "HEALTHY", label: "Sano" },
-//     { value: "CARIES", label: "Caries" },
-//     { value: "FILLED", label: "Obturado" },
-//     { value: "FRACTURED", label: "Fracturado" },
-//     { value: "WORN", label: "Desgastado" },
-//     { value: "MISSING", label: "Ausente" },
-//     { value: "EXTRACTED", label: "Extraído" },
-//     { value: "ROOT_CANAL_TREATED", label: "Tratamiento de conducto" },
-//     { value: "CROWN", label: "Corona" },
-//     { value: "IMPLANT", label: "Implante" },
-//     { value: "BRIDGE", label: "Puente" },
-//     { value: "PROSTHETIC", label: "Prótesis" },
-//     { value: "IMPACTED", label: "Impactado" },
-//     { value: "MOBILE", label: "Móvil" },
-//     { value: "INFECTED", label: "Infectado" },
-//     { value: "ABSCESS", label: "Absceso" },
-//     {
-//       value: "PERIODONTAL_AFFECTATION",
-//       label: "Afectación periodontal",
-//     },
-//     { value: "SENSITIVITY", label: "Sensibilidad" },
-//     { value: "DISCOLORATION", label: "Decoloración" },
-//     {
-//       value: "DEVELOPMENTAL_ANOMALY",
-//       label: "Anomalía del desarrollo",
-//     },
-//     { value: "OTHER", label: "Otro" },
-//   ];
-
 interface DentalChartSectionProps {
   appointment: Appointment | null;
   onChange: (
@@ -221,16 +188,17 @@ const DentalChartSection: React.FC<
     };
 
     return (
-      <div className="border-t border-slate-100 pt-5 space-y-5">
+      <div className="border-t border-slate-100 space-y-5">
+        <div className="flex items-center gap-4 my-6">
+          <div className="flex-1 h-px bg-slate-200" />
 
-        <div>
-          <h3 className="text-sm font-semibold text-slate-800">
-            Odontograma
-          </h3>
+          <div className="flex flex-col text-center">
+            <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+              Odontograma (opcional)
+            </h2>
+          </div>
 
-          <p className="text-xs text-slate-500 mt-1">
-            Esta sección es opcional.
-          </p>
+          <div className="flex-1 h-px bg-slate-200" />
         </div>
 
         {/* OBSERVACIONES */}
@@ -333,28 +301,28 @@ const DentalChartSection: React.FC<
 
                 </div>
 
-                {/* DIENTE */}
+                <div className="flex flex-col md:flex-row gap-2 w-full">
+                  {/* DIENTE */}
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Número de diente
+                    </label>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Número de diente
-                  </label>
-
-                  <input
-                    type="number"
-                    min={11}
-                    max={48}
-                    value={
-                      detail.toothNumber || ""
-                    }
-                    onChange={(e) =>
-                      handleDetailChange(
-                        index,
-                        "toothNumber",
-                        Number(e.target.value)
-                      )
-                    }
-                    className="
+                    <input
+                      type="number"
+                      min={11}
+                      max={48}
+                      value={
+                        detail.toothNumber || ""
+                      }
+                      onChange={(e) =>
+                        handleDetailChange(
+                          index,
+                          "toothNumber",
+                          Number(e.target.value)
+                        )
+                      }
+                      className="
                     w-full
                     px-3 py-2.5
                     border border-slate-200
@@ -363,56 +331,25 @@ const DentalChartSection: React.FC<
                     outline-none
                     focus:border-blue-500
                   "
-                  />
-                </div>
+                    />
+                  </div>
 
-                {/* CARA */}
+                  {/* CARA del diente */}
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Cara
+                    </label>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Cara
-                  </label>
-
-                  <input
-                    type="text"
-                    value={detail.face}
-                    onChange={(e) =>
-                      handleDetailChange(
-                        index,
-                        "face",
-                        e.target.value
-                      )
-                    }
-                    placeholder="Ej. Oclusal"
-                    className="
-                    w-full
-                    px-3 py-2.5
-                    border border-slate-200
-                    rounded-lg
-                    text-sm
-                    outline-none
-                    focus:border-blue-500
-                  "
-                  />
-                </div>
-
-                {/* ESTADO */}
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Estado
-                  </label>
-
-                  <select
-                    value={detail.toothStatus}
-                    onChange={(e) =>
-                      handleDetailChange(
-                        index,
-                        "toothStatus",
-                        e.target.value as DentalChartDetailsStatus
-                      )
-                    }
-                    className="
+                    <select
+                      value={detail.face}
+                      onChange={(e) =>
+                        handleDetailChange(
+                          index,
+                          "face",
+                          e.target.value
+                        )
+                      }
+                      className="
                       w-full
                       px-3 py-2.5
                       border border-slate-200
@@ -424,24 +361,67 @@ const DentalChartSection: React.FC<
                       focus:ring-2
                       focus:ring-blue-500/10
                     "
-                  >
-                    <option value="">
-                      Seleccione un estado
-                    </option>
-
-                    {dentalChartStatusSpanishOptions.map((status) => (
-                      <option
-                        key={status.value}
-                        value={status.value}
-                      >
-                        {status.label}
+                    >
+                      <option value="">
+                        Seleccione una cara
                       </option>
-                    ))}
-                  </select>
+
+                      <option value="OCLUSAL">Oclusal</option>
+                      <option value="INCISAL">Incisal</option>
+                      <option value="VESTIBULAR">Vestibular</option>
+                      <option value="LINGUAL">Lingual</option>
+                      <option value="PALATINA">Palatina</option>
+                      <option value="MESIAL">Mesial</option>
+                      <option value="DISTAL">Distal</option>
+                    </select>
+                  </div>
+
+                  {/* ESTADO */}
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Estado
+                    </label>
+
+                    <select
+                      value={detail.toothStatus}
+                      onChange={(e) =>
+                        handleDetailChange(
+                          index,
+                          "toothStatus",
+                          e.target.value as DentalChartDetailsStatus
+                        )
+                      }
+                      className="
+                      w-full
+                      px-3 py-2.5
+                      border border-slate-200
+                      rounded-lg
+                      text-sm
+                      outline-none
+                      bg-white
+                      focus:border-blue-500
+                      focus:ring-2
+                      focus:ring-blue-500/10
+                    "
+                    >
+                      <option value="">
+                        Seleccione un estado
+                      </option>
+
+                      {dentalChartStatusSpanishOptions.map((status) => (
+                        <option
+                          key={status.value}
+                          value={status.value}
+                        >
+                          {status.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                 </div>
 
                 {/* NOTAS */}
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
                     Notas
