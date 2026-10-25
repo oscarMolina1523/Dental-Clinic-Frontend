@@ -265,7 +265,7 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
                     {/* Email */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Correo Electrónico
+                            Correo Electrónico *
                         </label>
                         <input
                             type="email"
@@ -278,7 +278,7 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
                     {/* Rol */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Rol
+                            Rol *
                         </label>
                         <select
                             value={roleId}
