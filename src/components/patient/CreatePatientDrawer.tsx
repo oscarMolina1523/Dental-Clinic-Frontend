@@ -455,7 +455,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Nombres
+                                Nombres *
                             </label>
 
                             <input
@@ -479,7 +479,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                         </div>
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Apellidos
+                                Apellidos *
                             </label>
 
                             <input
@@ -529,7 +529,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                             <>
                                 <div className="flex-1">
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Documento de identidad (cédula o pasaporte)
+                                        Documento de identidad * (cédula o pasaporte)
                                     </label>
 
                                     <input
@@ -539,22 +539,22 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                         onChange={handleChange}
                                         placeholder="Ingrese el su documento de identidad"
                                         className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
+                                            w-full
+                                            px-3 py-2.5
+                                            border border-slate-200
+                                            rounded-lg
+                                            text-sm
+                                            outline-none
+                                            focus:border-blue-500
+                                            focus:ring-2
+                                            focus:ring-blue-500/10
+                                        "
                                     />
                                 </div>
 
                                 <div className="flex-1">
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Email
+                                        Email *
                                     </label>
 
                                     <input
@@ -583,7 +583,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Género
+                                Género *
                             </label>
 
                             <select
@@ -616,7 +616,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
 
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Fecha de nacimiento
+                                Fecha de nacimiento *
                             </label>
 
                             <input
@@ -670,7 +670,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                         )}
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Dirección
+                                Dirección *
                             </label>
 
                             <input
@@ -697,7 +697,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                         {/* estado civil */}
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Estado Civil del paciente
+                                Estado Civil del paciente *
                             </label>
                             <select
                                 disabled={isMinor}
@@ -731,7 +731,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                         {/* tipos de sangre */}
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Tipo de sangre del paciente
+                                Tipo de sangre del paciente *
                             </label>
 
                             <select
@@ -798,7 +798,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Nombre del contacto de emergencia
+                                Nombre del contacto de emergencia *
                             </label>
 
                             <input
@@ -822,7 +822,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                         </div>
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Número del contacto de emergencia
+                                Número del contacto de emergencia *
                             </label>
 
                             <input
@@ -861,7 +861,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                             <div className="flex flex-col md:flex-row gap-2 w-full">
                                 <div className="flex-1">
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Nombre del responsable
+                                        Nombre del responsable *
                                     </label>
 
                                     <input
@@ -886,7 +886,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
 
                                 <div className="flex-1">
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Documento de identidad del responsable
+                                        Documento de identidad del responsable *
                                     </label>
 
                                     <input
@@ -912,7 +912,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Teléfono del responsable
+                                    Teléfono del responsable *
                                 </label>
 
                                 <input
