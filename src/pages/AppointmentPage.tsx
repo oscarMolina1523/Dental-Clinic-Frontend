@@ -5,7 +5,7 @@ import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
-import { useAppointments, useMarkReminderAsSent } from "../hooks/useAppointment";
+import { useAppointments } from "../hooks/useAppointment";
 import type AppointmentModel from "../models/AppointmentModel";
 import CreateAppointmentDrawer from "../components/appointment/CreateAppointmentDrawer";
 import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawer";
@@ -74,7 +74,7 @@ const AppointmentPage: React.FC = () => {
         selectedAppointment?.id || ""
     );
 
-    const markReminderAsSentMutation = useMarkReminderAsSent();
+    // const markReminderAsSentMutation = useMarkReminderAsSent();
 
     const isViewer = role === UserRole.Viewer;
     const canWrite = !isViewer;
@@ -245,33 +245,33 @@ const AppointmentPage: React.FC = () => {
                 );
             },
         },
-        {
-            key: "reminderSent",
-            className: "w-20",
-            header: "Recordatorio Enviado",
-            render: (appointment: AppointmentModel) => (
-                <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-slate-800">
-                        {appointment.reminderSent ? "Sí" : "No"}
-                    </span>
+        // {
+        //     key: "reminderSent",
+        //     className: "w-20",
+        //     header: "Recordatorio Enviado",
+        //     render: (appointment: AppointmentModel) => (
+        //         <div className="flex items-center gap-3">
+        //             <span className="text-sm font-semibold text-slate-800">
+        //                 {appointment.reminderSent ? "Sí" : "No"}
+        //             </span>
 
-                </div>
-            ),
-        },
+        //         </div>
+        //     ),
+        // },
     ];
 
     const actions: TableAction<typeof appointments[number]>[] = [
-        {
-            label: "Marcar recordatorio como enviado",
-            icon: <CheckCircle2 className="w-4 h-4 text-emerald-600" />,
-            onClick: (appointment) => {
-                markReminderAsSentMutation.mutate(appointment.id);
-            },
-            hidden: (appointment) =>
-                !canWrite || appointment.reminderSent ||
-                appointment.status === "COMPLETED" ||
-                appointment.status === "CANCELLED",
-        },
+        // {
+        //     label: "Marcar recordatorio como enviado",
+        //     icon: <CheckCircle2 className="w-4 h-4 text-emerald-600" />,
+        //     onClick: (appointment) => {
+        //         markReminderAsSentMutation.mutate(appointment.id);
+        //     },
+        //     hidden: (appointment) =>
+        //         !canWrite || appointment.reminderSent ||
+        //         appointment.status === "COMPLETED" ||
+        //         appointment.status === "CANCELLED",
+        // },
         {
             label: "Editar Cita",
             icon: <Pencil className="w-4 h-4" />,
