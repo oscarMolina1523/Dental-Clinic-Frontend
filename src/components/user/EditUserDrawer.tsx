@@ -7,6 +7,7 @@ import useImageUpload from "../../hooks/useImageUpload";
 import { SPECIALTIES, type Specialty } from "../../utils/specialtiesData.enum";
 import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
 import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
+import { validateProfessionalCode } from "../../utils/validateProfessionalCode";
 
 interface EditUserDrawerProps {
     isOpen: boolean;
@@ -173,6 +174,24 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                 "Ingrese un número de teléfono válido de 8 dígitos del usuario."
             );
             return;
+        }
+
+        if (isSpecialist) {
+            if (!form.membershipNumber?.trim()) {
+                showToast(
+                    "error",
+                    "El código de profesional es obligatorio para los especialistas."
+                );
+                return;
+            }
+
+            if (!validateProfessionalCode(form.membershipNumber)) {
+                showToast(
+                    "error",
+                    "El código de profesional debe contener entre 3 y 5 dígitos numéricos."
+                );
+                return;
+            }
         }
 
         try {
