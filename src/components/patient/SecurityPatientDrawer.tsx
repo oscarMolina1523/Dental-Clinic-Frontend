@@ -4,6 +4,7 @@ import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import PatientModel from "../../models/PatientModel";
 import { useActivatePatient, useChangePatientAddress, useChangePatientEmail, useChangePatientImage, useChangePatientPhoneNumber, useDeactivatePatient, useUpdateEmergencyContact } from "../../hooks/usePatients";
 import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
+import { getAge } from "../../utils/getAge";
 
 interface SecurityPatientDrawerProps {
     isOpen: boolean;
@@ -44,6 +45,10 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
     const [emergencyContactPhone, setEmergencyContactPhone] = useState<string>("");
     const [image, setImage] = useState<string>("");
     const [isActive, setIsActive] = useState<boolean>(false);
+
+    const isMinor = patient?.birthdate
+        ? getAge(patient.birthdate) < 18
+        : false;
 
     const [toast, setToast] = useState<{
         type: "success" | "error";
@@ -210,7 +215,7 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
                 onHide={onHide}
                 title="Seguridad del Paciente"
                 description="Modifica la información sensible del paciente"
-                width="w-80 md:w-112.5"
+                width="w-80 md:w-200"
                 footer={
                     <>
                         <button
@@ -263,28 +268,45 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
                 {/* TODO EL BODY ES EXCLUSIVO DE EDITAR */}
 
                 <div className="space-y-5">
-                    {/* Email */}
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Correo Electrónico
-                        </label>
-                        <input
-                            type="email"
-                            value={email || ""}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                        />
-                    </div>
+                    {!isMinor && (
+                        <div className="flex flex-col md:flex-row gap-2 w-full">
+                            {/* Email */}
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Correo Electrónico *
+                                </label>
+                                <input
+                                    type="email"
+                                    value={email || ""}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                />
+                            </div>
 
-                    {/* numero de telefono */}
+                            {/* numero de telefono */}
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Número de teléfono *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={phone || ""}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* direccion */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Número de teléfono
+                            Dirección
                         </label>
                         <input
                             type="text"
-                            value={phone || ""}
-                            onChange={(e) => setPhone(e.target.value)}
+                            value={address || ""}
+                            onChange={(e) => setAddress(e.target.value)}
                             className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
                         />
                     </div>
@@ -303,19 +325,6 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
                         </label>
                     </div>
 
-                    {/* direccion */}
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Dirección
-                        </label>
-                        <input
-                            type="text"
-                            value={address || ""}
-                            onChange={(e) => setAddress(e.target.value)}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                        />
-                    </div>
-
                     <div className="flex items-center gap-4 my-6">
                         <div className="flex-1 h-px bg-slate-200" />
 
@@ -325,32 +334,34 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
 
                         <div className="flex-1 h-px bg-slate-200" />
                     </div>
-                    {/* nombre de contatco de emergencia */}
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombre del contacto de emergencia
-                        </label>
-                        <input
-                            type="text"
-                            value={emergencyContactName || ""}
-                            onChange={(e) => setEmergencyContactName(e.target.value)}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                        />
-                    </div>
 
-                    {/* numero de contatco de emergencia */}
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Número del contacto de emergencia
-                        </label>
-                        <input
-                            type="text"
-                            value={emergencyContactPhone || ""}
-                            onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
-                        />
-                    </div>
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        {/* nombre de contatco de emergencia */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Nombre del contacto de emergencia *
+                            </label>
+                            <input
+                                type="text"
+                                value={emergencyContactName || ""}
+                                onChange={(e) => setEmergencyContactName(e.target.value)}
+                                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            />
+                        </div>
 
+                        {/* numero de contatco de emergencia */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Número del contacto de emergencia *
+                            </label>
+                            <input
+                                type="text"
+                                value={emergencyContactPhone || ""}
+                                onChange={(e) => setEmergencyContactPhone(e.target.value)}
+                                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                            />
+                        </div>
+                    </div>
                 </div>
             </GenericDrawer >
         </>
