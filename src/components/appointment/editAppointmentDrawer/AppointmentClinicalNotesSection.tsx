@@ -89,7 +89,7 @@ export const AppointmentClinicalNotesSection: React.FC<AppointmentClinicalNotesS
             />
 
             <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Razón</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Razón *</label>
                 <textarea
                     name="reason"
                     value={reason}

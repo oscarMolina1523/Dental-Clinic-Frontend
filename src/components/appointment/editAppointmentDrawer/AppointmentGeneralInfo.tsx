@@ -49,7 +49,7 @@ export const AppointmentGeneralInfo: React.FC<AppointmentGeneralInfoProps> = ({
             <div className="flex flex-col md:flex-row gap-2 w-full">
                 <div className="flex-1">
                     <SearchableSelect<PatientModel>
-                        label="Pacientes"
+                        label="Pacientes *"
                         value={form?.patientId || ""}
                         items={patients}
                         getOptionValue={(patient) => patient.id}
@@ -69,7 +69,7 @@ export const AppointmentGeneralInfo: React.FC<AppointmentGeneralInfoProps> = ({
                 </div>
                 <div className="flex-1">
                     <SearchableSelect<UserModel>
-                        label="Especialistas"
+                        label="Especialistas *"
                         value={form?.dentistId || ""}
                         items={dentists}
                         getOptionValue={(dentist) => dentist.id}
@@ -94,7 +94,7 @@ export const AppointmentGeneralInfo: React.FC<AppointmentGeneralInfoProps> = ({
                 </div>
                 <div className="flex-1">
                     <SearchableSelect<string>
-                        label="Especialidad"
+                        label="Especialidad *"
                         value={form?.dentistSpeciality || ""}
                         items={dentistSpecialities}
                         getOptionValue={(speciality) => speciality}
