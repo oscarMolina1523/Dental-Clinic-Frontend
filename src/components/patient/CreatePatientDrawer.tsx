@@ -7,6 +7,7 @@ import { genderData } from "../../data/genderData";
 import { validateIdentityDocument } from "../../utils/validatIdentityDocument";
 import { usePatientAgeValidation } from "../../utils/usePatientAgeValidation";
 import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
+
 interface CreatePatientProps {
     isOpen: boolean;
     onHide: () => void;
@@ -29,6 +30,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
         birthdate: "",
         gender: "",
         phoneNumber: "",
+        bloodType: "",
         email: "",
         address: "",
         emergencyContactName: "",
@@ -38,6 +40,8 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
         payerIdCard: "",
         payerPhoneNumber: "",
     });
+
+    const [isMinor, setIsMinor] = useState(false);
 
     const [isSelfPayer, setIsSelfPayer] = useState(true);
 
@@ -54,6 +58,38 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             type,
             message,
         });
+    };
+
+    const maxBirthdateForMinor = (() => {
+        const today = new Date();
+        const date = new Date(today);
+
+        date.setFullYear(date.getFullYear() - 18);
+
+        // Formatear como YYYY-MM-DD usando la fecha local
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    })();
+
+    const handleMinorChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const checked = e.target.checked;
+
+        setIsMinor(checked);
+
+        if (checked) {
+            // Un menor de edad debe tener un responsable de pago
+            setIsSelfPayer(false);
+
+            setForm((prev) => ({
+                ...prev,
+                maritalStatus: "Soltero/a",
+            }));
+        }
     };
 
     const handleSelfPayerChange = (
@@ -80,6 +116,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             idCard: "",
             birthdate: "",
             gender: "",
+            bloodType: "",
             phoneNumber: "",
             email: "",
             address: "",
@@ -90,6 +127,9 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             payerIdCard: "",
             payerPhoneNumber: "",
         });
+
+        setIsMinor(false);
+        setIsSelfPayer(true);
 
         onHide();
     };
@@ -113,6 +153,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
         const gender = form.gender.trim();
         const phone = form.phoneNumber.trim();
         const email = form.email.trim();
+        const bloodType = form.bloodType.trim();
         const address = form.address.trim();
         const emergencyContactName = form.emergencyContactName.trim();
         const emergencyContactPhone = form.emergencyContactPhone.trim();
@@ -136,8 +177,15 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             );
             return;
         }
+        if (!bloodType) {
+            showToast(
+                "error",
+                "Debe seleccionar un tipo de sangre."
+            );
+            return;
+        }
 
-        if (!validatePhoneNumber(phone)) {
+        if (!isMinor && !validatePhoneNumber(phone)) {
             showToast(
                 "error",
                 "Ingrese un número de teléfono válido de 8 dígitos del paciente."
@@ -153,7 +201,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             return;
         }
 
-        if (!idCard) {
+        if (!isMinor && !idCard) {
             showToast(
                 "error",
                 "Debe tener un documento de identidad."
@@ -183,14 +231,6 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             showToast(
                 "error",
                 "Debe proporcionar dirección."
-            );
-            return;
-        }
-
-        if (!email) {
-            showToast(
-                "error",
-                "El email es obligatorio."
             );
             return;
         }
@@ -253,23 +293,31 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             }
         }
 
-        // Validación básica de email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!isMinor) {
+            if (!email) {
+                showToast(
+                    "error",
+                    "El email es obligatorio."
+                );
+                return;
+            }
 
-        if (!emailRegex.test(email)) {
-            showToast(
-                "error",
-                "Ingrese un email válido."
-            );
-            return;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(email)) {
+                showToast(
+                    "error",
+                    "Ingrese un email válido."
+                );
+                return;
+            }
         }
 
-        if (!validateIdentityDocument(form.idCard)) {
+        if (!isMinor && !validateIdentityDocument(idCard)) {
             showToast(
                 "error",
                 "El documento de identidad debe ser una cédula o un pasaporte válido."
             );
-
             return;
         }
 
@@ -277,11 +325,11 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
             {
                 name,
                 lastName,
-                idCard,
+                idCard: isMinor ? "" : idCard,
                 birthdate: birthdateDate,
                 gender,
-                phoneNumber: phone,
-                email,
+                phoneNumber: isMinor ? "" : phone,
+                email: isMinor ? "" : email,
                 address,
                 emergencyContactName,
                 emergencyContactPhone,
@@ -298,6 +346,7 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                 payerPhoneNumber: isSelfPayer
                     ? phone
                     : payerPhoneNumber,
+                bloodType
             },
             {
                 onSuccess: () => {
@@ -453,19 +502,43 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                             />
                         </div>
                     </div>
+
+                    <div className="mt-6">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={isMinor}
+                                onChange={handleMinorChange}
+                                className="
+                                    w-4 h-4
+                                    rounded
+                                    border-slate-300
+                                    text-blue-600
+                                    focus:ring-blue-500
+                                    cursor-pointer
+                                "
+                            />
+
+                            <span className="text-sm font-medium text-slate-700">
+                                El paciente es menor de edad
+                            </span>
+                        </label>
+                    </div>
                     <div className="flex flex-col md:flex-row gap-2 w-full">
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Documento de identidad (cédula o pasaporte)
-                            </label>
+                        {!isMinor && (
+                            <>
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Documento de identidad (cédula o pasaporte)
+                                    </label>
 
-                            <input
-                                type="text"
-                                name="idCard"
-                                value={form.idCard}
-                                onChange={handleChange}
-                                placeholder="Ingrese el su documento de identidad"
-                                className="
+                                    <input
+                                        type="text"
+                                        name="idCard"
+                                        value={form.idCard}
+                                        onChange={handleChange}
+                                        placeholder="Ingrese el su documento de identidad"
+                                        className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -476,34 +549,36 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Fecha de nacimiento
-                            </label>
+                                    />
+                                </div>
 
-                            <input
-                                key={isOpen ? "birthdate-open" : "birthdate-closed"}
-                                type="date"
-                                name="birthdate"
-                                value={form.birthdate}
-                                onChange={handleChange}
-                                min={minBirthdate}
-                                max={maxBirthdate}
-                                className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                            />
-                        </div>
+                                <div className="flex-1">
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Email
+                                    </label>
+
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={form.email}
+                                        onChange={handleChange}
+                                        placeholder="correo@ejemplo.com"
+                                        className="
+                                            w-full
+                                            px-3 py-2.5
+                                            border border-slate-200
+                                            rounded-lg
+                                            text-sm
+                                            outline-none
+                                            focus:border-blue-500
+                                            focus:ring-2
+                                            focus:ring-blue-500/10
+                                        "
+                                    />
+                                </div>
+                            </>
+                        )}
+
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
@@ -538,17 +613,20 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 ))}
                             </select>
                         </div>
+
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Email
+                                Fecha de nacimiento
                             </label>
 
                             <input
-                                type="email"
-                                name="email"
-                                value={form.email}
+                                key={isOpen ? "birthdate-open" : "birthdate-closed"}
+                                type="date"
+                                name="birthdate"
+                                value={form.birthdate}
                                 onChange={handleChange}
-                                placeholder="correo@ejemplo.com"
+                                min={isMinor ? maxBirthdateForMinor : minBirthdate}
+                                max={maxBirthdate}
                                 className="
                                 w-full
                                 px-3 py-2.5
@@ -564,18 +642,19 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                         </div>
                     </div>
                     <div className="flex flex-col md:flex-row gap-2 w-full">
-                        <div className="flex-1">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Número de teléfono del paciente
-                            </label>
+                        {!isMinor && (
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Número de teléfono del paciente
+                                </label>
 
-                            <input
-                                type="text"
-                                name="phoneNumber"
-                                value={form.phoneNumber}
-                                onChange={handleChange}
-                                placeholder="Ingrese su número de teléfono"
-                                className="
+                                <input
+                                    type="text"
+                                    name="phoneNumber"
+                                    value={form.phoneNumber}
+                                    onChange={handleChange}
+                                    placeholder="Ingrese su número de teléfono"
+                                    className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -586,8 +665,9 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                            />
-                        </div>
+                                />
+                            </div>
+                        )}
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
                                 Dirección
@@ -613,15 +693,18 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                             />
                         </div>
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Estado Civil del paciente
-                        </label>
-                        <select
-                            name="maritalStatus"
-                            value={form.maritalStatus}
-                            onChange={handleChange}
-                            className="
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        {/* estado civil */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Estado Civil del paciente
+                            </label>
+                            <select
+                                disabled={isMinor}
+                                name="maritalStatus"
+                                value={form.maritalStatus}
+                                onChange={handleChange}
+                                className="
                                 w-full 
                                 px-3 py-2.5 
                                 border border-slate-200 
@@ -632,22 +715,60 @@ const CreatePatientDrawer: React.FC<CreatePatientProps> = ({ isOpen, onHide }) =
                                 focus:ring-2 
                                 focus:ring-blue-500/10
                             "
-                        >
-                            <option value="">
-                                Seleccione un estado civil
-                            </option>
-
-                            {maritalStatuses.map((status) => (
-                                <option key={status} value={status}>
-                                    {status}
+                            >
+                                <option value="">
+                                    Seleccione un estado civil
                                 </option>
-                            ))}
-                        </select>
+
+                                {maritalStatuses.map((status) => (
+                                    <option key={status} value={status}>
+                                        {status}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* tipos de sangre */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Tipo de sangre del paciente
+                            </label>
+
+                            <select
+                                name="bloodType"
+                                value={form.bloodType}
+                                onChange={handleChange}
+                                className="
+                                    w-full
+                                    px-3 py-2.5
+                                    border border-slate-200
+                                    rounded-lg
+                                    text-sm
+                                    outline-none
+                                    focus:border-blue-500
+                                    focus:ring-2
+                                    focus:ring-blue-500/10
+                                "
+                            >
+                                <option value="">
+                                    Seleccione un tipo de sangre
+                                </option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
                     </div>
                     <div className="mt-6">
                         <label className="flex items-center gap-3 cursor-pointer">
                             <input
                                 type="checkbox"
+                                disabled={isMinor}
                                 checked={isSelfPayer}
                                 onChange={handleSelfPayerChange}
                                 className="
