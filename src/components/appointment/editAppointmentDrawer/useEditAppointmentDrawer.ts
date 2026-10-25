@@ -303,6 +303,7 @@ export const useEditAppointmentDrawer = (
                 dentistFullName: selectedDentist
                     ? selectedDentist.fullName
                     : "",
+                dentistSpeciality: "",
             };
         });
     };
@@ -821,6 +822,14 @@ export const useEditAppointmentDrawer = (
             showToast(
                 "error",
                 "El nombre del dentista es obligatorio."
+            );
+            return;
+        }
+
+        if (!form.dentistSpeciality.trim()) {
+            showToast(
+                "error",
+                "El dentista seleccionado no tiene una especialidad registrada."
             );
             return;
         }

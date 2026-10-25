@@ -120,16 +120,11 @@ export const AppointmentGeneralInfo: React.FC<AppointmentGeneralInfoProps> = ({
             <div className="flex flex-col md:flex-row gap-2 w-full">
                 <div className="flex-1">
                     <DateTimePicker
-                        label="Fecha y hora de inicio"
+                        label="Fecha y horario de la cita *"
                         value={formatDateTimeForInput(form?.startAppointmentTime)}
                         onChange={(newValue) => onUpdateField("startAppointmentTime", newValue)}
-                    />
-                </div>
-                <div className="flex-1">
-                    <DateTimePicker
-                        label="Fecha y hora de finalización"
-                        value={formatDateTimeForInput(form?.endAppointmentTime)}
-                        onChange={(newValue) => onUpdateField("endAppointmentTime", newValue)}
+                        endValue={formatDateTimeForInput(form?.endAppointmentTime)}
+                        onEndChange={(newValue) => onUpdateField("endAppointmentTime", newValue)}
                     />
                 </div>
             </div>

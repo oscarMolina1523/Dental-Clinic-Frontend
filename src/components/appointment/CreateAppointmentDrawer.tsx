@@ -16,17 +16,31 @@ import type { TreatmentPlanDetailDto } from "../../models/TreatmentPlanDetailsMo
 import type AppointmentModel from "../../models/AppointmentModel";
 import { useAppointments } from "../../hooks/useAppointment";
 
-const getLocalDateTime = () => {
+const getDefaultAppointmentTimes = () => {
     const now = new Date();
 
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
+    // Redondear al siguiente minuto para evitar segundos ocultos.
+    now.setSeconds(0, 0);
 
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    const start = new Date(now);
+    const end = new Date(now.getTime() + 30 * 60 * 1000);
+
+    const formatLocal = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+
+    return {
+        startAppointmentTime: formatLocal(start),
+        endAppointmentTime: formatLocal(end),
+    };
 };
+
 
 const localDateTimeToDate = (value: string): Date => {
     const [datePart, timePart] = value.split("T");
@@ -50,7 +64,7 @@ interface CreateAppointmentProps {
 }
 
 const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onHide }) => {
-    const {data: appointments} = useAppointments();
+    const { data: appointments } = useAppointments();
     const { mutate: addAppointment, isPending } = useAddAppointmentOrchestrator();
     const {
         data: treatments = [],
@@ -116,8 +130,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
 
         treatmentPlanId: "",
         treatmentId: "",
-        startAppointmentTime: getLocalDateTime(),
-        endAppointmentTime: getLocalDateTime(),
+        ...getDefaultAppointmentTimes(),
         reason: "",
         status: "SCHEDULED",
         cancelationNotes: "",
@@ -182,8 +195,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
 
             treatmentPlanId: "",
             treatmentId: "",
-            startAppointmentTime: getLocalDateTime(),
-            endAppointmentTime: getLocalDateTime(),
+            ...getDefaultAppointmentTimes(),
             reason: "",
             status: "SCHEDULED",
             cancelationNotes: "",
@@ -502,9 +514,6 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         const cleanedClinicalNotes = clinicalNotes
             .map((note) => note.trim())
             .filter(Boolean);
-
-        console.log("start appointment time", startAppointmentTime);
-        console.log("date time satrt appointment time", new Date(startAppointmentTime));
         // ============================================================
         // APPOINTMENT BASE
         // ============================================================
@@ -749,7 +758,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
                             <SearchableSelect<PatientModel>
-                                label="Pacientes"
+                                label="Pacientes *"
                                 value={form.patientId}
                                 items={validPatients}
                                 getOptionValue={(patient) => patient.id}
@@ -769,7 +778,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                         </div>
                         <div className="flex-1">
                             <SearchableSelect<UserModel>
-                                label="Especialistas"
+                                label="Especialistas *"
                                 value={form.dentistId}
                                 items={dentists}
                                 getOptionValue={(dentist) => dentist.id}
@@ -794,7 +803,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                         </div>
                         <div className="flex-1">
                             <SearchableSelect<string>
-                                label="Especialidad"
+                                label="Especialidad *"
                                 value={form.dentistSpeciality}
                                 items={dentistSpecialities}
                                 getOptionValue={(speciality) => speciality}
@@ -824,22 +833,21 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
                             <DateTimePicker
-                                label="Fecha y hora de inicio"
+                                label="Fecha y horario de la cita *"
                                 value={form.startAppointmentTime}
-                                onChange={(newValue) => updateField("startAppointmentTime", newValue)}
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <DateTimePicker
-                                label="Fecha y hora de finalización"
-                                value={form.endAppointmentTime}
-                                onChange={(newValue) => updateField("endAppointmentTime", newValue)}
+                                onChange={(newValue) =>
+                                    updateField("startAppointmentTime", newValue)
+                                }
+                                endValue={form.endAppointmentTime}
+                                onEndChange={(newValue) =>
+                                    updateField("endAppointmentTime", newValue)
+                                }
                             />
                         </div>
                     </div>
                     <div>
                         <SearchableSelect<TreatmentCatalogModel>
-                            label="servicios"
+                            label="servicios *"
                             value={""}
                             items={validTreatments}
                             getOptionValue={(treatment) => treatment.id}
@@ -1304,7 +1312,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Razón
+                            Razón *
                         </label>
 
                         <textarea
