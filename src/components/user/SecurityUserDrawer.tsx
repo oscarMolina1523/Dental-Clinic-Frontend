@@ -5,6 +5,7 @@ import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import User from "../../models/UserModel";
 import { useRoles } from "../../hooks/useRoles";
 import { getRoleName } from "../../hooks/useRolePermitions";
+import { validatePassword } from "../../utils/validatePassword";
 
 interface SecurityUserDrawerProps {
     isOpen: boolean;
@@ -109,6 +110,14 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
                 showToast("error", "Las nuevas contraseñas no coinciden.");
                 return;
             }
+
+            if (!validatePassword(newPassword)) {
+                showToast(
+                    "error",
+                    "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial."
+                );
+                return;
+            }
         }
 
         if (email !== user.email && !email?.trim()) {
@@ -208,7 +217,7 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
                 onHide={onHide}
                 title="Seguridad del Usuario"
                 description="Modifica la información sensible del usuario"
-                width="w-112.5"
+                width="w-112.5 md:w-150"
                 footer={
                     <>
                         <button
@@ -284,7 +293,7 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
                             {roles.map((role) => (
                                 <option key={role.id} value={role.id}>
                                     {/* para obtener el nombre del rol en español y no en ingles */}
-                                    {getRoleName(role.id)} 
+                                    {getRoleName(role.id)}
                                 </option>
                             ))}
                         </select>
@@ -326,7 +335,7 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
 
                         {/* Renderizado condicional de los inputs de contraseña */}
                         {shouldChangePassword && (
-                            <div className="space-y-3 pl-2 border-l-2 border-blue-500/20">
+                            <div className="space-y-3 pl-2">
                                 <div>
                                     <label className="block text-xs font-medium text-slate-600 mb-1">
                                         Contraseña actual
@@ -365,6 +374,20 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
                                         className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none focus:border-blue-500"
                                     />
                                 </div>
+
+                                <span className="block mt-2 text-xs text-slate-500 leading-relaxed">
+                                    La contraseña debe contener:
+                                    <br />
+                                    • Mínimo 8 caracteres
+                                    <br />
+                                    • Al menos una letra mayúscula
+                                    <br />
+                                    • Al menos una letra minúscula
+                                    <br />
+                                    • Al menos un número
+                                    <br />
+                                    • Al menos un carácter especial (ej. @, #, !)
+                                </span>
                             </div>
                         )}
                     </div>

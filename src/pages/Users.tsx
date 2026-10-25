@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, KeyRound } from "lucide-react";
+import { Plus, Pencil, KeyRound } from "lucide-react";
 import type UserModel from "../models/UserModel";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
@@ -193,15 +193,15 @@ const UsersPage: React.FC = () => {
       },
       hidden: () => !canWrite,
     },
-    {
-      label: "Eliminar Usuario",
-      icon: <Trash2 className="w-4 h-4" />,
-      onClick: (user) => {
-        setSelectedUser(user);
-        setIsDeleteModalOpen(true);
-      },
-      hidden: () => !canWrite,
-    },
+    // {
+    //   label: "Eliminar Usuario",
+    //   icon: <Trash2 className="w-4 h-4" />,
+    //   onClick: (user) => {
+    //     setSelectedUser(user);
+    //     setIsDeleteModalOpen(true);
+    //   },
+    //   hidden: () => !canWrite,
+    // },
   ];
 
   const handleSearch = (value: string) => {
