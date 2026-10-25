@@ -120,6 +120,14 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
             return;
         }
 
+        if (!specialities.trim()) {
+            showToast(
+                "error",
+                "Debe seleccionar al menos una especialidad."
+            );
+            return;
+        }
+
         if (!estimatedDurationMinutes) {
             showToast(
                 "error",
@@ -244,8 +252,8 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
                 <div className="space-y-5">
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Nombre
+                            <label className="block text-sm font-medium text-slate-700 mb-4">
+                                Nombre *
                             </label>
 
                             <input
@@ -270,7 +278,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
 
                         <div className="flex-1 flex-wrap gap-2">
                             <SearchableSelect<Specialty>
-                                label="Especialidades"
+                                label="Especialidades *"
                                 value=""
                                 items={availableSpecialties}
                                 getOptionValue={(specialty) => specialty.id}
@@ -353,7 +361,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
                             placeholder="Ingrese una descripción"
                             className="
                                 w-full
-                                min-h-50
+                                min-h-30
                                 px-3 py-2.5
                                 border border-slate-200
                                 rounded-lg
@@ -368,7 +376,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Precio Base (C$)
+                            Precio Base * (C$)
                         </label>
 
                         <input
@@ -393,7 +401,7 @@ const CreateTreatmentCatalogDrawer: React.FC<CreateTreatmentCatalogProps> = ({ i
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Duración Estimada (minutos)
+                            Duración Estimada * (minutos)
                         </label>
                         <input
                             type="number"
