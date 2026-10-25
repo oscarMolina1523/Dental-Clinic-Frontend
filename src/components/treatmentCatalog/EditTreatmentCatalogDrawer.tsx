@@ -238,7 +238,7 @@ const EditTreatmentCatalogDrawer: React.FC<EditTreatmentCatalogProps> = ({
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombre
+                            Nombre *
                         </label>
 
                         <input

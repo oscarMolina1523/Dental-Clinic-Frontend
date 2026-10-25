@@ -161,7 +161,7 @@ const TreatmentCatalogPage: React.FC = () => {
 
     const actions: TableAction<typeof treatments[number]>[] = [
         {
-            label: "Credenciales y Seguridad",
+            label: "Datos sensibles",
             icon: <KeyRound className="w-4 h-4 text-amber-600" />,
             onClick: (treatment) => {
                 setSelectedTreatment(treatment);
