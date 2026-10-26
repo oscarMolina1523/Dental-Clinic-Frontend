@@ -33,8 +33,6 @@ export const useEditAppointmentDrawer = (
         isLoading: isLoadingTreatments,
     } = useTreatments();
 
-    const treatments = treatmentsComplete.filter((treatment) => treatment.active);
-
     const {
         mutate: markAsInvoiced,
         isPending: isMarkingAsInvoiced,
@@ -91,6 +89,22 @@ export const useEditAppointmentDrawer = (
         TreatmentCatalogModel[]
     >([]);
     const [treatmentDetails, setTreatmentDetails] = useState<TreatmentPlanDetailState[]>([]);
+
+    const treatments = treatmentsComplete.filter((treatment) => {
+        if (!treatment.active || !form?.dentistSpeciality) {
+            return false;
+        }
+
+        const treatmentSpecialities = treatment.specialities
+            ?.split(",")
+            .map((speciality) => speciality.trim().toLowerCase())
+            .filter(Boolean) ?? [];
+
+        return treatmentSpecialities.includes(
+            form.dentistSpeciality.trim().toLowerCase()
+        );
+    }
+    );
 
     const [diagnoses, setDiagnoses] = useState<string[]>([]);
     const [allergies, setAllergies] = useState<string[]>([]);
@@ -185,6 +199,7 @@ export const useEditAppointmentDrawer = (
                 basePrice: 0,
                 estimatedDurationMinutes: 0,
                 active: true,
+                specialities: form?.dentistSpeciality || "ODONTOLOGIA_GENERAL"
             };
 
             // SIEMPRE poblamos los estados sin importar si el catálogo ya terminó de cargar o no
