@@ -38,6 +38,9 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
 
     const [isCreatingCategory, setIsCreatingCategory] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState("");
+    const [hasExpiration, setHasExpiration] = useState(
+        false
+    );
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -51,6 +54,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
         description: "",
         category_id: "",
         measurement_unit_id: "",
+        hasExpiration: false
     });
 
     const [toast, setToast] = useState<{
@@ -75,9 +79,18 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
             description: "",
             category_id: "",
             measurement_unit_id: "",
+            hasExpiration: false
         });
 
         onHide();
+    };
+
+    const handleHasExpirationChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const checked = e.target.checked;
+
+        setHasExpiration(checked);
     };
 
     const handleChange = (
@@ -239,6 +252,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
         const description = form.description.trim();
         const category_id = form.category_id.trim();
         const measurement_unit_id = form.measurement_unit_id.trim();
+        const hasExpiration = form.hasExpiration;
 
         // Validaciones
         if (!name) {
@@ -271,7 +285,8 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                 barcode,
                 description,
                 category_id,
-                measurement_unit_id
+                measurement_unit_id,
+                hasExpiration
             },
             {
                 onSuccess: () => {
@@ -465,6 +480,26 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                             "
                         />
                     </div>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={hasExpiration}
+                            onChange={handleHasExpirationChange}
+                            className="
+                                    h-4
+                                    w-4
+                                    rounded
+                                    border-slate-300
+                                    text-blue-600
+                                    focus:ring-blue-500
+                                    cursor-pointer
+                                "
+                        />
+
+                        <span className="text-sm font-medium text-slate-700">
+                            ¿Tiene fecha de caducidad?
+                        </span>
+                    </label>
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">

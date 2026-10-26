@@ -27,7 +27,9 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
 
     const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
     const { data: measurementUnites = [], isLoading: isLoadingMeasurementUnites } = useMeasurementUnites();
-
+    const [hasExpiration, setHasExpiration] = useState(
+        Boolean(Number(product?.hasExpiration))
+    );
 
     const [prevProduct, setPrevProduct] = useState<ProductModel | null>(product);
     const [form, setForm] = useState<ProductModel | null>(product);
@@ -68,7 +70,13 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
         });
     };
 
+    const handleHasExpirationChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const checked = e.target.checked;
 
+        setHasExpiration(checked);
+    };
 
     const handleSubmit = () => {
         if (!product || !form) {
@@ -107,7 +115,8 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                     barcode: form.barcode,
                     description: form.description,
                     category_id: form.category_id,
-                    measurement_unit_id: form.measurement_unit_id
+                    measurement_unit_id: form.measurement_unit_id,
+                    hasExpiration: hasExpiration
                 }
             },
             {
@@ -227,6 +236,26 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                             "
                         />
                     </div>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={hasExpiration}
+                            onChange={handleHasExpirationChange}
+                            className="
+                                    h-4
+                                    w-4
+                                    rounded
+                                    border-slate-300
+                                    text-blue-600
+                                    focus:ring-blue-500
+                                    cursor-pointer
+                                "
+                        />
+
+                        <span className="text-sm font-medium text-slate-700">
+                            ¿Tiene fecha de caducidad?
+                        </span>
+                    </label>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
                             Código de barra (opcional)
