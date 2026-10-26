@@ -108,9 +108,6 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         (user) => roleNames[user.roleId] === UserRole.Dentist && user.active //hace referencia al rol de dentista
     );
 
-    const validPatients = patients.filter((patient) => patient.active);
-    const validTreatments = treatments.filter((treatment) => treatment.active);
-
     const [selectedTreatments, setSelectedTreatments] = useState<
         TreatmentCatalogModel[]
     >([]);
@@ -170,6 +167,22 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         status: "SCHEDULED",
         cancelationNotes: "",
         reminderSent: false,
+    });
+
+    const validPatients = patients.filter((patient) => patient.active);
+    const validTreatments = treatments.filter((treatment) => {
+        if (!treatment.active || !form.dentistSpeciality) {
+            return false;
+        }
+
+        const treatmentSpecialities = treatment.specialities
+            ?.split(",")
+            .map((speciality) => speciality.trim().toLowerCase())
+            .filter(Boolean) ?? [];
+
+        return treatmentSpecialities.includes(
+            form.dentistSpeciality.trim().toLowerCase()
+        );
     });
 
     const hasScheduleConflict = (
@@ -937,7 +950,10 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                             }
                             searchPlaceholder="Buscar servicio por nombre..."
                             noResultsMessage="No se encontraron servicios."
-                            disabled={isLoadingTreatments}
+                            disabled={
+                                !form.dentistSpeciality ||
+                                isLoadingTreatments
+                            }
                             onChange={handleTreatmentChange}
                         />
                     </div>
