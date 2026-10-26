@@ -181,7 +181,7 @@ const InstallmentPaymentFormSection: React.FC<InstallmentPaymentFormSectionProps
                     </div>
                 </div>
 
-                {paymentMethod === "TRANSFER" && (
+                {(paymentMethod === "TRANSFER" || paymentMethod === "CARD") && (
                     <div>
                         <label className="
                                                 block

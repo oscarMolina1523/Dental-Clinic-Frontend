@@ -210,7 +210,7 @@ const InstallmentDetailsSection: React.FC<InstallmentDetailsSectionProps> = ({
                                         text-slate-600
                                         mb-1
                                     ">
-                            Fecha de vencimiento
+                            Fecha de límite
                         </label>
 
                         <input
