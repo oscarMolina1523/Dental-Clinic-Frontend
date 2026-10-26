@@ -18,7 +18,7 @@ import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 import { useAppointmentOrchestratorById } from "../hooks/useAppointmentOrchestrator";
 
 const AppointmentPage: React.FC = () => {
-    const { role, user} = useRolePermissions();
+    const { role, user } = useRolePermissions();
     const {
         data: appointments = [],
         isLoading
@@ -360,6 +360,8 @@ const AppointmentPage: React.FC = () => {
         setCurrentPage(1);
     };
 
+    const isDisabled = !canWrite || role === UserRole.Dentist;
+
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
             {toast && (
@@ -378,10 +380,11 @@ const AppointmentPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar cita..."
                     />
-                    <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
-                        ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
-                        : "bg-slate-300 cursor-not-allowed opacity-70"
-                        }`}>
+                    <button disabled={isDisabled} onClick={() => setIsCreateDrawerOpen(true)}
+                        className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${isDisabled
+                            ? "bg-slate-300 cursor-not-allowed opacity-70"
+                            : "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                            }`}>
                         <Plus className="w-4 h-4" />
                         <span>Nueva Cita</span>
                     </button>
