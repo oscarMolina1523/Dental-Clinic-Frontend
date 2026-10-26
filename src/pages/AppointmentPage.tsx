@@ -93,7 +93,7 @@ const AppointmentPage: React.FC = () => {
 
 
     const filteredAppointments = useMemo(() => {
-        if (role === UserRole.Admin) {
+        if (role === UserRole.Admin || role === UserRole.Receptionist) {
             return appointments;
         }
 
