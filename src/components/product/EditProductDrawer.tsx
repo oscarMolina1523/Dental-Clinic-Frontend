@@ -215,7 +215,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombre
+                            Nombre *
                         </label>
 
                         <input
@@ -304,7 +304,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                     </div>
                     <div>
                         <SearchableSelect<CategoryModel>
-                            label="Categorías"
+                            label="Categorías *"
                             value={form?.category_id || ""}
                             items={categories}
                             getOptionValue={(category) => category.id}
@@ -333,7 +333,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                     </div>
                     <div>
                         <SearchableSelect<MeasurementUnitModel>
-                            label="Unidades de Medida"
+                            label="Unidades de Medida *"
                             value={form?.measurement_unit_id || ""}
                             items={measurementUnites}
                             getOptionValue={(measurementUnit) => measurementUnit.id}
