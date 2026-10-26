@@ -64,6 +64,14 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
         observation: ""
     });
 
+    const selectedProduct = products.find(
+        (product) => String(product.id) === form.productId
+    );
+
+    const requiresExpiration = Boolean(
+        Number(selectedProduct?.hasExpiration)
+    );
+
     const [toast, setToast] = useState<{
         type: "success" | "error";
         message: string;
@@ -241,6 +249,14 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
         const entryDate = new Date();
         const userId = "system"; //este siempre sera cero al crear
         const observation = form.observation.trim();
+
+        if (requiresExpiration && !form.dueDate) {
+            showToast(
+                "error",
+                "La fecha de vencimiento es obligatoria para este producto."
+            );
+            return;
+        }
 
         // Validaciones
         if (!productName) {
@@ -644,7 +660,12 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Fecha de venciminento (opcional)
+                            Fecha de venciminento
+                            {requiresExpiration ? (
+                                <span className="text-red-500"> *</span>
+                            ) : (
+                                <span className="text-slate-400"> (opcional)</span>
+                            )}
                         </label>
 
                         <input
@@ -653,6 +674,7 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                             name="dueDate"
                             value={form.dueDate}
                             onChange={handleChange}
+                            required={requiresExpiration}
                             min={new Date().toISOString().split("T")[0]} // Fecha mínima de vencimiento es hoy
                             className="
                                 w-full
