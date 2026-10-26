@@ -106,6 +106,29 @@ export const useEditAppointmentDrawer = (
     }
     );
 
+    const adjustAppointmentEndTime = (minutes: number) => {
+        if (!minutes) return;
+
+        setForm((prev) => {
+            if (!prev?.endAppointmentTime) return prev;
+
+            const currentEnd = new Date(prev.endAppointmentTime);
+
+            if (Number.isNaN(currentEnd.getTime())) {
+                return prev;
+            }
+
+            currentEnd.setMinutes(
+                currentEnd.getMinutes() + minutes
+            );
+
+            return {
+                ...prev,
+                endAppointmentTime: currentEnd,
+            };
+        });
+    };
+
     const [diagnoses, setDiagnoses] = useState<string[]>([]);
     const [allergies, setAllergies] = useState<string[]>([]);
     const [symptoms, setSymptoms] = useState<string[]>([]);
@@ -367,6 +390,12 @@ export const useEditAppointmentDrawer = (
             return;
         }
 
+        // Sumar la duración del nuevo servicio a la hora de finalización.
+        const durationMinutes =
+            Number(treatment.estimatedDurationMinutes) || 0;
+
+        adjustAppointmentEndTime(durationMinutes);
+
         /*
          * Si la cita originalmente tenía un solo tratamiento,
          * ese tratamiento no tenía TreatmentPlanDetail porque
@@ -430,7 +459,20 @@ export const useEditAppointmentDrawer = (
             },
         ]);
     };
+
     const handleRemoveTreatment = (treatmentId: string) => {
+        const treatmentToRemove = selectedTreatments.find(
+            (treatment) =>
+                String(treatment.id) === String(treatmentId)
+        );
+
+        if (treatmentToRemove) {
+            const durationMinutes =
+                Number(treatmentToRemove.estimatedDurationMinutes) || 0;
+
+            adjustAppointmentEndTime(-durationMinutes);
+        }
+
         setSelectedTreatments((prev) =>
             prev.filter(
                 (treatment) =>

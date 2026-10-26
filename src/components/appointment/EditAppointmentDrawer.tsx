@@ -91,7 +91,6 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         handleRemoveClinicalNote,
     } = useEditAppointmentDrawer(appointment, onHide);
 
-
     const handleSubmitInvoice = () => {
         if (!patientData) {
             setToast({
