@@ -113,25 +113,25 @@ const NoPlanFormSection: React.FC<NoPlanFormSectionProps> = ({
                         </select>
                     </div>
 
-                    {directPaymentForm.paymentMethod === "TRANSFER" && (
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Referencia
-                            </label>
-                            <input
-                                type="text"
-                                value={directPaymentForm.transactionReference}
-                                onChange={(e) =>
-                                    setDirectPaymentForm((prev) => ({
-                                        ...prev,
-                                        transactionReference: e.target.value,
-                                    }))
-                                }
-                                placeholder="Número de referencia"
-                                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 outline-none focus:border-[#001D4A]"
-                            />
-                        </div>
-                    )}
+                    {(directPaymentForm.paymentMethod === "TRANSFER" || directPaymentForm.paymentMethod === "CARD") && (
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Referencia
+                                </label>
+                                <input
+                                    type="text"
+                                    value={directPaymentForm.transactionReference}
+                                    onChange={(e) =>
+                                        setDirectPaymentForm((prev) => ({
+                                            ...prev,
+                                            transactionReference: e.target.value,
+                                        }))
+                                    }
+                                    placeholder="Número de referencia"
+                                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 outline-none focus:border-[#001D4A]"
+                                />
+                            </div>
+                        )}
                 </div>
             )}
 
