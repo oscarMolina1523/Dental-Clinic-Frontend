@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { ReadOnlyTime } from "./ReadOnlyTime";
 
 interface DateTimePickerProps {
     label: string;
@@ -241,17 +242,17 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
         }
     };
 
-    const handleEndTimeChange = (newValue: string) => {
-        if (!isRangeMode) return;
+    // const handleEndTimeChange = (newValue: string) => {
+    //     if (!isRangeMode) return;
 
-        const timePart = getValidTime(
-            newValue.split("T")[1] || "08:00"
-        );
+    //     const timePart = getValidTime(
+    //         newValue.split("T")[1] || "08:00"
+    //     );
 
-        const sharedDate = datePart || getLocalDate();
+    //     const sharedDate = datePart || getLocalDate();
 
-        onEndChange(`${sharedDate}T${timePart}`);
-    };
+    //     onEndChange(`${sharedDate}T${timePart}`);
+    // };
 
     return (
         <div>
@@ -286,11 +287,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
                                 Hora de finalización *
                             </label>
 
-                            <TimeSelector
-                                value={endValue}
-                                datePart={datePart}
-                                onChange={handleEndTimeChange}
-                            />
+                            <ReadOnlyTime value={endValue} />
                         </div>
                     </div>
                 ) : (
