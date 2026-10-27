@@ -168,7 +168,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                 onHide={onHide}
                 title="Editar Producto"
                 description="Modifica la información del producto"
-                width="w-80 md:w-112.5"
+                width="w-80 md:w-200"
                 footer={
                     <>
                         <button
@@ -212,18 +212,19 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                 {/* TODO EL BODY ES EXCLUSIVO DE EDITAR */}
 
                 <div className="space-y-5">
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        {/* nombre del producto */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Nombre *
+                            </label>
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombre *
-                        </label>
-
-                        <input
-                            type="text"
-                            name="name"
-                            value={form?.name || ""}
-                            onChange={handleChange}
-                            className="
+                            <input
+                                type="text"
+                                name="name"
+                                value={form?.name || ""}
+                                onChange={handleChange}
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -234,8 +235,34 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                            />
+                        </div>
+                        {/* codigo de barra */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Código de barra (opcional)
+                            </label>
+
+                            <input
+                                type="text"
+                                name="barcode"
+                                value={form?.barcode || ""}
+                                onChange={handleChange}
+                                className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                            />
+                        </div>
                     </div>
+
                     <label className="flex items-center gap-3 cursor-pointer">
                         <input
                             type="checkbox"
@@ -256,29 +283,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                             ¿Tiene fecha de caducidad?
                         </span>
                     </label>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Código de barra (opcional)
-                        </label>
 
-                        <input
-                            type="text"
-                            name="barcode"
-                            value={form?.barcode || ""}
-                            onChange={handleChange}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        />
-                    </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
                             Descripción

@@ -13,6 +13,7 @@ import type SupplierModel from "../../models/SupplierModel";
 import type { SupplierDTO } from "../../models/SupplierModel";
 import { Check, Plus, Trash2, X } from "lucide-react";
 import ConfirmModal from "../../shared/ConfirmModal";
+import { generateLoteNumber } from "../../utils/generateLoteNumber";
 
 interface CreateInventoryLoteProps {
     isOpen: boolean;
@@ -243,7 +244,7 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
         const productId = form.productId.trim();
         const productName = form.productName.trim();
         const supplierId = form.supplierId.trim();
-        const loteNumber = form.loteNumber.trim();
+        const loteNumber = generateLoteNumber(inventoryLotes);
         const quantity = Number(form.quantity);
         const dueDate = form.dueDate ? new Date(form.dueDate) : undefined;
         const entryDate = new Date();
@@ -618,8 +619,10 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                         <input
                             type="text"
                             name="loteNumber"
-                            value={form.loteNumber}
-                            onChange={handleChange}
+                            readOnly
+                            disabled
+                            value={generateLoteNumber(inventoryLotes)}
+                            // onChange={handleChange}
                             placeholder="Ingrese el número de lote"
                             className="
                                 w-full
