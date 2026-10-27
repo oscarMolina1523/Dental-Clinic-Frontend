@@ -16,16 +16,29 @@ import type { TreatmentPlanDetailDto } from "../../models/TreatmentPlanDetailsMo
 import type AppointmentModel from "../../models/AppointmentModel";
 import { useAppointments } from "../../hooks/useAppointment";
 
-const getLocalDateTime = () => {
+const getDefaultAppointmentTimes = () => {
     const now = new Date();
 
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
+    // Redondear al siguiente minuto para evitar segundos ocultos.
+    now.setSeconds(0, 0);
 
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    const start = new Date(now);
+    const end = new Date(now.getTime() + 10 * 60 * 1000);
+
+    const formatLocal = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    };
+
+    return {
+        startAppointmentTime: formatLocal(start),
+        endAppointmentTime: formatLocal(end),
+    };
 };
 
 const localDateTimeToDate = (value: string): Date => {
@@ -44,13 +57,37 @@ const localDateTimeToDate = (value: string): Date => {
         0
     );
 };
+
+const formatLocalDateTime = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const calculateEndTime = (
+    startTime: string,
+    durationMinutes: number
+): string => {
+    if (!startTime) return "";
+
+    const startDate = localDateTimeToDate(startTime);
+
+    startDate.setMinutes(startDate.getMinutes() + durationMinutes);
+
+    return formatLocalDateTime(startDate);
+};
+
 interface CreateAppointmentProps {
     isOpen: boolean;
     onHide: () => void;
 }
 
 const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onHide }) => {
-    const {data: appointments} = useAppointments();
+    const { data: appointments } = useAppointments();
     const { mutate: addAppointment, isPending } = useAddAppointmentOrchestrator();
     const {
         data: treatments = [],
@@ -71,12 +108,21 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         (user) => roleNames[user.roleId] === UserRole.Dentist && user.active //hace referencia al rol de dentista
     );
 
-    const validPatients = patients.filter((patient) => patient.active);
-    const validTreatments = treatments.filter((treatment) => treatment.active);
-
     const [selectedTreatments, setSelectedTreatments] = useState<
         TreatmentCatalogModel[]
     >([]);
+
+    const totalDurationMinutes = selectedTreatments.reduce(
+        (total, treatment) =>
+            total + Number(treatment.estimatedDurationMinutes ?? 0),
+        0
+    );
+
+    const appointmentDurationMinutes =
+        selectedTreatments.length > 0
+            ? totalDurationMinutes
+            : 30;
+
     const [dentistSpecialities, setDentistSpecialities] = useState<string[]>([]);
 
     const [treatmentDetails, setTreatmentDetails] = useState<TreatmentPlanDetailDto[]>([]);
@@ -116,12 +162,27 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
 
         treatmentPlanId: "",
         treatmentId: "",
-        startAppointmentTime: getLocalDateTime(),
-        endAppointmentTime: getLocalDateTime(),
+        ...getDefaultAppointmentTimes(),
         reason: "",
         status: "SCHEDULED",
         cancelationNotes: "",
         reminderSent: false,
+    });
+
+    const validPatients = patients.filter((patient) => patient.active);
+    const validTreatments = treatments.filter((treatment) => {
+        if (!treatment.active || !form.dentistSpeciality) {
+            return false;
+        }
+
+        const treatmentSpecialities = treatment.specialities
+            ?.split(",")
+            .map((speciality) => speciality.trim().toLowerCase())
+            .filter(Boolean) ?? [];
+
+        return treatmentSpecialities.includes(
+            form.dentistSpeciality.trim().toLowerCase()
+        );
     });
 
     const hasScheduleConflict = (
@@ -162,6 +223,26 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         message: string;
     } | null>(null);
 
+    const updateEndAppointmentTime = (
+        startTime: string,
+        treatments: TreatmentCatalogModel[]
+    ) => {
+        const durationMinutes = treatments.length > 0
+            ? treatments.reduce(
+                (total, treatment) =>
+                    total + Number(treatment.estimatedDurationMinutes ?? 0),
+                0
+            )
+            : 30;
+
+        const endTime = calculateEndTime(startTime, durationMinutes);
+
+        setForm((prev) => ({
+            ...prev,
+            endAppointmentTime: endTime,
+        }));
+    };
+
     const showToast = (
         type: "success" | "error",
         message: string
@@ -182,8 +263,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
 
             treatmentPlanId: "",
             treatmentId: "",
-            startAppointmentTime: getLocalDateTime(),
-            endAppointmentTime: getLocalDateTime(),
+            ...getDefaultAppointmentTimes(),
             reason: "",
             status: "SCHEDULED",
             cancelationNotes: "",
@@ -245,7 +325,14 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                 return prev;
             }
 
-            return [...prev, treatment];
+            const updatedTreatments = [...prev, treatment];
+
+            updateEndAppointmentTime(
+                form.startAppointmentTime,
+                updatedTreatments
+            );
+
+            return updatedTreatments;
         });
 
         setTreatmentDetails((prev) => {
@@ -272,12 +359,19 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
     };
 
     const handleRemoveTreatment = (treatmentId: string) => {
-        setSelectedTreatments((prev) =>
-            prev.filter(
+        setSelectedTreatments((prev) => {
+            const updatedTreatments = prev.filter(
                 (treatment) =>
                     String(treatment.id) !== String(treatmentId)
-            )
-        );
+            );
+
+            updateEndAppointmentTime(
+                form.startAppointmentTime,
+                updatedTreatments
+            );
+
+            return updatedTreatments;
+        });
 
         setTreatmentDetails((prev) =>
             prev.filter(
@@ -502,9 +596,6 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         const cleanedClinicalNotes = clinicalNotes
             .map((note) => note.trim())
             .filter(Boolean);
-
-        console.log("start appointment time", startAppointmentTime);
-        console.log("date time satrt appointment time", new Date(startAppointmentTime));
         // ============================================================
         // APPOINTMENT BASE
         // ============================================================
@@ -749,7 +840,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
                             <SearchableSelect<PatientModel>
-                                label="Pacientes"
+                                label="Pacientes *"
                                 value={form.patientId}
                                 items={validPatients}
                                 getOptionValue={(patient) => patient.id}
@@ -769,7 +860,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                         </div>
                         <div className="flex-1">
                             <SearchableSelect<UserModel>
-                                label="Especialistas"
+                                label="Especialistas *"
                                 value={form.dentistId}
                                 items={dentists}
                                 getOptionValue={(dentist) => dentist.id}
@@ -794,7 +885,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                         </div>
                         <div className="flex-1">
                             <SearchableSelect<string>
-                                label="Especialidad"
+                                label="Especialidad *"
                                 value={form.dentistSpeciality}
                                 items={dentistSpecialities}
                                 getOptionValue={(speciality) => speciality}
@@ -824,22 +915,28 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
                             <DateTimePicker
-                                label="Fecha y hora de inicio"
+                                label="Fecha y horario de la cita *"
                                 value={form.startAppointmentTime}
-                                onChange={(newValue) => updateField("startAppointmentTime", newValue)}
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <DateTimePicker
-                                label="Fecha y hora de finalización"
-                                value={form.endAppointmentTime}
-                                onChange={(newValue) => updateField("endAppointmentTime", newValue)}
+                                onChange={(newValue) => {
+                                    setForm((prev) => ({
+                                        ...prev,
+                                        startAppointmentTime: newValue,
+                                        endAppointmentTime: calculateEndTime(
+                                            newValue,
+                                            appointmentDurationMinutes
+                                        ),
+                                    }));
+                                }}
+                                endValue={form.endAppointmentTime}
+                                onEndChange={(newValue) =>
+                                    updateField("endAppointmentTime", newValue)
+                                }
                             />
                         </div>
                     </div>
                     <div>
                         <SearchableSelect<TreatmentCatalogModel>
-                            label="servicios"
+                            label="servicios *"
                             value={""}
                             items={validTreatments}
                             getOptionValue={(treatment) => treatment.id}
@@ -853,7 +950,10 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                             }
                             searchPlaceholder="Buscar servicio por nombre..."
                             noResultsMessage="No se encontraron servicios."
-                            disabled={isLoadingTreatments}
+                            disabled={
+                                !form.dentistSpeciality ||
+                                isLoadingTreatments
+                            }
                             onChange={handleTreatmentChange}
                         />
                     </div>
@@ -888,8 +988,8 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                             </p>
                                         )}
 
-                                        <p className="text-xs text-slate-500 mt-1">
-                                            C$ {Number(treatment.basePrice).toFixed(2)}
+                                        <p className="text-xs text-slate-500 mt-1 truncate">
+                                            costo: C$ {Number(treatment.basePrice).toFixed(2)} - duración estimada: {treatment.estimatedDurationMinutes} .min
                                         </p>
                                     </div>
 
@@ -953,7 +1053,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                     <div>
                         <div className="flex items-center justify-between mb-2">
                             <label className="block text-sm font-medium text-slate-700">
-                                Diagnósticos
+                                Diagnóstico inicial
                             </label>
 
                             {diagnoses.length === 0 && (
@@ -1304,7 +1404,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Razón
+                            Razón *
                         </label>
 
                         <textarea

@@ -11,6 +11,7 @@ export default class PatientModel extends BaseModel {
   phoneNumber: string;
   email: string;
   address: string;
+  bloodType: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
   maritalStatus: string;
@@ -34,6 +35,7 @@ export default class PatientModel extends BaseModel {
     phoneNumber,
     email,
     address,
+    bloodType,
     emergencyContactName,
     emergencyContactPhone,
     maritalStatus,
@@ -56,6 +58,7 @@ export default class PatientModel extends BaseModel {
     phoneNumber: string;
     email: string;
     address: string;
+    bloodType: string;
     emergencyContactName: string;
     emergencyContactPhone: string;
     maritalStatus: string;
@@ -78,6 +81,7 @@ export default class PatientModel extends BaseModel {
     this.phoneNumber = phoneNumber;
     this.email = email;
     this.address = address;
+    this.bloodType = bloodType;
     this.emergencyContactName = emergencyContactName;
     this.emergencyContactPhone = emergencyContactPhone;
     this.maritalStatus = maritalStatus;
@@ -102,6 +106,7 @@ export interface CreatePatientDTO {
   phoneNumber: string;
   email: string;
   address: string;
+  bloodType: string;
   emergencyContactName: string;
   emergencyContactPhone: string;
   maritalStatus: string;
@@ -116,10 +121,12 @@ export interface UpdatePatientDTO {
   lastName: string;
   birthdate: Date;
   gender: string;
+  bloodType: string;
   isSelfPayer: boolean;
   payerName: string;
   payerIdCard: string;
   payerPhoneNumber: string;
+  idCard?: string;
 }
 
 export interface UpdatePatientVariables {

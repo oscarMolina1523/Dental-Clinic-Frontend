@@ -33,8 +33,6 @@ export const useEditAppointmentDrawer = (
         isLoading: isLoadingTreatments,
     } = useTreatments();
 
-    const treatments = treatmentsComplete.filter((treatment) => treatment.active);
-
     const {
         mutate: markAsInvoiced,
         isPending: isMarkingAsInvoiced,
@@ -91,6 +89,45 @@ export const useEditAppointmentDrawer = (
         TreatmentCatalogModel[]
     >([]);
     const [treatmentDetails, setTreatmentDetails] = useState<TreatmentPlanDetailState[]>([]);
+
+    const treatments = treatmentsComplete.filter((treatment) => {
+        if (!treatment.active || !form?.dentistSpeciality) {
+            return false;
+        }
+
+        const treatmentSpecialities = treatment.specialities
+            ?.split(",")
+            .map((speciality) => speciality.trim().toLowerCase())
+            .filter(Boolean) ?? [];
+
+        return treatmentSpecialities.includes(
+            form.dentistSpeciality.trim().toLowerCase()
+        );
+    }
+    );
+
+    const adjustAppointmentEndTime = (minutes: number) => {
+        if (!minutes) return;
+
+        setForm((prev) => {
+            if (!prev?.endAppointmentTime) return prev;
+
+            const currentEnd = new Date(prev.endAppointmentTime);
+
+            if (Number.isNaN(currentEnd.getTime())) {
+                return prev;
+            }
+
+            currentEnd.setMinutes(
+                currentEnd.getMinutes() + minutes
+            );
+
+            return {
+                ...prev,
+                endAppointmentTime: currentEnd,
+            };
+        });
+    };
 
     const [diagnoses, setDiagnoses] = useState<string[]>([]);
     const [allergies, setAllergies] = useState<string[]>([]);
@@ -185,6 +222,7 @@ export const useEditAppointmentDrawer = (
                 basePrice: 0,
                 estimatedDurationMinutes: 0,
                 active: true,
+                specialities: form?.dentistSpeciality || "ODONTOLOGIA_GENERAL"
             };
 
             // SIEMPRE poblamos los estados sin importar si el catálogo ya terminó de cargar o no
@@ -303,6 +341,7 @@ export const useEditAppointmentDrawer = (
                 dentistFullName: selectedDentist
                     ? selectedDentist.fullName
                     : "",
+                dentistSpeciality: "",
             };
         });
     };
@@ -350,6 +389,12 @@ export const useEditAppointmentDrawer = (
         ) {
             return;
         }
+
+        // Sumar la duración del nuevo servicio a la hora de finalización.
+        const durationMinutes =
+            Number(treatment.estimatedDurationMinutes) || 0;
+
+        adjustAppointmentEndTime(durationMinutes);
 
         /*
          * Si la cita originalmente tenía un solo tratamiento,
@@ -414,7 +459,20 @@ export const useEditAppointmentDrawer = (
             },
         ]);
     };
+
     const handleRemoveTreatment = (treatmentId: string) => {
+        const treatmentToRemove = selectedTreatments.find(
+            (treatment) =>
+                String(treatment.id) === String(treatmentId)
+        );
+
+        if (treatmentToRemove) {
+            const durationMinutes =
+                Number(treatmentToRemove.estimatedDurationMinutes) || 0;
+
+            adjustAppointmentEndTime(-durationMinutes);
+        }
+
         setSelectedTreatments((prev) =>
             prev.filter(
                 (treatment) =>
@@ -821,6 +879,14 @@ export const useEditAppointmentDrawer = (
             showToast(
                 "error",
                 "El nombre del dentista es obligatorio."
+            );
+            return;
+        }
+
+        if (!form.dentistSpeciality.trim()) {
+            showToast(
+                "error",
+                "El dentista seleccionado no tiene una especialidad registrada."
             );
             return;
         }

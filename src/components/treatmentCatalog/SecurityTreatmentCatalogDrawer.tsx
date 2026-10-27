@@ -191,7 +191,7 @@ const SecurityTreatmentCatalogDrawer: React.FC<SecurityTreatmentCatalogDrawerPro
                     {/* Email */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Precio
+                            Precio (C$) *
                         </label>
                         <input
                             type="number"
@@ -204,7 +204,7 @@ const SecurityTreatmentCatalogDrawer: React.FC<SecurityTreatmentCatalogDrawerPro
                     {/* numero de telefono */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Duración (minutos)
+                            Duración (minutos) *
                         </label>
                         <input
                             type="number"

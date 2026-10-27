@@ -7,6 +7,7 @@ import useImageUpload from "../../hooks/useImageUpload";
 import { SPECIALTIES, type Specialty } from "../../utils/specialtiesData.enum";
 import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
 import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
+import { validateProfessionalCode } from "../../utils/validateProfessionalCode";
 
 interface EditUserDrawerProps {
     isOpen: boolean;
@@ -151,6 +152,14 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
             return;
         }
 
+        if (!form.userName.trim()) {
+            showToast(
+                "error",
+                "El nombre de usuario es obligatorio."
+            );
+            return;
+        }
+
         if (!form.email.trim()) {
             showToast(
                 "error",
@@ -165,6 +174,24 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                 "Ingrese un número de teléfono válido de 8 dígitos del usuario."
             );
             return;
+        }
+
+        if (isSpecialist) {
+            if (!form.membershipNumber?.trim()) {
+                showToast(
+                    "error",
+                    "El código de profesional es obligatorio para los especialistas."
+                );
+                return;
+            }
+
+            if (!validateProfessionalCode(form.membershipNumber)) {
+                showToast(
+                    "error",
+                    "El código de profesional debe contener entre 3 y 5 dígitos numéricos."
+                );
+                return;
+            }
         }
 
         try {
@@ -195,6 +222,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                     id: user.id,
                     user: {
                         fullName: form.fullName.trim(),
+                        userName: form.userName.trim(),
                         phoneNumber: form.phoneNumber.trim(),
                         image: imageUrl,
                         membershipNumber: form.membershipNumber,
@@ -212,6 +240,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                     },
 
                     onError: (error) => {
+                        console.log("eror", error)
                         showToast(
                             "error",
                             error.message ||
@@ -267,7 +296,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                 onHide={onHide}
                 title="Editar Usuario"
                 description="Modifica la información del usuario"
-                width="w-112.5"
+                width="w-112.5 md:w-200"
                 footer={
                     <>
                         <button
@@ -311,18 +340,19 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                 {/* TODO EL BODY ES EXCLUSIVO DE EDITAR */}
 
                 <div className="space-y-5">
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        {/* nombre completo */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Nombre completo *
+                            </label>
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombre completo
-                        </label>
-
-                        <input
-                            type="text"
-                            name="fullName"
-                            value={form?.fullName || ""}
-                            onChange={handleChange}
-                            className="
+                            <input
+                                type="text"
+                                name="fullName"
+                                value={form?.fullName || ""}
+                                onChange={handleChange}
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -333,11 +363,39 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                            />
+                        </div>
+
+                        {/* username */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Nombre de usuario *
+                            </label>
+
+                            <input
+                                type="text"
+                                name="userName"
+                                value={form?.userName || ""}
+                                onChange={handleChange}
+                                className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                            />
+                        </div>
                     </div>
+
+                    {/* telefono */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Teléfono
+                            Teléfono *
                         </label>
 
                         <input
@@ -358,6 +416,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                             "
                         />
                     </div>
+                    {/* imagen */}
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
                             Imagen
@@ -443,47 +502,24 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                         )}
 
                     </div>
-                    {/* <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Codigo de Profesional
-                        </label>
-
-                        <input
-                            type="text"
-                            name="membershipNumber"
-                            value={form?.membershipNumber || ""}
-                            onChange={handleChange}
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        />
-                    </div> */}
 
                     {/* Especialista */}
                     <div className="border-t border-slate-100 pt-5">
-
+                        {/* checkboxs para activar */}
                         <label className="flex items-center gap-3 cursor-pointer">
                             <input
                                 type="checkbox"
                                 checked={isSpecialist}
                                 onChange={handleSpecialistChange}
                                 className="
-                h-4
-                w-4
-                rounded
-                border-slate-300
-                text-blue-600
-                focus:ring-blue-500
-                cursor-pointer
-            "
+                                    h-4
+                                    w-4
+                                    rounded
+                                    border-slate-300
+                                    text-blue-600
+                                    focus:ring-blue-500
+                                    cursor-pointer
+                                "
                             />
 
                             <span className="text-sm font-medium text-slate-700">
@@ -493,107 +529,107 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
 
                         {isSpecialist && (
                             <div className="mt-4 space-y-5">
+                                <div className="flex flex-col md:flex-row gap-2 w-full">
+                                    {/* Especialidades */}
+                                    <div className="flex-1">
+                                        <SearchableSelect<Specialty>
+                                            label="Especialidades"
+                                            value=""
+                                            items={availableSpecialties}
+                                            getOptionValue={(specialty) => specialty.id}
+                                            getOptionLabel={(specialty) => specialty.name}
+                                            placeholder="Seleccione una especialidad"
+                                            searchPlaceholder="Buscar especialidad..."
+                                            noResultsMessage="No se encontraron especialidades."
+                                            onChange={handleSpecialtyChange}
+                                        />
 
-                                {/* Especialidades */}
-                                <div>
-                                    <SearchableSelect<Specialty>
-                                        label="Especialidades"
-                                        value=""
-                                        items={availableSpecialties}
-                                        getOptionValue={(specialty) => specialty.id}
-                                        getOptionLabel={(specialty) => specialty.name}
-                                        placeholder="Seleccione una especialidad"
-                                        searchPlaceholder="Buscar especialidad..."
-                                        noResultsMessage="No se encontraron especialidades."
-                                        onChange={handleSpecialtyChange}
-                                    />
+                                        {/* Especialidades seleccionadas */}
+                                        {selectedSpecialties.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mt-3">
+                                                {selectedSpecialties.map((specialtyId) => {
+                                                    const specialty = SPECIALTIES.find(
+                                                        (item) => item.id === specialtyId
+                                                    );
 
-                                    {/* Especialidades seleccionadas */}
-                                    {selectedSpecialties.length > 0 && (
-                                        <div className="flex flex-wrap gap-2 mt-3">
-                                            {selectedSpecialties.map((specialtyId) => {
-                                                const specialty = SPECIALTIES.find(
-                                                    (item) => item.id === specialtyId
-                                                );
+                                                    if (!specialty) return null;
 
-                                                if (!specialty) return null;
-
-                                                return (
-                                                    <div
-                                                        key={specialty.id}
-                                                        className="
-                                        inline-flex
-                                        items-center
-                                        gap-2
-                                        px-3
-                                        py-1.5
-                                        bg-blue-50
-                                        border
-                                        border-blue-100
-                                        rounded-lg
-                                        text-sm
-                                        text-blue-700
-                                    "
-                                                    >
-                                                        <span>
-                                                            {specialty.name}
-                                                        </span>
-
-                                                        <button
-                                                            type="button"
-                                                            onClick={() =>
-                                                                handleRemoveSpecialty(
-                                                                    specialty.id
-                                                                )
-                                                            }
+                                                    return (
+                                                        <div
+                                                            key={specialty.id}
                                                             className="
-                                            text-blue-500
-                                            hover:text-red-500
-                                            cursor-pointer
-                                            font-medium
-                                        "
+                                                                inline-flex
+                                                                items-center
+                                                                gap-2
+                                                                px-3
+                                                                py-1.5
+                                                                bg-blue-50
+                                                                border
+                                                                border-blue-100
+                                                                rounded-lg
+                                                                text-sm
+                                                                text-blue-700
+                                                            "
                                                         >
-                                                            ×
-                                                        </button>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    )}
+                                                            <span>
+                                                                {specialty.name}
+                                                            </span>
 
-                                    {selectedSpecialties.length === 0 && (
-                                        <p className="mt-2 text-xs text-slate-400">
-                                            Seleccione una o más especialidades.
-                                        </p>
-                                    )}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    handleRemoveSpecialty(
+                                                                        specialty.id
+                                                                    )
+                                                                }
+                                                                className="
+                                                                    text-blue-500
+                                                                    hover:text-red-500
+                                                                    cursor-pointer
+                                                                    font-medium
+                                                                "
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+
+                                        {selectedSpecialties.length === 0 && (
+                                            <p className="mt-2 text-xs text-slate-400">
+                                                Seleccione una o más especialidades.
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    {/* Código profesional */}
+                                    <div className="flex-1">
+                                        <label className="block text-sm font-medium text-slate-700 mb-4">
+                                            Código de Profesional
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            name="membershipNumber"
+                                            value={form?.membershipNumber || ""}
+                                            onChange={handleChange}
+                                            placeholder="Ingrese el código de profesional"
+                                            className="
+                                                w-full
+                                                px-3 py-2.5
+                                                border border-slate-200
+                                                rounded-lg
+                                                text-sm
+                                                outline-none
+                                                focus:border-blue-500
+                                                focus:ring-2
+                                                focus:ring-blue-500/10
+                                            "
+                                        />
+                                    </div>
                                 </div>
-
-                                {/* Código profesional */}
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Código de Profesional
-                                    </label>
-
-                                    <input
-                                        type="text"
-                                        name="membershipNumber"
-                                        value={form?.membershipNumber || ""}
-                                        onChange={handleChange}
-                                        placeholder="Ingrese el código de profesional"
-                                        className="
-                        w-full
-                        px-3 py-2.5
-                        border border-slate-200
-                        rounded-lg
-                        text-sm
-                        outline-none
-                        focus:border-blue-500
-                        focus:ring-2
-                        focus:ring-blue-500/10
-                    "
-                                    />
-                                </div>
-
                             </div>
                         )}
                     </div>

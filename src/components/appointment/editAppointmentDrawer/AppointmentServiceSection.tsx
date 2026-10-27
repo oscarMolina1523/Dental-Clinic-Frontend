@@ -50,7 +50,7 @@ export const AppointmentServicesSection: React.FC<AppointmentServicesSectionProp
         <>
             <div>
                 <SearchableSelect<TreatmentCatalogModel>
-                    label="servicios"
+                    label="servicios *"
                     value={""}
                     items={treatments}
                     getOptionValue={(treatment) => treatment.id}

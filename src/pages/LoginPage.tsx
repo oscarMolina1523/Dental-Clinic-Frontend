@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Mail, Lock } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useAuth";
 
 const LoginPage: React.FC = () => {
@@ -104,7 +104,7 @@ const LoginPage: React.FC = () => {
                     </button>
                 </form>
 
-                <div className="mt-4 text-sm text-right">
+                {/* <div className="mt-4 text-sm text-right">
                     ¿No tiene cuenta?{" "}
                     <NavLink
                         to="/auth/register"
@@ -113,7 +113,7 @@ const LoginPage: React.FC = () => {
                     >
                         Regístrese aquí
                     </NavLink>
-                </div>
+                </div> */}
             </div>
         </div>
     );

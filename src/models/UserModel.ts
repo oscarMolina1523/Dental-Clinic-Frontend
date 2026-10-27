@@ -3,6 +3,7 @@ import BaseModel from "./BaseModel";
 export default class User extends BaseModel {
   roleId: string;
   fullName: string;
+  userName: string;
   image: string;
   email: string;
   password: string;
@@ -17,6 +18,7 @@ export default class User extends BaseModel {
     id,
     roleId,
     fullName,
+    userName,
     image,
     email,
     password,
@@ -30,6 +32,7 @@ export default class User extends BaseModel {
     id: string;
     roleId: string;
     fullName: string;
+    userName: string;
     image: string;
     email: string;
     password: string;
@@ -43,6 +46,7 @@ export default class User extends BaseModel {
     super(id);
     this.roleId = roleId;
     this.fullName = fullName;
+    this.userName = userName;
     this.image = image;
     this.email = email;
     this.password = password;
@@ -59,6 +63,7 @@ export default class User extends BaseModel {
 export interface CreateUserDTO {
   roleId?: string; //el backend le da el role de viewer por default
   fullName: string;
+  userName: string;
   image?: string;
   email: string;
   password: string;
@@ -69,6 +74,7 @@ export interface CreateUserDTO {
 
 export interface UpdateUserDTO {
   fullName?: string;
+  userName?: string;
   image?: string;
   phoneNumber: string;
   membershipNumber?: string;

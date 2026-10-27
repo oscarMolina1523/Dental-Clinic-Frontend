@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, KeyRound } from "lucide-react";
+import { Plus, Pencil, KeyRound } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -199,15 +199,15 @@ const PatientsPage: React.FC = () => {
       },
       hidden: () => !canWrite,
     },
-    {
-      label: "Eliminar paciente",
-      icon: <Trash2 className="w-4 h-4" />,
-      onClick: (patient) => {
-        setSelectedPatient(patient);
-        setIsDeleteModalOpen(true);
-      },
-      hidden: () => !canWrite,
-    },
+    // {
+    //   label: "Eliminar paciente",
+    //   icon: <Trash2 className="w-4 h-4" />,
+    //   onClick: (patient) => {
+    //     setSelectedPatient(patient);
+    //     setIsDeleteModalOpen(true);
+    //   },
+    //   hidden: () => !canWrite,
+    // },
   ];
 
   const handleSearch = (value: string) => {

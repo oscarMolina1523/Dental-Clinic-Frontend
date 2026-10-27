@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Ban, Eye, Pencil} from "lucide-react";
+import { Eye, Pencil} from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -198,18 +198,18 @@ const InvoicesPage: React.FC = () => {
             },
             hidden: () => !canWrite,
         },
+        // {
+        //     label: "Cancelar Factura",
+        //     hidden: (invoice) =>
+        //         invoice.status !== "PENDING"  || !canWrite,
+        //     icon: <Ban className="w-4 h-4" />,
+        //     onClick: (invoice) => {
+        //         setSelectedInvoice(invoice);
+        //         setIsCancelModalOpen(true);
+        //     },
+        // },
         {
-            label: "Cancelar Factura",
-            hidden: (invoice) =>
-                invoice.status !== "PENDING"  || !canWrite,
-            icon: <Ban className="w-4 h-4" />,
-            onClick: (invoice) => {
-                setSelectedInvoice(invoice);
-                setIsCancelModalOpen(true);
-            },
-        },
-        {
-            label: "Editar inventario",
+            label: "Editar factura",
             icon: <Pencil className="w-4 h-4" />,
             onClick: (invoice) => {
                 setSelectedInvoice(invoice);

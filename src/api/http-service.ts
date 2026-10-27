@@ -74,10 +74,15 @@ export default class HTTPService {
     }
   }
 
-  async put<T = unknown, B = unknown>(path: string, body: B): Promise<T> {
+
+  async put<T = unknown, B = unknown>(
+    path: string,
+    body: B
+  ): Promise<T> {
     try {
       const token = await this.getToken();
       const url = `${this.baseUrl}/${path}`;
+
       const response = await fetch(url, {
         method: "PUT",
         headers: {
@@ -86,15 +91,28 @@ export default class HTTPService {
         },
         body: JSON.stringify(body),
       });
+
+      // Leer la respuesta una sola vez
+      const json = await response.json().catch(() => null);
+
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        const message =
+          typeof json === "object" &&
+            json !== null &&
+            "message" in json
+            ? String((json as { message: unknown }).message)
+            : "Error en la solicitud";
+
+        throw new Error(message);
       }
-      return (await response.json()) as T;
+
+      return json as T;
     } catch (error: unknown) {
       console.error("Error putting data:", error);
       throw error;
     }
   }
+
 
   async delete<T = void>(
     path: string

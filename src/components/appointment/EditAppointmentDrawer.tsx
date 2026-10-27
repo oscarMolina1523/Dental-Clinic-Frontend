@@ -91,7 +91,6 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         handleRemoveClinicalNote,
     } = useEditAppointmentDrawer(appointment, onHide);
 
-
     const handleSubmitInvoice = () => {
         if (!patientData) {
             setToast({
@@ -209,8 +208,8 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
             <GenericDrawer
                 isOpen={isOpen}
                 onHide={handleCancel}
-                title="Editar Cita"
-                description="Modifica la información de la cita"
+                title="Editar Consulta"
+                description="Modifica la información de la consulta médica"
                 width="w-80 md:w-200"
                 footer={
                     <>

@@ -9,9 +9,13 @@ import type { PaymentMethods } from "../../utils/paymentMethodsStatus.enum";
 import type Invoice from "../../models/InvoiceModel";
 import type Installment from "../../models/InstallmentModel";
 import Toast from "../../shared/Toast";
-import InvoiceInstallmentSection from "./InvoiceInstallmentSection";
 import { useAddPaymentToInvoice } from "../../hooks/useInvoicesPayment";
 import { useUpdateInvoice } from "../../hooks/useInvoices";
+import NoPlanFormSection from "./NoPlanFormSection";
+import InvoiceSummarySection from "./InvoiceSummarySection";
+import InstallmentSelectorSection from "./InstallmentSelectrSection";
+import InstallmentDetailsSection from "./InstallmentDetailsSection";
+import InstallmentPaymentFormSection from "./InstallmentPaymentFormSection";
 
 interface RegisterPaymentDrawerProps {
     isOpen: boolean;
@@ -626,110 +630,20 @@ const RegisterPaymentDrawer: React.FC<
                         </p>
                     </div>
                 ) : !paymentPlanDetails ? (
-                    <form onSubmit={handleSubmitNoPlan} className="space-y-5">
-                        {/* Checkbox selector de modalidad */}
-                        <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                            <input
-                                type="checkbox"
-                                id="isInstallmentPaymentDrawer"
-                                checked={isInstallmentPayment}
-                                onChange={(e) => setIsInstallmentPayment(e.target.checked)}
-                                className="w-4 h-4 text-[#001D4A] rounded border-slate-300 focus:ring-[#001D4A]"
-                            />
-                            <label htmlFor="isInstallmentPaymentDrawer" className="text-sm font-medium text-slate-700 cursor-pointer">
-                                Registrar pago en cuotas
-                            </label>
-                        </div>
 
-                        {/* SI EL CHECKBOX ESTÁ ACTIVO -> SECCIÓN DE CUOTAS */}
-                        {isInstallmentPayment ? (
-                            <InvoiceInstallmentSection
-                                numberOfInstallments={installmentForm.numberOfInstallments}
-                                interestRate={installmentForm.interestRate}
-                                firstDueDate={installmentForm.firstDueDate}
-                                isPending={isCreatingPlan}
-                                onChange={(e) =>
-                                    setInstallmentForm((prev) => ({
-                                        ...prev,
-                                        [e.target.name]: e.target.value,
-                                    }))
-                                }
-                            />
-                        ) : (
-                            /* SI EL CHECKBOX NO ESTÁ ACTIVO -> REGISTRO DE PAGO DIRECTO */
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Monto a pagar
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min="0.01"
-                                        max={Number(invoice.pendingAmount || 0)}
-                                        step="0.01"
-                                        value={directPaymentForm.amount}
-                                        onChange={(e) =>
-                                            setDirectPaymentForm((prev) => ({ ...prev, amount: e.target.value }))
-                                        }
-                                        className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 outline-none focus:border-[#001D4A]"
-                                    />
-                                </div>
+                    <NoPlanFormSection
+                        invoice={invoice}
+                        isInstallmentPayment={isInstallmentPayment}
+                        setIsInstallmentPayment={setIsInstallmentPayment}
+                        installmentForm={installmentForm}
+                        setInstallmentForm={setInstallmentForm}
+                        directPaymentForm={directPaymentForm}
+                        setDirectPaymentForm={setDirectPaymentForm}
+                        isCreatingPlan={isCreatingPlan}
+                        isAddingPayment={isAddingPayment}
+                        onSubmit={handleSubmitNoPlan}
+                    />
 
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Método de pago
-                                    </label>
-                                    <select
-                                        value={directPaymentForm.paymentMethod}
-                                        onChange={(e) =>
-                                            setDirectPaymentForm((prev) => ({
-                                                ...prev,
-                                                paymentMethod: e.target.value as PaymentMethods,
-                                            }))
-                                        }
-                                        className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 outline-none focus:border-[#001D4A]"
-                                    >
-                                        <option value="">Seleccione un método</option>
-                                        <option value="CASH">Efectivo</option>
-                                        <option value="CARD">Tarjeta</option>
-                                        <option value="TRANSFER">Transferencia</option>
-                                    </select>
-                                </div>
-
-                                {directPaymentForm.paymentMethod === "TRANSFER" && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                                            Referencia
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={directPaymentForm.transactionReference}
-                                            onChange={(e) =>
-                                                setDirectPaymentForm((prev) => ({
-                                                    ...prev,
-                                                    transactionReference: e.target.value,
-                                                }))
-                                            }
-                                            placeholder="Número de referencia"
-                                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 outline-none focus:border-[#001D4A]"
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        <button
-                            type="submit"
-                            disabled={isCreatingPlan || isAddingPayment}
-                            className="w-full px-4 py-2.5 rounded-lg text-sm font-medium text-white bg-[#001D4A] hover:bg-[#002b6b] disabled:opacity-50 transition"
-                        >
-                            {isCreatingPlan || isAddingPayment
-                                ? "Procesando..."
-                                : isInstallmentPayment
-                                    ? "Generar Plan de Cuotas"
-                                    : "Registrar Pago"}
-                        </button>
-                    </form>
                 ) : pendingInstallments.length === 0 ? (
                     <div className="
                     border
@@ -755,414 +669,35 @@ const RegisterPaymentDrawer: React.FC<
                             FACTURA
                         ================================================= */}
 
-                        <div>
-                            <h3 className="
-                                text-sm
-                                font-semibold
-                                text-slate-800
-                                mb-4
-                            ">
-                                Información de la factura - {invoice.invoiceNumber}
-                            </h3>
-
-                            <div className="
-                            border
-                            border-slate-200
-                            rounded-xl
-                            p-4
-                            space-y-4
-                        ">
-                                <div className="flex flex-col md:flex-row gap-2 w-full">
-                                    <div className="flex-1">
-                                        <label className="
-                                    block
-                                    text-xs
-                                    font-medium
-                                    text-slate-600
-                                    mb-1
-                                ">
-                                            Deudor
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            value={
-                                                invoice.patientFullName
-                                            }
-                                            disabled
-                                            className="
-                                        w-full
-                                        px-3
-                                        py-2.5
-                                        border
-                                        border-slate-200
-                                        rounded-lg
-                                        text-sm
-                                        bg-slate-50
-                                        text-slate-500
-                                        outline-none
-                                    "
-                                        />
-                                    </div>
-
-                                    <div className="flex-1">
-                                        <label className="
-                                    block
-                                    text-xs
-                                    font-medium
-                                    text-slate-600
-                                    mb-1
-                                ">
-                                            Saldo pendiente de factura
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            value={formatCurrency(
-                                                Number(
-                                                    invoice.pendingAmount ||
-                                                    0
-                                                )
-                                            )}
-                                            disabled
-                                            className="
-                                        w-full
-                                        px-3
-                                        py-2.5
-                                        border
-                                        border-slate-200
-                                        rounded-lg
-                                        text-sm
-                                        bg-blue-50
-                                        text-[#001D4A]
-                                        font-semibold
-                                        outline-none
-                                    "
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <InvoiceSummarySection
+                            invoice={invoice}
+                            formatCurrency={formatCurrency}
+                        />
 
                         {/* =================================================
                             SELECCIONAR CUOTA
                         ================================================= */}
 
-                        <div>
-                            <label className="
-                            block
-                            text-sm
-                            font-medium
-                            text-slate-700
-                            mb-2
-                        ">
-                                Cuota a pagar
-                            </label>
-
-                            <select
-                                value={
-                                    selectedInstallment?.id ||
-                                    ""
-                                }
-                                onChange={
-                                    handleInstallmentChange
-                                }
-                                disabled={isPending}
-                                className="
-                                w-full
-                                px-3
-                                py-2.5
-                                border
-                                border-slate-200
-                                rounded-lg
-                                text-sm
-                                bg-white
-                                text-slate-700
-                                outline-none
-                                focus:border-[#001D4A]
-                            "
-                            >
-                                <option value="">
-                                    Seleccione una cuota
-                                </option>
-
-                                {pendingInstallments.map(
-                                    (installment) => {
-                                        const installmentPending =
-                                            Math.max(
-                                                Number(
-                                                    installment.amount ||
-                                                    0
-                                                ) +
-                                                Number(
-                                                    installment.lateFeeAmount ||
-                                                    0
-                                                ) -
-                                                Number(
-                                                    installment.paidAmount ||
-                                                    0
-                                                ),
-                                                0
-                                            );
-
-                                        return (
-                                            <option
-                                                key={
-                                                    installment.id
-                                                }
-                                                value={
-                                                    installment.id
-                                                }
-                                            >
-                                                Cuota{" "}
-                                                {
-                                                    installment.installmentNumber
-                                                }{" "}
-                                                -{" "}
-                                                {formatCurrency(
-                                                    installmentPending
-                                                )}
-                                            </option>
-                                        );
-                                    }
-                                )}
-                            </select>
-                        </div>
+                        <InstallmentSelectorSection
+                            selectedInstallment={selectedInstallment}
+                            pendingInstallments={pendingInstallments}
+                            isPending={isPending}
+                            handleInstallmentChange={handleInstallmentChange}
+                            formatCurrency={formatCurrency}
+                        />
 
                         {/* =================================================
                             INFORMACIÓN DE LA CUOTA
                         ================================================= */}
 
                         {selectedInstallment && (
-                            <div>
-                                <h3 className="
-                                text-sm
-                                font-semibold
-                                text-slate-800
-                                mb-4
-                            ">
-                                    Información de la cuota
-                                </h3>
 
-                                <div className="
-                                border
-                                border-slate-200
-                                rounded-xl
-                                p-4
-                                space-y-4
-                            ">
-                                    <div className="flex flex-col md:flex-row gap-2 w-full">
-                                        <div className="flex-1">
-                                            <label className="
-                                        block
-                                        text-xs
-                                        font-medium
-                                        text-slate-600
-                                        mb-1
-                                    ">
-                                                Cuota
-                                            </label>
+                            <InstallmentDetailsSection
+                                selectedInstallment={selectedInstallment}
+                                pendingAmount={pendingAmount}
+                                formatCurrency={formatCurrency}
+                            />
 
-                                            <input
-                                                type="text"
-                                                value={
-                                                    selectedInstallment.installmentNumber
-                                                }
-                                                disabled
-                                                className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-slate-50
-                                            text-slate-500
-                                            outline-none
-                                        "
-                                            />
-                                        </div>
-
-                                        <div className="flex-1">
-                                            <label className="
-                                        block
-                                        text-xs
-                                        font-medium
-                                        text-slate-600
-                                        mb-1
-                                    ">
-                                                Monto de la cuota
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                value={formatCurrency(
-                                                    Number(
-                                                        selectedInstallment.amount ||
-                                                        0
-                                                    )
-                                                )}
-                                                disabled
-                                                className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-slate-50
-                                            text-slate-500
-                                            outline-none
-                                        "
-                                            />
-                                        </div>
-
-                                        <div className="flex-1">
-                                            <label className="
-                                        block
-                                        text-xs
-                                        font-medium
-                                        text-slate-600
-                                        mb-1
-                                    ">
-                                                Monto por mora
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                value={formatCurrency(
-                                                    Number(
-                                                        selectedInstallment.lateFeeAmount ||
-                                                        0
-                                                    )
-                                                )}
-                                                disabled
-                                                className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-slate-50
-                                            text-slate-500
-                                            outline-none
-                                        "
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col md:flex-row gap-2 w-full">
-                                        <div className="flex-1">
-                                            <label className="
-                                        block
-                                        text-xs
-                                        font-medium
-                                        text-slate-600
-                                        mb-1
-                                    ">
-                                                Monto pagado
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                value={formatCurrency(
-                                                    Number(
-                                                        selectedInstallment.paidAmount ||
-                                                        0
-                                                    )
-                                                )}
-                                                disabled
-                                                className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-slate-50
-                                            text-slate-500
-                                            outline-none
-                                        "
-                                            />
-                                        </div>
-
-                                        <div className="flex-1">
-                                            <label className="
-                                        block
-                                        text-xs
-                                        font-medium
-                                        text-slate-600
-                                        mb-1
-                                    ">
-                                                Saldo pendiente
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                value={formatCurrency(
-                                                    pendingAmount
-                                                )}
-                                                disabled
-                                                className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-blue-50
-                                            text-[#001D4A]
-                                            font-semibold
-                                            outline-none
-                                        "
-                                            />
-                                        </div>
-
-                                        <div className="flex-1">
-                                            <label className="
-                                        block
-                                        text-xs
-                                        font-medium
-                                        text-slate-600
-                                        mb-1
-                                    ">
-                                                Fecha de vencimiento
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                value={
-                                                    selectedInstallment.dueDate
-                                                        ? new Date(
-                                                            selectedInstallment.dueDate
-                                                        ).toLocaleDateString(
-                                                            "es-NI"
-                                                        )
-                                                        : "N/A"
-                                                }
-                                                disabled
-                                                className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-slate-50
-                                            text-slate-500
-                                            outline-none
-                                        "
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         )}
 
                         {/* =================================================
@@ -1170,200 +705,21 @@ const RegisterPaymentDrawer: React.FC<
                         ================================================= */}
 
                         {selectedInstallment && (
-                            <div>
-                                <h3 className="
-                                    text-sm
-                                    font-semibold
-                                    text-slate-800
-                                    mb-4
-                                    ">
-                                    Datos del pago
-                                </h3>
-                                <div className="space-y-4">
-                                    <div className="flex flex-col md:flex-row gap-2 w-full">
-                                        <div className="flex-1">
-                                            <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                                Monto a pagar (C$)
-                                            </label>
 
-                                            <input
-                                                type="number"
-                                                min="0.01"
-                                                max={pendingAmount}
-                                                step="0.01"
-                                                value={amount}
-                                                onChange={(event) =>
-                                                    setAmount(
-                                                        event.target.value
-                                                    )
-                                                }
-                                                disabled={isPending}
-                                                className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-white
-                                            text-slate-700
-                                            outline-none
-                                            focus:border-[#001D4A]
-                                        "
-                                            />
-
-                                            <p className="
-                                        text-xs
-                                        text-slate-500
-                                        mt-1
-                                    ">
-                                                Máximo permitido:{" "}
-                                                {formatCurrency(
-                                                    pendingAmount
-                                                )}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex-1">
-                                            <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                                Método de pago
-                                            </label>
-
-                                            <select
-                                                value={
-                                                    paymentMethod
-                                                }
-                                                onChange={(event) =>
-                                                    setPaymentMethod(
-                                                        event.target
-                                                            .value as PaymentMethods
-                                                    )
-                                                }
-                                                disabled={isPending}
-                                                className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-white
-                                            text-slate-700
-                                            outline-none
-                                            focus:border-[#001D4A]
-                                        "
-                                            >
-                                                <option value="">
-                                                    Seleccione un método
-                                                </option>
-
-                                                <option value="CASH">
-                                                    Efectivo
-                                                </option>
-
-                                                <option value="CARD">
-                                                    Tarjeta
-                                                </option>
-
-                                                <option value="TRANSFER">
-                                                    Transferencia
-                                                </option>
-                                            </select>
-                                        </div>
-
-                                        <div className="flex-1">
-                                            <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                                Fecha del pago
-                                            </label>
-
-                                            <input
-                                                type="date"
-                                                value={paymentDate}
-                                                onChange={(event) =>
-                                                    setPaymentDate(
-                                                        event.target.value
-                                                    )
-                                                }
-                                                disabled
-                                                className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-white
-                                            text-slate-700
-                                            outline-none
-                                            focus:border-[#001D4A]
-                                        "
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {paymentMethod === "TRANSFER" && (
-                                        <div>
-                                            <label className="
-                                        block
-                                        text-sm
-                                        font-medium
-                                        text-slate-700
-                                        mb-2
-                                    ">
-                                                Referencia
-                                            </label>
-
-                                            <input
-                                                type="text"
-                                                value={
-                                                    transactionReference
-                                                }
-                                                onChange={(event) =>
-                                                    setTransactionReference(
-                                                        event.target.value
-                                                    )
-                                                }
-                                                placeholder="Número de referencia"
-                                                disabled={isPending}
-                                                className="
-                                            w-full
-                                            px-3
-                                            py-2.5
-                                            border
-                                            border-slate-200
-                                            rounded-lg
-                                            text-sm
-                                            bg-white
-                                            text-slate-700
-                                            outline-none
-                                            focus:border-[#001D4A]
-                                        "
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                            <InstallmentPaymentFormSection
+                                amount={amount}
+                                setAmount={setAmount}
+                                pendingAmount={pendingAmount}
+                                paymentMethod={paymentMethod}
+                                setPaymentMethod={setPaymentMethod}
+                                paymentDate={paymentDate}
+                                setPaymentDate={setPaymentDate}
+                                transactionReference={transactionReference}
+                                setTransactionReference={setTransactionReference}
+                                isPending={isPending}
+                                formatCurrency={formatCurrency}
+                            />
+                            
                         )}
 
                         {/* =================================================
@@ -1398,8 +754,8 @@ const RegisterPaymentDrawer: React.FC<
                         )}
 
                         {/* =================================================
-                        BOTÓN
-                    ================================================= */}
+                            BOTÓN
+                        ================================================= */}
 
                         <button
                             type="submit"

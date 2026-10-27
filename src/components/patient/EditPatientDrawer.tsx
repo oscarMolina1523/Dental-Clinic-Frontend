@@ -7,6 +7,7 @@ import { genderData } from "../../data/genderData";
 import { usePatientAgeValidation } from "../../utils/usePatientAgeValidation";
 import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
 import { validateIdentityDocument } from "../../utils/validatIdentityDocument";
+import { getAge } from "../../utils/getAge";
 
 interface EditPatientDrawerProps {
     isOpen: boolean;
@@ -33,6 +34,10 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
 
     const [prevPatient, setPrevPatient] = useState<PatientModel | null>(patient);
     const [form, setForm] = useState<PatientModel | null>(patient);
+
+    const isMinor = form?.birthdate
+        ? getAge(form.birthdate) < 18
+        : false;
 
     const [toast, setToast] = useState<{
         type: "success" | "error";
@@ -173,6 +178,14 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                 return;
             }
 
+            if (!form.bloodType) {
+                showToast(
+                    "error",
+                    "Debe seleccionar un tipo de sangre."
+                );
+                return;
+            }
+
             if (!validateIdentityDocument(form.payerIdCard)) {
                 showToast(
                     "error",
@@ -210,6 +223,8 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                     payerName: form.payerName.trim(),
                     payerIdCard: form.payerIdCard.trim(),
                     payerPhoneNumber: form.payerPhoneNumber.trim(),
+                    bloodType: form.bloodType.trim(),
+                    idCard: form.idCard
                 }
             },
             {
@@ -261,7 +276,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                 onHide={onHide}
                 title="Editar Paciente"
                 description="Modifica la información del paciente"
-                width="w-80 md:w-150"
+                width="w-80 md:w-200"
                 footer={
                     <>
                         <button
@@ -308,7 +323,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Nombres
+                                Nombres *
                             </label>
 
                             <input
@@ -331,7 +346,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                         </div>
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Apellidos
+                                Apellidos *
                             </label>
 
                             <input
@@ -357,7 +372,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                     <div className="flex flex-col md:flex-row gap-2 w-full">
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Género
+                                Género *
                             </label>
 
                             <select
@@ -389,7 +404,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                         </div>
                         <div className="flex-1">
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Fecha de nacimiento
+                                Fecha de nacimiento *
                             </label>
 
                             <input
@@ -414,9 +429,74 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                             />
                         </div>
                     </div>
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Tipo de sangre del paciente *
+                            </label>
+
+                            <select
+                                name="bloodType"
+                                value={form?.bloodType}
+                                onChange={handleChange}
+                                className="
+                                    w-full
+                                    px-3 py-2.5
+                                    border border-slate-200
+                                    rounded-lg
+                                    text-sm
+                                    outline-none
+                                    focus:border-blue-500
+                                    focus:ring-2
+                                    focus:ring-blue-500/10
+                                "
+                            >
+                                <option value="">
+                                    Seleccione un tipo de sangre
+                                </option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+
+                        {!isMinor && (
+                            <div className="flex-1">
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Documento de identidad * (cédula o pasaporte)
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="idCard"
+                                    value={form?.idCard}
+                                    onChange={handleChange}
+                                    placeholder="Ingrese el su documento de identidad"
+                                    className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                                />
+                            </div>
+                        )}
+                    </div>
+
                     <div className="mt-6">
                         <label className="flex items-center gap-3 cursor-pointer">
                             <input
+                                disabled={isMinor}
                                 type="checkbox"
                                 checked={form?.isSelfPayer ?? true}
                                 onChange={handleSelfPayerChange}
@@ -441,7 +521,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                                 <div className="flex-1 h-px bg-slate-200" />
 
                                 <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
-                                    Datos del Responsable de Pago
+                                    Datos del Responsable de Pago 
                                 </h2>
 
                                 <div className="flex-1 h-px bg-slate-200" />
@@ -450,7 +530,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
                             <div className="flex flex-col md:flex-row gap-2 w-full">
                                 <div className="flex-1">
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Nombre del responsable
+                                        Nombre del responsable *
                                     </label>
 
                                     <input
@@ -475,7 +555,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
 
                                 <div className="flex-1">
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Documento de identidad del responsable
+                                        Documento de identidad del responsable *
                                     </label>
 
                                     <input
@@ -501,7 +581,7 @@ const EditPatientDrawer: React.FC<EditPatientDrawerProps> = ({
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Teléfono del responsable
+                                    Teléfono del responsable *
                                 </label>
 
                                 <input

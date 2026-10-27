@@ -119,7 +119,7 @@ const LotesPage: React.FC = () => {
     {
       key: "dueDate",
       header: "Fecha de vencimiento",
-      className: "w-40 md:w-80",
+      className: "w-40 md:w-60",
       render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
           {inventory.dueDate ? new Date(inventory.dueDate).toLocaleString("es-NI", {
@@ -135,7 +135,7 @@ const LotesPage: React.FC = () => {
     {
       key: "entryDate",
       header: "Fecha de entrada",
-      className: "w-40 md:w-80",
+      className: "w-40 md:w-60",
       render: (inventory: InventoryLoteModel) => (
         <span className="text-sm text-slate-500">
           {inventory.entryDate ? new Date(inventory.entryDate).toLocaleString("es-NI", {

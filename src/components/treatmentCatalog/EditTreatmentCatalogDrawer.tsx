@@ -3,6 +3,8 @@ import Toast from "../../shared/Toast";
 import GenericDrawer from "../../shared/drawer/GenericDrawer";
 import type TreatmentCatalogModel from "../../models/TreatmentCatalogModel";
 import { useUpdateTreatment } from "../../hooks/useTreatmentsCatalog";
+import { SPECIALTIES, type Specialty } from "../../utils/specialtiesData.enum";
+import SearchableSelect from "../../shared/searchableSelect/SearchableSelect";
 
 interface EditTreatmentCatalogProps {
     isOpen: boolean;
@@ -32,6 +34,46 @@ const EditTreatmentCatalogDrawer: React.FC<EditTreatmentCatalogProps> = ({
         setPrevtreatment(treatment);
         setForm(treatment);
     }
+
+    const handleRemoveSpecialty = (specialtyId: string) => {
+        setForm((prev) => {
+            if (!prev) return prev;
+
+            const specialities = (prev.specialities || "")
+                .split(",")
+                .map((item) => item.trim())
+                .filter((item) => item && item !== specialtyId);
+
+            return {
+                ...prev,
+                specialities: specialities.join(","),
+            };
+        });
+    };
+
+    const handleSpecialtyChange = (specialty: Specialty) => {
+        setForm((prev) => {
+            if (!prev) return prev;
+
+            const currentSpecialities = (prev.specialities || "")
+                .split(",")
+                .map((item) => item.trim())
+                .filter(Boolean);
+
+            if (currentSpecialities.includes(specialty.id)) {
+                return prev;
+            }
+
+            return {
+                ...prev,
+                specialities: [
+                    ...currentSpecialities,
+                    specialty.id,
+                ].join(","),
+            };
+        });
+    };
+
 
     const showToast = (
         type: "success" | "error",
@@ -72,12 +114,21 @@ const EditTreatmentCatalogDrawer: React.FC<EditTreatmentCatalogProps> = ({
             return;
         }
 
+        if (!form.specialities.trim()) {
+            showToast(
+                "error",
+                "Debe seleccionar al menos una especialidad."
+            );
+            return;
+        }
+
         updatetreatment(
             {
                 id: treatment.id,
                 treatment: {
                     name: form.name.trim(),
                     description: form.description?.trim() || "",
+                    specialities: form.specialities
                 }
             },
             {
@@ -100,6 +151,17 @@ const EditTreatmentCatalogDrawer: React.FC<EditTreatmentCatalogProps> = ({
             }
         );
     };
+
+    const selectedSpecialties = form?.specialities
+        ? form.specialities
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [];
+
+    const availableSpecialties = SPECIALTIES.filter(
+        (specialty) => !selectedSpecialties.includes(specialty.id)
+    );
 
     return (
         <>
@@ -176,7 +238,7 @@ const EditTreatmentCatalogDrawer: React.FC<EditTreatmentCatalogProps> = ({
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombre
+                            Nombre *
                         </label>
 
                         <input
@@ -196,6 +258,79 @@ const EditTreatmentCatalogDrawer: React.FC<EditTreatmentCatalogProps> = ({
                                 focus:ring-blue-500/10
                             "
                         />
+                    </div>
+
+                    <div className="flex-1 flex-wrap gap-2">
+                        <SearchableSelect<Specialty>
+                            label="Especialidades *"
+                            value=""
+                            items={availableSpecialties}
+                            getOptionValue={(specialty) => specialty.id}
+                            getOptionLabel={(specialty) => specialty.name}
+                            placeholder="Seleccione una especialidad"
+                            searchPlaceholder="Buscar especialidad..."
+                            noResultsMessage="No se encontraron especialidades."
+                            onChange={handleSpecialtyChange}
+                        />
+
+                        {/* Especialidades seleccionadas */}
+                        {selectedSpecialties.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-3">
+                                {selectedSpecialties.map((specialtyId) => {
+                                    const specialty = SPECIALTIES.find(
+                                        (item) => item.id === specialtyId
+                                    );
+
+                                    if (!specialty) return null;
+
+                                    return (
+                                        <div
+                                            key={specialty.id}
+                                            className="
+                                                                                            inline-flex
+                                                                                            items-center
+                                                                                            gap-2
+                                                                                            px-3
+                                                                                            py-1.5
+                                                                                            bg-blue-50
+                                                                                            border
+                                                                                            border-blue-100
+                                                                                            rounded-lg
+                                                                                            text-sm
+                                                                                            text-blue-700
+                                                                                        "
+                                        >
+                                            <span>
+                                                {specialty.name}
+                                            </span>
+
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    handleRemoveSpecialty(
+                                                        specialty.id
+                                                    )
+                                                }
+                                                className="
+                                                                                                text-blue-500
+                                                                                                hover:text-red-500
+                                                                                                cursor-pointer
+                                                                                                font-medium
+                                                                                            "
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {selectedSpecialties.length === 0 && (
+                            <p className="mt-2 text-xs text-slate-400">
+                                Seleccione una o más especialidades.
+                            </p>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
