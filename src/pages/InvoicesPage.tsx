@@ -117,7 +117,7 @@ const InvoicesPage: React.FC = () => {
         // },
         {
             key: "patientFullName",
-            header: "Deudor",
+            header: "Cliente",
             className: "pl-2 w-40 md:w-60",
             render: (invoice: Invoice) => (
                 <div className="flex items-center gap-3">

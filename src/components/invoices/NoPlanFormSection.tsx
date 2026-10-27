@@ -75,21 +75,37 @@ const NoPlanFormSection: React.FC<NoPlanFormSectionProps> = ({
             ) : (
                 /* SI EL CHECKBOX NO ESTÁ ACTIVO -> REGISTRO DE PAGO DIRECTO */
                 <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Monto a pagar
-                        </label>
-                        <input
-                            type="number"
-                            min="0.01"
-                            max={Number(invoice.pendingAmount || 0)}
-                            step="0.01"
-                            value={directPaymentForm.amount}
-                            onChange={(e) =>
-                                setDirectPaymentForm((prev) => ({ ...prev, amount: e.target.value }))
-                            }
-                            className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 outline-none focus:border-[#001D4A]"
-                        />
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        {/* moonto que debe */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Monto a pagar
+                            </label>
+
+                            <input
+                                type="number"
+                                value={invoice.pendingAmount ?? 0}
+                                readOnly
+                                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-slate-100 text-slate-700 outline-none cursor-not-allowed"
+                            />
+                        </div>
+                        {/* monto de dinero que va recibir */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Monto recibido
+                            </label>
+                            <input
+                                type="number"
+                                min="0.01"
+                                max={Number(invoice.pendingAmount || 0)}
+                                step="0.01"
+                                value={directPaymentForm.amount}
+                                onChange={(e) =>
+                                    setDirectPaymentForm((prev) => ({ ...prev, amount: e.target.value }))
+                                }
+                                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 outline-none focus:border-[#001D4A]"
+                            />
+                        </div>
                     </div>
 
                     <div>
@@ -114,24 +130,24 @@ const NoPlanFormSection: React.FC<NoPlanFormSectionProps> = ({
                     </div>
 
                     {(directPaymentForm.paymentMethod === "TRANSFER" || directPaymentForm.paymentMethod === "CARD") && (
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Referencia
-                                </label>
-                                <input
-                                    type="text"
-                                    value={directPaymentForm.transactionReference}
-                                    onChange={(e) =>
-                                        setDirectPaymentForm((prev) => ({
-                                            ...prev,
-                                            transactionReference: e.target.value,
-                                        }))
-                                    }
-                                    placeholder="Número de referencia"
-                                    className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 outline-none focus:border-[#001D4A]"
-                                />
-                            </div>
-                        )}
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Referencia
+                            </label>
+                            <input
+                                type="text"
+                                value={directPaymentForm.transactionReference}
+                                onChange={(e) =>
+                                    setDirectPaymentForm((prev) => ({
+                                        ...prev,
+                                        transactionReference: e.target.value,
+                                    }))
+                                }
+                                placeholder="Número de referencia"
+                                className="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 outline-none focus:border-[#001D4A]"
+                            />
+                        </div>
+                    )}
                 </div>
             )}
 

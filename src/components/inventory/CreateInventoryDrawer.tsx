@@ -206,7 +206,7 @@ const CreateInventoryDrawer: React.FC<CreateInventoryProps> = ({ isOpen, onHide 
                 <div className="space-y-5">
                     <div>
                         <SearchableSelect<ProductModel>
-                            label="Productos"
+                            label="Productos *"
                             value={form.productId}
                             items={products}
                             getOptionValue={(product) => product.id}
@@ -226,7 +226,7 @@ const CreateInventoryDrawer: React.FC<CreateInventoryProps> = ({ isOpen, onHide 
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Cantidad minima de stock
+                            Cantidad minima de stock *
                         </label>
 
                         <input

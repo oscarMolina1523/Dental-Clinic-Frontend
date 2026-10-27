@@ -222,7 +222,7 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             mb-2
                                         "
                                             >
-                                                Deudor
+                                                Cliente
                                             </label>
 
                                             <input

@@ -410,7 +410,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                 onHide={onHide}
                 title="Nuevo Producto"
                 description="Registra un nuevo producto"
-                width="w-80 md:w-112.5"
+                width="w-80 md:w-200"
                 footer={
                     <>
                         <button
@@ -455,19 +455,20 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
             >
                 {/* BODY DEL CREATE */}
                 <div className="space-y-5">
+                    <div className="flex flex-col md:flex-row gap-2 w-full">
+                        {/* nombre del producto */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Nombre del producto *
+                            </label>
 
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Nombre *
-                        </label>
-
-                        <input
-                            type="text"
-                            name="name"
-                            value={form.name}
-                            onChange={handleChange}
-                            placeholder="Ingrese el nombre completo"
-                            className="
+                            <input
+                                type="text"
+                                name="name"
+                                value={form.name}
+                                onChange={handleChange}
+                                placeholder="Ingrese el nombre completo"
+                                className="
                                 w-full
                                 px-3 py-2.5
                                 border border-slate-200
@@ -478,7 +479,33 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                                 focus:ring-2
                                 focus:ring-blue-500/10
                             "
-                        />
+                            />
+                        </div>
+                        {/* codigo de barra */}
+                        <div className="flex-1">
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                                Codigo de barra (opcional)
+                            </label>
+
+                            <input
+                                type="text"
+                                name="barcode"
+                                value={form.barcode}
+                                onChange={handleChange}
+                                placeholder="123456789"
+                                className="
+                                w-full
+                                px-3 py-2.5
+                                border border-slate-200
+                                rounded-lg
+                                text-sm
+                                outline-none
+                                focus:border-blue-500
+                                focus:ring-2
+                                focus:ring-blue-500/10
+                            "
+                            />
+                        </div>
                     </div>
                     <label className="flex items-center gap-3 cursor-pointer">
                         <input
@@ -500,31 +527,6 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                             ¿Tiene fecha de caducidad?
                         </span>
                     </label>
-
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Codigo de barra (opcional)
-                        </label>
-
-                        <input
-                            type="text"
-                            name="barcode"
-                            value={form.barcode}
-                            onChange={handleChange}
-                            placeholder="123456789"
-                            className="
-                                w-full
-                                px-3 py-2.5
-                                border border-slate-200
-                                rounded-lg
-                                text-sm
-                                outline-none
-                                focus:border-blue-500
-                                focus:ring-2
-                                focus:ring-blue-500/10
-                            "
-                        />
-                    </div>
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
