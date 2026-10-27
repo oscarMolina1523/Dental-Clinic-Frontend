@@ -124,6 +124,9 @@ const AppointmentPage: React.FC = () => {
         totalPages
     );
 
+    const isDisabled = !canWrite || role === UserRole.Dentist; //no tiene permisos de escritura o es dentista
+    const cantRegistermedicalProgress = !canWrite || role === UserRole.Admin; //no tiene permisos de escritura o es dentista
+
     //para obtener solo los lotes que queremos por pagina, los visibles
     const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
 
@@ -296,7 +299,7 @@ const AppointmentPage: React.FC = () => {
                  * También aparece para COMPLETED porque
                  * desde ahí podemos crear la receta.
                  */
-                return !canWrite || !canChangeStatus(appointment.status) || appointment?.isClinicalProgressRegistered;
+                return cantRegistermedicalProgress|| !canChangeStatus(appointment.status) || appointment?.isClinicalProgressRegistered;
             },
         },
     ];
@@ -360,7 +363,7 @@ const AppointmentPage: React.FC = () => {
         setCurrentPage(1);
     };
 
-    const isDisabled = !canWrite || role === UserRole.Dentist;
+    
 
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
