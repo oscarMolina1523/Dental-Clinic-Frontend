@@ -407,7 +407,7 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                 <div className="space-y-5">
                     <div>
                         <SearchableSelect<ProductModel>
-                            label="Productos"
+                            label="Productos *"
                             value={form.productId}
                             items={products}
                             getOptionValue={(product) => product.id}
@@ -447,7 +447,7 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
 
                     <div>
                         <SearchableSelect<SupplierModel>
-                            label="Proveedores"
+                            label="Proveedores *"
                             value={form.supplierId}
                             items={suppliers}
                             getOptionValue={(supplier) => String(supplier.id)}
@@ -637,9 +637,10 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                             "
                         />
                     </div>
+
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Cantidad
+                            Cantidad *
                         </label>
 
                         <input
