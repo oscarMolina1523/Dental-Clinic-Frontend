@@ -425,26 +425,6 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                             onChange={handleProductChange} />
                     </div>
 
-                    {/* <div>
-                        <SearchableSelect<SupplierModel>
-                            label="Proveedores"
-                            value={form.supplierId}
-                            items={suppliers}
-                            getOptionValue={(supplier) => supplier.id}
-                            getOptionLabel={(supplier) =>
-                                supplier.name
-                            }
-                            placeholder={
-                                isLoadingSuppliers
-                                    ? "Cargando proveedores..."
-                                    : "Seleccione un proveedor"
-                            }
-                            searchPlaceholder="Buscar proveedor por nombre..."
-                            noResultsMessage="No se encontraron proveedores."
-                            disabled={isLoadingSuppliers}
-                            onChange={handleSupplierChange} />
-                    </div> */}
-
                     <div>
                         <SearchableSelect<SupplierModel>
                             label="Proveedores *"
@@ -613,7 +593,7 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
 
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-2">
-                            Número de Lote
+                            Identificador
                         </label>
 
                         <input
@@ -623,7 +603,6 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({ isOpen,
                             disabled
                             value={generateLoteNumber(inventoryLotes)}
                             // onChange={handleChange}
-                            placeholder="Ingrese el número de lote"
                             className="
                                 w-full
                                 px-3 py-2.5
