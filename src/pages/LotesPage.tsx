@@ -156,7 +156,7 @@ const LotesPage: React.FC = () => {
       icon: <Watch className="w-4 h-4 text-amber-600" />,
       onClick: (lote) => {
         setSelectedLote(lote);
-        setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
+        setIsSecurityDrawerOpen(true);
       },
       hidden: (lote) => !canWrite || !lote.dueDate,
     },
@@ -193,9 +193,9 @@ const LotesPage: React.FC = () => {
             placeholder="Buscar lote..."
           />
           <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
-                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
-                            : "bg-slate-300 cursor-not-allowed opacity-70"
-                        }`}>
+            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+            : "bg-slate-300 cursor-not-allowed opacity-70"
+            }`}>
             <Plus className="w-4 h-4" />
             <span>Nuevo Lote</span>
           </button>
@@ -216,6 +216,20 @@ const LotesPage: React.FC = () => {
               actions={actions}
               getRowId={(lote) => lote.id}
               emptyMessage="No hay Lotes registrados."
+              getRowClassName={(lote) => {
+                if (!lote.dueDate) return "";
+
+                const dueDate = new Date(lote.dueDate);
+                const now = new Date();
+
+                // Comparar únicamente las fechas, sin considerar la hora.
+                dueDate.setHours(0, 0, 0, 0);
+                now.setHours(0, 0, 0, 0);
+
+                return dueDate < now
+                  ? "bg-red-100 hover:bg-red-200"
+                  : "";
+              }}
             />
           )}
         </div>

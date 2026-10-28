@@ -53,4 +53,7 @@ export interface DataTableProps<T> {
      * Texto cuando no existen registros.
      */
     emptyMessage?: string;
+
+    // clase para darle estilos a una fila en especifico
+    getRowClassName?: (item: T) => string;
 }

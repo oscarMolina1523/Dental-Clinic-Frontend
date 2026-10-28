@@ -10,6 +10,7 @@ const DataTable = <T,>({
     actions,
     loading = false,
     emptyMessage = "No hay registros para mostrar.",
+    getRowClassName,
 }: DataTableProps<T>) => {
 
     return (
@@ -75,7 +76,8 @@ const DataTable = <T,>({
 
                             <tr
                                 key={getRowId(item)}
-                                className="hover:bg-slate-50/60 transition-colors"
+                                className={`hover:bg-slate-50/60 transition-colors ${getRowClassName?.(item) ?? ""
+                                    }`}
                             >
 
                                 {columns.map((column) => (

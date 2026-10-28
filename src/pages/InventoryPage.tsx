@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Plus, Pencil } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
@@ -11,8 +11,15 @@ import CreateInventoryDrawer from "../components/inventory/CreateInventoryDrawer
 import EditInventoryDrawer from "../components/inventory/EditInventoryDrawer";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
 import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
+import { useNotifications } from "../hooks/usenotifications";
 
 const InventoryPage: React.FC = () => {
+
+  const {
+    addNotification,
+    removeNotification,
+  } = useNotifications();
+
   const {
     data: inventories = [],
     isLoading
@@ -122,7 +129,7 @@ const InventoryPage: React.FC = () => {
       },
       hidden: () => !canWrite,
     },
-    
+
   ];
 
   const handleSearch = (value: string) => {
@@ -134,6 +141,33 @@ const InventoryPage: React.FC = () => {
      */
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    inventories.forEach((inventory) => {
+      const notificationId = `low-stock-${inventory.id}`;
+
+      if (inventory.currentStock < inventory.minimumStock) {
+        addNotification({
+          id: notificationId,
+          title: "Inventario bajo",
+          message: `${inventory.productName}: stock actual de ${inventory.currentStock} unidades, por debajo del mínimo de ${inventory.minimumStock}.`,
+          type: "warning",
+          entityType: "Inventory",
+          entityId: inventory.id,
+          actionUrl: "/inventories",
+        });
+      } else {
+        removeNotification(notificationId);
+      }
+    });
+  }, [
+    inventories,
+    isLoading,
+    addNotification,
+    removeNotification,
+  ]);
 
   return (
     <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
@@ -147,9 +181,9 @@ const InventoryPage: React.FC = () => {
             placeholder="Buscar inventario..."
           />
           <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
-                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
-                            : "bg-slate-300 cursor-not-allowed opacity-70"
-                        }`}>
+            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+            : "bg-slate-300 cursor-not-allowed opacity-70"
+            }`}>
             <Plus className="w-4 h-4" />
             <span>Nuevo Inventario</span>
           </button>
@@ -170,6 +204,11 @@ const InventoryPage: React.FC = () => {
               actions={actions}
               getRowId={(inventory) => inventory.id}
               emptyMessage="No hay Inventarios registrados."
+              getRowClassName={(inventory) =>
+                inventory.currentStock < inventory.minimumStock
+                  ? "bg-red-100 hover:bg-red-200"
+                  : ""
+              }
             />
           )}
         </div>

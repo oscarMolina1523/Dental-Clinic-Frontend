@@ -5,12 +5,15 @@ import App from './App.tsx'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from "./config/queryClient";
 import AuthProvider from './context/AuthProvider.tsx'
+import NotificationProvider from './context/NotificationProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <App />
+        <NotificationProvider>
+          <App />
+        </NotificationProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,
