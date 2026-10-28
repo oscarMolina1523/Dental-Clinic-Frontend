@@ -6,6 +6,7 @@ import type {
 const DataTable = <T,>({
     data,
     columns,
+    getRowClassName,
     getRowId,
     actions,
     loading = false,

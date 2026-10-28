@@ -161,7 +161,7 @@ const LotesPage: React.FC = () => {
         setSelectedLote(lote);
         setIsSecurityDrawerOpen(true);
       },
-      hidden: (lote) => !canWrite || !lote.dueDate,
+      hidden: (lote) => !canWrite || !lote.dueDate || lote.quantity == 0,
     },
     {
       label: "Editar Lote",
@@ -170,7 +170,7 @@ const LotesPage: React.FC = () => {
         setSelectedLote(lote);
         setIsEditDrawerOpen(true);
       },
-      hidden: () => !canWrite,
+      hidden: (lote) => !canWrite || lote.quantity == 0,
     },
   ];
 
