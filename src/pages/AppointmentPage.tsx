@@ -94,16 +94,36 @@ const AppointmentPage: React.FC = () => {
         "reminderSent",
     ];
 
+
     const handleStartAppointment = () => {
         if (!selectedAppointment) {
             return;
         }
 
-        const dentistHasAppointmentInProgress = appointments.some(
+        const selectedStartDate = new Date(
+            selectedAppointment.startAppointmentTime
+        );
+
+        if (Number.isNaN(selectedStartDate.getTime())) {
+            setToast({
+                type: "error",
+                message: "La fecha de inicio de la cita no es válida.",
+            });
+
+            return;
+        }
+
+        // Buscar otras citas del mismo especialista
+        const dentistAppointments = appointments.filter(
             (appointment) =>
                 appointment.dentistId === selectedAppointment.dentistId &&
-                appointment.id !== selectedAppointment.id &&
-                appointment.status === "IN_PROGRESS"
+                appointment.id !== selectedAppointment.id
+        );
+
+        // Validación 1:
+        // El especialista no puede tener otra cita en progreso.
+        const dentistHasAppointmentInProgress = dentistAppointments.some(
+            (appointment) => appointment.status === "IN_PROGRESS"
         );
 
         if (dentistHasAppointmentInProgress) {
@@ -116,8 +136,49 @@ const AppointmentPage: React.FC = () => {
             return;
         }
 
+        // Validación 2:
+        // No puede iniciar una cita si tiene una cita anterior
+        // que todavía no se ha completado ni abortado.
+        const previousUnresolvedAppointment = dentistAppointments.find(
+            (appointment) => {
+                const previousStartDate = new Date(
+                    appointment.startAppointmentTime
+                );
+
+                const hasValidDate = !Number.isNaN(
+                    previousStartDate.getTime()
+                );
+
+                const isEarlierAppointment =
+                    hasValidDate &&
+                    previousStartDate < selectedStartDate;
+
+                const isUnresolved =
+                    appointment.status === "SCHEDULED" ||
+                    appointment.status === "CONFIRMED" ||
+                    appointment.status === "IN_PROGRESS";
+
+                return isEarlierAppointment && isUnresolved;
+            }
+        );
+
+        if (previousUnresolvedAppointment) {
+            const previousDate = new Date(
+                previousUnresolvedAppointment.startAppointmentTime
+            );
+
+            setToast({
+                type: "error",
+                message: `No puede iniciar esta cita porque el especialista todavía tiene una cita anterior con ${previousUnresolvedAppointment.patientFullName}, programada para el ${previousDate.toLocaleString("es-NI")}. Debe completarla, abortarla o reprogramarla antes de continuar.`,
+            });
+
+            return;
+        }
+
+        // Si ambas validaciones pasan, iniciar la cita.
         handleStart(selectedAppointment.id);
     };
+
 
     const filteredAppointments = useMemo(() => {
         if (role === UserRole.Admin || role === UserRole.Receptionist) {
