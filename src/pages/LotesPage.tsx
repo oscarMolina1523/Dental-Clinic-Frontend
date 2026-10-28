@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Watch } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
@@ -12,6 +12,7 @@ import EditInventoryLoteDrawer from "../components/inventory/EditInventoryLoteDr
 import ExpiredLoteDrawer from "../components/inventory/ExpiredLoteDrawer";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
 import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
+import { useNotifications } from "../hooks/usenotifications";
 
 const LotesPage: React.FC = () => {
   const {
@@ -20,6 +21,8 @@ const LotesPage: React.FC = () => {
   } = useInventoryLotes();
 
   const { role } = useRolePermissions();
+
+  const { addNotification } = useNotifications();
 
   const isViewer = role === UserRole.Viewer;
   const canWrite = !isViewer;
@@ -156,8 +159,7 @@ const LotesPage: React.FC = () => {
       icon: <Watch className="w-4 h-4 text-amber-600" />,
       onClick: (lote) => {
         setSelectedLote(lote);
-        setIsSecurityDrawerOpen(true); // aca vamos a manejar cosas mas seguras como cambio de contraseña, role y demas.
-        console.log("wuantity", lote.quantity)
+        setIsSecurityDrawerOpen(true);
       },
       hidden: (lote) => !canWrite || !lote.dueDate || lote.quantity == 0,
     },
@@ -181,6 +183,58 @@ const LotesPage: React.FC = () => {
      */
     setCurrentPage(1);
   };
+
+  useEffect(() => {
+    if (isLoading || inventoryLotes.length === 0) return;
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    inventoryLotes.forEach((lote) => {
+      if (!lote.dueDate) return;
+
+      const dueDate = new Date(lote.dueDate);
+
+      if (Number.isNaN(dueDate.getTime())) return;
+
+      dueDate.setHours(0, 0, 0, 0);
+
+      const daysUntilExpiration = Math.round(
+        (dueDate.getTime() - now.getTime()) / 86400000
+      );
+
+      // Notificar desde 5 días antes hasta el día del vencimiento.
+      if (daysUntilExpiration < 0 || daysUntilExpiration > 5) {
+        return;
+      }
+
+      // Una notificación por lote y por día.
+      const todayKey = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, "0"),
+        String(now.getDate()).padStart(2, "0"),
+      ].join("-");
+
+      const notificationId = `expiring-lote-${lote.id}-${todayKey}`;
+
+      const expirationMessage =
+        daysUntilExpiration === 0
+          ? "vence hoy"
+          : daysUntilExpiration === 1
+            ? "vence mañana"
+            : `vence en ${daysUntilExpiration} días`;
+
+      addNotification({
+        id: notificationId,
+        title: "Lote próximo a vencer",
+        message: `El lote ${lote.loteNumber} del producto ${lote.productName} ${expirationMessage}.`,
+        type: "warning",
+        entityType: "inventory-lote",
+        entityId: lote.id,
+        actionUrl:"/inventory-lotes"
+      });
+    });
+  }, [inventoryLotes, isLoading, addNotification]);
 
   return (
     <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
@@ -217,11 +271,20 @@ const LotesPage: React.FC = () => {
               actions={actions}
               getRowId={(lote) => lote.id}
               emptyMessage="No hay Lotes registrados."
-              getRowClassName={(lote) =>
-                lote.quantity === 0
+              getRowClassName={(lote) => {
+                if (!lote.dueDate) return "";
+
+                const dueDate = new Date(lote.dueDate);
+                const now = new Date();
+
+                // Comparar únicamente las fechas, sin considerar la hora.
+                dueDate.setHours(0, 0, 0, 0);
+                now.setHours(0, 0, 0, 0);
+
+                return dueDate < now
                   ? "bg-red-100 hover:bg-red-200"
-                  : ""
-              }
+                  : "";
+              }}
             />
           )}
         </div>

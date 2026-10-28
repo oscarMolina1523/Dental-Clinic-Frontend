@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { Eye, Pencil} from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Eye, Pencil } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -16,6 +16,7 @@ import { useCancelPaymentPlan } from "../hooks/usePaymentPlanOrchestrator";
 import { invoiceStatusColors, invoiceStatusSpanishOptions } from "../utils/invoiceStatus.enum";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
 import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
+import { useNotifications } from "../hooks/usenotifications";
 
 const InvoicesPage: React.FC = () => {
     const {
@@ -23,6 +24,8 @@ const InvoicesPage: React.FC = () => {
         isLoading
     } = useInvoices();
     const { role } = useRolePermissions();
+
+    const { addNotification, removeNotification } = useNotifications();
 
     const isViewer = role === UserRole.Viewer;
     const canWrite = !isViewer;
@@ -251,6 +254,34 @@ const InvoicesPage: React.FC = () => {
             },
         });
     };
+
+    useEffect(() => {
+        if (isLoading) return;
+
+        const pendingInvoices = invoices.filter(
+            (invoice) => invoice.status === "PENDING"
+        );
+
+        // Crear una notificación por cada factura pendiente.
+        pendingInvoices.forEach((invoice) => {
+            addNotification({
+                id: `pending-invoice-${invoice.id}`,
+                title: "Factura pendiente de pago",
+                message: `La factura de ${invoice.patientFullName} tiene un saldo pendiente de C$ ${invoice.pendingAmount}.`,
+                type: "warning",
+                entityType: "invoice",
+                entityId: invoice.id,
+                actionUrl:"/invoices"
+            });
+        });
+
+        // Eliminar avisos de facturas que ya no están pendientes.
+        invoices
+            .filter((invoice) => invoice.status !== "PENDING")
+            .forEach((invoice) => {
+                removeNotification(`pending-invoice-${invoice.id}`);
+            });
+    }, [invoices, isLoading, addNotification, removeNotification]);
 
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">

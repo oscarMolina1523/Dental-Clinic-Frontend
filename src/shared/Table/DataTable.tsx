@@ -6,11 +6,11 @@ import type {
 const DataTable = <T,>({
     data,
     columns,
-    getRowClassName,
     getRowId,
     actions,
     loading = false,
     emptyMessage = "No hay registros para mostrar.",
+    getRowClassName,
 }: DataTableProps<T>) => {
 
     return (
@@ -76,7 +76,7 @@ const DataTable = <T,>({
 
                             <tr
                                 key={getRowId(item)}
-                                className={`transition-colors ${getRowClassName?.(item) ?? "hover:bg-slate-50/60"
+                                className={`hover:bg-slate-50/60 transition-colors ${getRowClassName?.(item) ?? ""
                                     }`}
                             >
 

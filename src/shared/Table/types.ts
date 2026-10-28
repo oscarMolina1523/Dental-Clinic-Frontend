@@ -34,8 +34,6 @@ export interface DataTableProps<T> {
     data: T[];
     columns: TableColumn<T>[];
 
-    getRowClassName?: (row: T) => string;
-
     /**
      * Identificador único de cada fila.
      */
@@ -55,4 +53,7 @@ export interface DataTableProps<T> {
      * Texto cuando no existen registros.
      */
     emptyMessage?: string;
+
+    // clase para darle estilos a una fila en especifico
+    getRowClassName?: (item: T) => string;
 }
