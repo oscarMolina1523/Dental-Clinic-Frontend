@@ -271,6 +271,7 @@ const InvoicesPage: React.FC = () => {
                 type: "warning",
                 entityType: "invoice",
                 entityId: invoice.id,
+                actionUrl:"/invoices"
             });
         });
 

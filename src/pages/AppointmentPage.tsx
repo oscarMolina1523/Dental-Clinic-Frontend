@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Menu, X, CheckCircle2, Play, Check, UserX, XCircle } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
@@ -16,6 +16,7 @@ import type { AppointmentStatus } from "../utils/appointmentStatus.enum";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
 import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 import { useAppointmentOrchestratorById } from "../hooks/useAppointmentOrchestrator";
+import { useNotifications } from "../hooks/usenotifications";
 
 const AppointmentPage: React.FC = () => {
     const { role, user } = useRolePermissions();
@@ -23,6 +24,8 @@ const AppointmentPage: React.FC = () => {
         data: appointments = [],
         isLoading
     } = useAppointments();
+
+    const { addNotification, removeNotification } = useNotifications();
 
     const {
         isCreateDrawerOpen,
@@ -160,6 +163,10 @@ const AppointmentPage: React.FC = () => {
         COMPLETED: {
             label: "Completada",
             className: "text-emerald-600",
+        },
+        ABANDONED: {
+            label: "Abandonada",
+            className: "text-red-600",
         },
         CANCELLED: {
             label: "Abortada",
@@ -299,7 +306,7 @@ const AppointmentPage: React.FC = () => {
                  * También aparece para COMPLETED porque
                  * desde ahí podemos crear la receta.
                  */
-                return cantRegistermedicalProgress|| !canChangeStatus(appointment.status) || appointment?.isClinicalProgressRegistered;
+                return cantRegistermedicalProgress || !canChangeStatus(appointment.status) || appointment?.isClinicalProgressRegistered;
             },
         },
     ];
@@ -363,7 +370,47 @@ const AppointmentPage: React.FC = () => {
         setCurrentPage(1);
     };
 
-    
+    useEffect(() => {
+        if (isLoading) return;
+
+        const statusesToReview = [
+            "SCHEDULED",
+            "CONFIRMED",
+            "IN_PROGRESS",
+        ];
+
+        const now = new Date();
+
+        appointments.forEach((appointment) => {
+            const notificationId = `abandoned-appointment-${appointment.id}`;
+
+            const startDate = new Date(appointment.startAppointmentTime);
+
+            const isPastAppointment =
+                !Number.isNaN(startDate.getTime()) &&
+                startDate < now;
+
+            const needsReview =
+                statusesToReview.includes(appointment.status) &&
+                isPastAppointment;
+
+            if (needsReview) {
+                addNotification({
+                    id: notificationId,
+                    title: "Cita pendiente de resolver",
+                    message: `La cita del paciente ${appointment.patientFullName} tenía fecha de inicio ${startDate.toLocaleString("es-NI")}, pero continúa en estado pendiente de resolución. Revise si corresponde abortarla o abandonarla.`,
+                    type: "warning",
+                    entityType: "appointment",
+                    entityId: appointment.id,
+                    actionUrl:"/agenda"
+                });
+            } else {
+                // Si se completó, canceló o todavía no ha comenzado,
+                // ya no necesita esta notificación.
+                removeNotification(notificationId);
+            }
+        });
+    }, [appointments, isLoading, addNotification, removeNotification]);
 
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">

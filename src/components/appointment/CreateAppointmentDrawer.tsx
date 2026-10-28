@@ -198,7 +198,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
             }
 
             // Las citas canceladas no deben bloquear el horario.
-            if (appointment.status === "CANCELLED") {
+            if (appointment.status === "CANCELLED" || appointment.status === "ABANDONED") {
                 return false;
             }
 

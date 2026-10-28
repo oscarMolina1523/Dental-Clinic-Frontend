@@ -231,6 +231,7 @@ const LotesPage: React.FC = () => {
         type: "warning",
         entityType: "inventory-lote",
         entityId: lote.id,
+        actionUrl:"/inventory-lotes"
       });
     });
   }, [inventoryLotes, isLoading, addNotification]);
