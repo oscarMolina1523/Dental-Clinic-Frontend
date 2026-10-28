@@ -44,7 +44,6 @@ export const rolePermissions: Record<string, string[]> = {
 
     // DENTIST
     "2f67c45e35ff526b": [
-        "/patients",
         "/agenda",
         "/prescriptions",
         "/medical-progress",

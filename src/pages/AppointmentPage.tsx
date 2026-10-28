@@ -94,6 +94,30 @@ const AppointmentPage: React.FC = () => {
         "reminderSent",
     ];
 
+    const handleStartAppointment = () => {
+        if (!selectedAppointment) {
+            return;
+        }
+
+        const dentistHasAppointmentInProgress = appointments.some(
+            (appointment) =>
+                appointment.dentistId === selectedAppointment.dentistId &&
+                appointment.id !== selectedAppointment.id &&
+                appointment.status === "IN_PROGRESS"
+        );
+
+        if (dentistHasAppointmentInProgress) {
+            setToast({
+                type: "error",
+                message:
+                    "Este especialista ya tiene una cita en progreso. Debe completarla o abortarla antes de iniciar otra.",
+            });
+
+            return;
+        }
+
+        handleStart(selectedAppointment.id);
+    };
 
     const filteredAppointments = useMemo(() => {
         if (role === UserRole.Admin || role === UserRole.Receptionist) {
@@ -289,7 +313,7 @@ const AppointmentPage: React.FC = () => {
                 setSelectedAppointment(appointment);
                 setIsEditDrawerOpen(true);
             },
-            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced,
+            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced || role === UserRole.Dentist,
         },
         {
             label: "Cambios de estados",
@@ -402,7 +426,7 @@ const AppointmentPage: React.FC = () => {
                     type: "warning",
                     entityType: "appointment",
                     entityId: appointment.id,
-                    actionUrl:"/agenda"
+                    actionUrl: "/agenda"
                 });
             } else {
                 // Si se completó, canceló o todavía no ha comenzado,
@@ -539,7 +563,7 @@ const AppointmentPage: React.FC = () => {
                             {canStart(selectedAppointment.status) && (
                                 <button
                                     disabled={isPendingAny}
-                                    onClick={() => handleStart(selectedAppointment.id)}
+                                    onClick={handleStartAppointment}
                                     className="w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-slate-700 hover:bg-blue-100 rounded-xl transition-colors disabled:opacity-50"
                                 >
                                     <Play className="w-4 h-4 text-blue-600" />
