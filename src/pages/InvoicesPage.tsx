@@ -32,6 +32,9 @@ const InvoicesPage: React.FC = () => {
 
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedStatus, setSelectedStatus] = useState<
+        Invoice["status"] | "ALL"
+    >("ALL");
 
     const [isCreateDrawerOpen, setIsCreateDrawerOpen] =
         useState(false);
@@ -65,10 +68,8 @@ const InvoicesPage: React.FC = () => {
 
     const searchFields: (keyof Invoice)[] = [
         "patientFullName",
-        "invoiceNumber",
         "totalAmount",
         "pendingAmount",
-        "status",
     ];
 
     const {
@@ -81,7 +82,17 @@ const InvoicesPage: React.FC = () => {
         delay: 800,
     });
 
-    const totalItems = filteredData.length; //obtenemos la cantidad total de items 
+    const filteredInvoices = useMemo(() => {
+        if (selectedStatus === "ALL") {
+            return filteredData;
+        }
+
+        return filteredData.filter(
+            (invoice) => invoice.status === selectedStatus
+        );
+    }, [filteredData, selectedStatus]);
+
+    const totalItems = filteredInvoices.length; //obtenemos la cantidad total de items 
 
     const totalPages = Math.max(
         1,
@@ -100,11 +111,11 @@ const InvoicesPage: React.FC = () => {
 
     const currentInvoices = useMemo(
         () =>
-            filteredData.slice(
+            filteredInvoices.slice(
                 startIndex,
                 endIndex
             ),
-        [startIndex, endIndex, filteredData]
+        [startIndex, endIndex, filteredInvoices]
     );
 
     const columns: TableColumn<typeof invoices[number]>[] = [
@@ -271,7 +282,7 @@ const InvoicesPage: React.FC = () => {
                 type: "warning",
                 entityType: "invoice",
                 entityId: invoice.id,
-                actionUrl:"/invoices"
+                actionUrl: "/invoices"
             });
         });
 
@@ -301,6 +312,29 @@ const InvoicesPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar Factura..."
                     />
+
+                    <div className="flex flex-wrap items-center gap-2">
+                        {[
+                            { value: "ALL", label: "Todas" },
+                            { value: "PENDING", label: "Pendientes" },
+                            { value: "PARTIALLY_PAID", label: "Parciales" },
+                            { value: "PAID", label: "Pagadas" },
+                        ].map((tab) => (
+                            <button
+                                key={tab.value}
+                                onClick={() => {
+                                    setSelectedStatus(tab.value as Invoice["status"] | "ALL");
+                                    setCurrentPage(1);
+                                }}
+                                className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${selectedStatus === tab.value
+                                        ? "border-[#001D4A] bg-[#001D4A] text-white"
+                                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                                    }`}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
                     {/* <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
                             ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
                             : "bg-slate-300 cursor-not-allowed opacity-70"
