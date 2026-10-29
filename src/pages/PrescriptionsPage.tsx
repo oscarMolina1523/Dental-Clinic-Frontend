@@ -112,7 +112,7 @@ const PrescriptionsPage: React.FC = () => {
         {
             key: "medicine",
             header: "Cantidad de productos recetados",
-            className: "w-20 text-center md:text-left md:w-40",
+            className: "w-20 text-center md:text-left md:w-60",
             render: (prescription: MedicalPrescriptionOrchestratorResponse) => (
                 <span className="text-sm text-slate-500">
                     {prescription.details.length}
@@ -151,7 +151,7 @@ const PrescriptionsPage: React.FC = () => {
     };
 
     return (
-        <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
+        <div className="h-full w-full bg-[#f8fafc] px-8 py-4 flex flex-col justify-between select-none">
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 ">
                 {/* Encabezado */}
                 <div className="flex items-center justify-between pb-6 mb-2">

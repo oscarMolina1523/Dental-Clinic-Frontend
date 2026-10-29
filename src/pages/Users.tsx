@@ -102,7 +102,7 @@ const UsersPage: React.FC = () => {
           <img
             src={user.image}
             alt={user.fullName}
-            className="w-9 h-9 rounded-full object-cover border border-slate-200"
+            className="w-8 h-8 rounded-full object-cover border border-slate-200"
           />
 
           <span className="text-sm font-semibold text-slate-800">
@@ -234,10 +234,10 @@ const UsersPage: React.FC = () => {
   };
 
   return (
-    <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
+    <div className="h-full w-full bg-[#f8fafc] px-8 py-4 flex flex-col justify-between select-none">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         {/* Encabezado */}
-        <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
+        <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-2 mb-2">
           {/* <h1 className="text-xl font-bold text-[#001D4A]">Usuarios</h1> */}
           <SearchInput
             value={search}
@@ -258,7 +258,7 @@ const UsersPage: React.FC = () => {
         </div>
 
         {/* Tabla de Usuarios */}
-        <div className="overflow-x-auto max-h-100">
+        <div className="overflow-x-auto max-h-120">
           {isLoading ? (
             <TableSkeleton
               columns={columns}
@@ -278,7 +278,7 @@ const UsersPage: React.FC = () => {
       </div>
 
       {/* Paginación de la Tabla */}
-      <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
+      <div className="flex items-center justify-between text-xs text-slate-500">
         <Pagination
           currentPage={validPage}
           totalItems={totalItems}

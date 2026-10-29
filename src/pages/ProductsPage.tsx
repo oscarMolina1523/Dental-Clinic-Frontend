@@ -114,7 +114,7 @@ const ProductsPage: React.FC = () => {
 
     {
       key: "barcode",
-      className: "w-40",
+      className: "w-40 md:w-60",
       header: "Código de barra",
       render: (product: ProductModel) => (
         <span className="text-sm text-slate-500">
@@ -125,7 +125,7 @@ const ProductsPage: React.FC = () => {
     {
       key: "category_id",
       header: "Categoría",
-      className: "w-40 md:w-100",
+      className: "w-40 md:w-80",
       render: (product: ProductModel) => (
         <span className="text-sm text-slate-500">
           {categoryMap.get(product.category_id) ?? "Cargando..."}
@@ -135,7 +135,7 @@ const ProductsPage: React.FC = () => {
     {
       key: "measurement_unit_id",
       header: "Unidad de medida",
-      className: "pl-2 w-40 md:w-80",
+      className: "pl-2 w-40 md:w-60",
       render: (product: ProductModel) => {
         const measurement = measurementMap.get(product.measurement_unit_id);
 

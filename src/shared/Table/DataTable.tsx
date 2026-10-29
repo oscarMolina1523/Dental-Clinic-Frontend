@@ -33,6 +33,7 @@ const DataTable = <T,>({
 
                         {actions && actions.length > 0 && (
                             <th className="pb-3 pr-2 text-right font-normal">
+                                Acciones
                             </th>
                         )}
 
@@ -84,7 +85,7 @@ const DataTable = <T,>({
 
                                     <td
                                         key={column.key}
-                                        className={`py-3.5 ${column.className ?? ""}`}
+                                        className={`py-1.5 ${column.className ?? ""}`}
                                     >
                                         {column.render
                                             ? column.render(item, index)
@@ -96,7 +97,7 @@ const DataTable = <T,>({
                                 {/* ACTIONS */}
                                 {actions && actions.length > 0 && (
 
-                                    <td className="py-3.5 pr-2 text-right">
+                                    <td className="py-1 pr-2 text-right">
 
                                         <div className="flex items-center justify-end gap-1 w-20 md:w-auto" >
 
