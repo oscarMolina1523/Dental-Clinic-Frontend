@@ -483,7 +483,7 @@ const AppointmentPage: React.FC = () => {
                 setSelectedAppointment(appointment);
                 setIsEditDrawerOpen(true);
             },
-            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced || role === UserRole.Admin,
+            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced || role === UserRole.Dentist,
         },
         {
             label: "Cambios de estados",
@@ -670,7 +670,82 @@ const AppointmentPage: React.FC = () => {
                     onClose={() => setToast(null)}
                 />
             )}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            {/* Filtros por período */}
+            <div className="flex flex-row justify-between">
+                <div>
+                    <p className="text-sm font-semibold text-slate-700 mb-3">
+                        Filtrar por período
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                        {[
+                            { value: "ALL", label: "Todas" },
+                            { value: "DAY", label: "Hoy" },
+                            { value: "WEEK", label: "Esta semana" },
+                            { value: "MONTH", label: "Este mes" },
+                        ].map((period) => (
+                            <button
+                                key={period.value}
+                                type="button"
+                                onClick={() => {
+                                    setSelectedPeriod(
+                                        period.value as AppointmentPeriod
+                                    );
+                                    setCurrentPage(1);
+                                }}
+                                className={`p-2 rounded-lg text-sm font-medium
+                                            border transition-colors cursor-pointer
+                                            ${selectedPeriod === period.value
+                                        ? "bg-[#001D4A] text-white border-[#001D4A]"
+                                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                    }`}
+                            >
+                                {period.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Filtros por estado */}
+                <div>
+                    <p className="text-sm font-semibold text-slate-700 mb-3">
+                        Filtrar por estado
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                        {[
+                            { value: "ALL", label: "Todos los estados" },
+                            { value: "SCHEDULED", label: "Programadas" },
+                            { value: "CONFIRMED", label: "Confirmadas" },
+                            { value: "IN_PROGRESS", label: "En progreso" },
+                            { value: "COMPLETED", label: "Completadas" },
+                            { value: "ABANDONED", label: "Abandonadas" },
+                            { value: "CANCELLED", label: "Abortadas" },
+                            { value: "NO_SHOW", label: "No asistió" },
+                        ].map((status) => (
+                            <button
+                                key={status.value}
+                                type="button"
+                                onClick={() => {
+                                    setSelectedStatus(
+                                        status.value as AppointmentStatus | "ALL"
+                                    );
+                                    setCurrentPage(1);
+                                }}
+                                className={`p-2 rounded-lg text-xs sm:text-sm
+                                            font-medium border transition-colors cursor-pointer
+                                            ${selectedStatus === status.value
+                                        ? "bg-blue-50 text-blue-700 border-blue-300"
+                                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                    }`}
+                            >
+                                {status.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 min-h-120">
                 {/* Encabezado */}
                 <div className="flex flex-col md:flex-row gap-2 items-end md:items-center justify-between mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
@@ -687,82 +762,6 @@ const AppointmentPage: React.FC = () => {
                         <Plus className="w-4 h-4" />
                         <span>Nueva Cita</span>
                     </button>
-                </div>
-
-                {/* Filtros por período */}
-                <div className="flex flex-row gap-4">
-                    <div>
-                        <p className="text-sm font-semibold text-slate-700 mb-3">
-                            Filtrar por período
-                        </p>
-
-                        <div className="flex flex-wrap gap-2">
-                            {[
-                                { value: "ALL", label: "Todas" },
-                                { value: "DAY", label: "Hoy" },
-                                { value: "WEEK", label: "Esta semana" },
-                                { value: "MONTH", label: "Este mes" },
-                            ].map((period) => (
-                                <button
-                                    key={period.value}
-                                    type="button"
-                                    onClick={() => {
-                                        setSelectedPeriod(
-                                            period.value as AppointmentPeriod
-                                        );
-                                        setCurrentPage(1);
-                                    }}
-                                    className={`p-2 rounded-lg text-sm font-medium
-                                            border transition-colors cursor-pointer
-                                            ${selectedPeriod === period.value
-                                            ? "bg-[#001D4A] text-white border-[#001D4A]"
-                                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                                        }`}
-                                >
-                                    {period.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Filtros por estado */}
-                    <div>
-                        <p className="text-sm font-semibold text-slate-700 mb-3">
-                            Filtrar por estado
-                        </p>
-
-                        <div className="flex flex-wrap gap-2">
-                            {[
-                                { value: "ALL", label: "Todos los estados" },
-                                { value: "SCHEDULED", label: "Programadas" },
-                                { value: "CONFIRMED", label: "Confirmadas" },
-                                { value: "IN_PROGRESS", label: "En progreso" },
-                                { value: "COMPLETED", label: "Completadas" },
-                                { value: "ABANDONED", label: "Abandonadas" },
-                                { value: "CANCELLED", label: "Abortadas" },
-                                { value: "NO_SHOW", label: "No asistió" },
-                            ].map((status) => (
-                                <button
-                                    key={status.value}
-                                    type="button"
-                                    onClick={() => {
-                                        setSelectedStatus(
-                                            status.value as AppointmentStatus | "ALL"
-                                        );
-                                        setCurrentPage(1);
-                                    }}
-                                    className={`p-2 rounded-lg text-xs sm:text-sm
-                                            font-medium border transition-colors cursor-pointer
-                                            ${selectedStatus === status.value
-                                            ? "bg-blue-50 text-blue-700 border-blue-300"
-                                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                                        }`}
-                                >
-                                    {status.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
                 </div>
 
                 {/* Tabla de Citas */}
