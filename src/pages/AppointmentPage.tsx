@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Pencil, Menu, X, CheckCircle2, Play, Check, UserX, XCircle } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
 import { useTableSearch } from "../shared/Table/useTableSearch";
 import SearchInput from "../shared/Table/SearchInput";
-import { useAppointments } from "../hooks/useAppointment";
+import { useAbandonedAppointment, useAppointments } from "../hooks/useAppointment";
 import type AppointmentModel from "../models/AppointmentModel";
 import CreateAppointmentDrawer from "../components/appointment/CreateAppointmentDrawer";
 import EditAppointmentDrawer from "../components/appointment/EditAppointmentDrawer";
@@ -22,8 +22,12 @@ const AppointmentPage: React.FC = () => {
     const { role, user } = useRolePermissions();
     const {
         data: appointments = [],
-        isLoading
+        isLoading,
     } = useAppointments();
+
+    const markAsAbandonedMutation = useAbandonedAppointment();
+
+    const processingAppointmentIdsRef = useRef(new Set<string>());
 
     const { addNotification, removeNotification } = useNotifications();
 
@@ -77,8 +81,6 @@ const AppointmentPage: React.FC = () => {
         selectedAppointment?.id || ""
     );
 
-    // const markReminderAsSentMutation = useMarkReminderAsSent();
-
     const isViewer = role === UserRole.Viewer;
     const canWrite = !isViewer;
 
@@ -93,7 +95,6 @@ const AppointmentPage: React.FC = () => {
         "status",
         "reminderSent",
     ];
-
 
     const handleStartAppointment = () => {
         if (!selectedAppointment) {
@@ -179,7 +180,6 @@ const AppointmentPage: React.FC = () => {
         handleStart(selectedAppointment.id);
     };
 
-
     const filteredAppointments = useMemo(() => {
         if (role === UserRole.Admin || role === UserRole.Receptionist) {
             return appointments;
@@ -251,7 +251,7 @@ const AppointmentPage: React.FC = () => {
         },
         ABANDONED: {
             label: "Abandonada",
-            className: "text-red-600",
+            className: "text-gray-600",
         },
         CANCELLED: {
             label: "Abortada",
@@ -455,47 +455,102 @@ const AppointmentPage: React.FC = () => {
         setCurrentPage(1);
     };
 
+
     useEffect(() => {
         if (isLoading) return;
-
-        const statusesToReview = [
-            "SCHEDULED",
-            "CONFIRMED",
-            "IN_PROGRESS",
-        ];
-
-        const now = new Date();
 
         appointments.forEach((appointment) => {
             const notificationId = `abandoned-appointment-${appointment.id}`;
 
-            const startDate = new Date(appointment.startAppointmentTime);
+            if (appointment.status === "ABANDONED") {
+                const startDate = new Date(
+                    appointment.startAppointmentTime
+                );
 
-            const isPastAppointment =
-                !Number.isNaN(startDate.getTime()) &&
-                startDate < now;
-
-            const needsReview =
-                statusesToReview.includes(appointment.status) &&
-                isPastAppointment;
-
-            if (needsReview) {
                 addNotification({
                     id: notificationId,
-                    title: "Cita pendiente de resolver",
-                    message: `La cita del paciente ${appointment.patientFullName} tenía fecha de inicio ${startDate.toLocaleString("es-NI")}, pero continúa en estado pendiente de resolución. Revise si corresponde abortarla o abandonarla.`,
+                    title: "Cita abandonada pendiente de revisión",
+                    message: `La cita del paciente ${appointment.patientFullName}, programada para ${startDate.toLocaleString("es-NI")}, fue marcada como abandonada. Revise la cita y determine si requiere seguimiento.`,
                     type: "warning",
                     entityType: "appointment",
                     entityId: appointment.id,
-                    actionUrl: "/agenda"
+                    actionUrl: "/agenda",
                 });
             } else {
-                // Si se completó, canceló o todavía no ha comenzado,
-                // ya no necesita esta notificación.
+                // Si la cita ya no está abandonada, retirar la notificación.
                 removeNotification(notificationId);
             }
         });
-    }, [appointments, isLoading, addNotification, removeNotification]);
+    }, [
+        appointments,
+        isLoading,
+        addNotification,
+        removeNotification,
+    ]);
+
+
+    useEffect(() => {
+        if (isLoading || appointments.length === 0) return;
+
+        const checkAbandonedAppointments = () => {
+            const now = Date.now();
+            const oneHourInMs = 60 * 60 * 1000;
+
+            appointments.forEach((appointment) => {
+                // Solo citas programadas o confirmadas.
+                if (
+                    appointment.status !== "SCHEDULED" &&
+                    appointment.status !== "CONFIRMED"
+                ) {
+                    return;
+                }
+
+                const startTime = new Date(
+                    appointment.startAppointmentTime
+                ).getTime();
+
+                // Ignorar fechas inválidas.
+                if (Number.isNaN(startTime)) return;
+
+                // Debe haber pasado al menos una hora desde el inicio.
+                if (now - startTime < oneHourInMs) return;
+
+                // Evitar ejecutar la misma mutación más de una vez simultáneamente.
+                if (
+                    processingAppointmentIdsRef.current.has(appointment.id)
+                ) {
+                    return;
+                }
+
+                processingAppointmentIdsRef.current.add(appointment.id);
+
+                markAsAbandonedMutation.mutate(appointment.id, {
+                    onSettled: () => {
+                        processingAppointmentIdsRef.current.delete(
+                            appointment.id
+                        );
+                    },
+                });
+            });
+        };
+
+        // Revisar inmediatamente al cargar las citas.
+        checkAbandonedAppointments();
+
+        // Volver a revisar cada minuto.
+        const intervalId = window.setInterval(
+            checkAbandonedAppointments,
+            60_000
+        );
+
+        return () => {
+            window.clearInterval(intervalId);
+        };
+    }, [
+        appointments,
+        isLoading,
+        markAsAbandonedMutation.mutate,
+    ]);
 
     return (
         <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">

@@ -144,6 +144,19 @@ export default class AppointmentService extends HTTPService {
     return response || null;
   }
 
+  /**
+   * Marca una cita como no abandonada
+   */
+  async markAsAbandoned(
+    id: string
+  ): Promise<Appointment | null> {
+    const response = await super.post<Appointment>(
+      `${this.path}/${id}/abandon`
+    );
+
+    return response || null;
+  }
+
   // ============================================================
   // REMINDER
   // ============================================================
