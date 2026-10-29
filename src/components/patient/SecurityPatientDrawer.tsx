@@ -5,6 +5,7 @@ import PatientModel from "../../models/PatientModel";
 import { useActivatePatient, useChangePatientAddress, useChangePatientEmail, useChangePatientImage, useChangePatientPhoneNumber, useDeactivatePatient, useUpdateEmergencyContact } from "../../hooks/usePatients";
 import { validatePhoneNumber } from "../../utils/validatePhoneNumber";
 import { getAge } from "../../utils/getAge";
+import { useAppointments } from "../../hooks/useAppointment";
 
 interface SecurityPatientDrawerProps {
     isOpen: boolean;
@@ -17,6 +18,10 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
     onHide,
     patient,
 }) => {
+    const {
+        data: appointments = [],
+        isLoading: isLoadingAppointments,
+    } = useAppointments(1, 100);
     const [prevPatient, setPrevPatient] = useState<PatientModel | null>(patient);
 
     // Hooks de mutación
@@ -80,27 +85,57 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
     const handleSubmit = async () => {
         if (!patient) return;
 
-        if (email !== patient.email && !email?.trim()) {
-            showToast("error", "El correo electrónico no puede estar vacío.");
-            return;
-        }
+        if (patient.active && !isActive) {
+            if (isLoadingAppointments) {
+                showToast(
+                    "error",
+                    "Espera a que termine la validación de las citas."
+                );
+                return;
+            }
 
-        if (!phone.trim()) {
-            showToast("error", "Debes tener un número de contacto.");
-            return;
-        }
-
-        if (!validatePhoneNumber(phone)) {
-            showToast(
-                "error",
-                "Ingrese un número de teléfono válido de 8 dígitos del paciente."
+            const activeAppointments = appointments.filter(
+                (appointment) =>
+                    String(appointment.patientId) === String(patient.id) &&
+                    ["SCHEDULED", "CONFIRMED", "IN_PROGRESS"].includes(
+                        appointment.status
+                    )
             );
-            return;
+
+            if (activeAppointments.length > 0) {
+                showToast(
+                    "error",
+                    `No se puede desactivar al paciente porque tiene ${activeAppointments.length} cita(s) programada(s), confirmada(s) o en progreso.`
+                );
+                return;
+            }
         }
 
-        if (!address.trim()) {
-            showToast("error", "Debes tener una dirección.");
-            return;
+
+        // Validar correo y teléfono únicamente si el paciente es mayor de edad
+        if (!isMinor) {
+            if (email !== patient.email && !email?.trim()) {
+                showToast("error", "El correo electrónico no puede estar vacío.");
+                return;
+            }
+
+            if (!phone.trim()) {
+                showToast("error", "Debes tener un número de contacto.");
+                return;
+            }
+
+            if (!validatePhoneNumber(phone)) {
+                showToast(
+                    "error",
+                    "Ingrese un número de teléfono válido de 8 dígitos del paciente."
+                );
+                return;
+            }
+
+            if (!address.trim()) {
+                showToast("error", "Debes tener una dirección.");
+                return;
+            }
         }
 
         if (!image.trim()) {
@@ -134,18 +169,28 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
 
             // Evaluar cambios y encolar peticiones específicas
 
-            // Cambiar Email
-            if (email !== patient.email) {
-                promises.push(changeEmail({ id: patient.id, email: email.trim() }));
+            // Cambiar email solo si es mayor de edad
+            if (!isMinor && email !== patient.email) {
+                promises.push(
+                    changeEmail({
+                        id: patient.id,
+                        email: email!.trim(),
+                    })
+                );
             }
 
-            // Cambiar Numero de telefono
-            if (phone !== patient.phoneNumber) {
-                promises.push(changePhone({ id: patient.id, phoneNumber: phone }));
+            // Cambiar teléfono solo si es mayor de edad
+            if (!isMinor && phone !== patient.phoneNumber) {
+                promises.push(
+                    changePhone({
+                        id: patient.id,
+                        phoneNumber: phone,
+                    })
+                );
             }
 
             // Cambiar dirección
-            if (address !== patient.address) {
+            if ( !isMinor && address !== patient.address) {
                 promises.push(changeAddress({ id: patient.id, address: address }));
             }
 

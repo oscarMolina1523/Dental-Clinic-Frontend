@@ -155,6 +155,31 @@ export function useConfirmAppointment() {
 }
 
 /* =========================================================
+   ABANDON APPOINTMENT
+========================================================= */
+
+export function useAbandonedAppointment() {
+  const queryClient = useQueryClient();
+
+  return useMutation<Appointment | null, Error, string>({
+    mutationKey: ["abandonAppointment"],
+
+    mutationFn: (id) =>
+      appointmentService.markAsAbandoned(id),
+
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({
+        queryKey: ["appointments"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["appointmentById", id],
+      });
+    },
+  });
+}
+
+/* =========================================================
    START APPOINTMENT
 ========================================================= */
 

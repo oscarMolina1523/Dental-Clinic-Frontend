@@ -57,8 +57,79 @@ const LotesPage: React.FC = () => {
     delay: 800,
   });
 
+  const priorityLoteIds = useMemo(() => {
+    const firstLoteByProduct = new Map<string, InventoryLoteModel>();
 
-  const totalItems = filteredData.length; //obtenemos la cantidad total de items 
+    // Usamos todos los lotes, no filteredData,
+    // para que una búsqueda no permita editar un lote
+    // que normalmente no sería el prioritario.
+    const orderedLotes = [...inventoryLotes].sort((a, b) => {
+      if (a.dueDate && !b.dueDate) return -1;
+      if (!a.dueDate && b.dueDate) return 1;
+
+      if (a.dueDate && b.dueDate) {
+        return new Date(a.dueDate).getTime() -
+          new Date(b.dueDate).getTime();
+      }
+
+      const entryA = a.entryDate
+        ? new Date(a.entryDate).getTime()
+        : Number.MAX_SAFE_INTEGER;
+
+      const entryB = b.entryDate
+        ? new Date(b.entryDate).getTime()
+        : Number.MAX_SAFE_INTEGER;
+
+      return entryA - entryB;
+    });
+
+    for (const lote of orderedLotes) {
+      // Los lotes agotados no necesitan prioridad de salida.
+      if (lote.quantity <= 0) continue;
+
+      // Agrupar por producto, no por nombre visible.
+      const productKey = String(lote.productId);
+
+      if (!firstLoteByProduct.has(productKey)) {
+        firstLoteByProduct.set(productKey, lote);
+      }
+    }
+
+    return new Set(
+      Array.from(firstLoteByProduct.values()).map((lote) => lote.id)
+    );
+  }, [inventoryLotes]);
+
+  const sortedLotes = useMemo(() => {
+    return [...filteredData].sort((a, b) => {
+      // Los lotes con fecha de vencimiento tienen prioridad.
+      if (a.dueDate && !b.dueDate) return -1;
+      if (!a.dueDate && b.dueDate) return 1;
+
+      // Si ambos tienen fecha de vencimiento,
+      // primero el que vence antes.
+      if (a.dueDate && b.dueDate) {
+        const dateA = new Date(a.dueDate).getTime();
+        const dateB = new Date(b.dueDate).getTime();
+
+        return dateA - dateB;
+      }
+
+      // Si ninguno tiene vencimiento,
+      // primero el lote que ingresó antes.
+      const entryA = a.entryDate
+        ? new Date(a.entryDate).getTime()
+        : Number.MAX_SAFE_INTEGER;
+
+      const entryB = b.entryDate
+        ? new Date(b.entryDate).getTime()
+        : Number.MAX_SAFE_INTEGER;
+
+      return entryA - entryB;
+    });
+  }, [filteredData]);
+
+  const totalItems = sortedLotes.length;; //obtenemos la cantidad total de items 
 
   const totalPages = Math.max(
     1,
@@ -77,11 +148,11 @@ const LotesPage: React.FC = () => {
 
   const currentProducts = useMemo(
     () =>
-      filteredData.slice(
+      sortedLotes.slice(
         startIndex,
         endIndex
       ),
-    [startIndex, endIndex, filteredData]
+    [startIndex, endIndex, sortedLotes]
   );
 
   const columns: TableColumn<typeof inventoryLotes[number]>[] = [
@@ -170,7 +241,7 @@ const LotesPage: React.FC = () => {
         setSelectedLote(lote);
         setIsEditDrawerOpen(true);
       },
-      hidden: (lote) => !canWrite || lote.quantity == 0,
+      hidden: (lote) => !canWrite || lote.quantity == 0 || !priorityLoteIds.has(lote.id),
     },
   ];
 
@@ -231,7 +302,7 @@ const LotesPage: React.FC = () => {
         type: "warning",
         entityType: "inventory-lote",
         entityId: lote.id,
-        actionUrl:"/inventory-lotes"
+        actionUrl: "/inventory-lotes"
       });
     });
   }, [inventoryLotes, isLoading, addNotification]);
