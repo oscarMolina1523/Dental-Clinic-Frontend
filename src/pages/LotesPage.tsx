@@ -57,6 +57,49 @@ const LotesPage: React.FC = () => {
     delay: 800,
   });
 
+  const priorityLoteIds = useMemo(() => {
+    const firstLoteByProduct = new Map<string, InventoryLoteModel>();
+
+    // Usamos todos los lotes, no filteredData,
+    // para que una búsqueda no permita editar un lote
+    // que normalmente no sería el prioritario.
+    const orderedLotes = [...inventoryLotes].sort((a, b) => {
+      if (a.dueDate && !b.dueDate) return -1;
+      if (!a.dueDate && b.dueDate) return 1;
+
+      if (a.dueDate && b.dueDate) {
+        return new Date(a.dueDate).getTime() -
+          new Date(b.dueDate).getTime();
+      }
+
+      const entryA = a.entryDate
+        ? new Date(a.entryDate).getTime()
+        : Number.MAX_SAFE_INTEGER;
+
+      const entryB = b.entryDate
+        ? new Date(b.entryDate).getTime()
+        : Number.MAX_SAFE_INTEGER;
+
+      return entryA - entryB;
+    });
+
+    for (const lote of orderedLotes) {
+      // Los lotes agotados no necesitan prioridad de salida.
+      if (lote.quantity <= 0) continue;
+
+      // Agrupar por producto, no por nombre visible.
+      const productKey = String(lote.productId);
+
+      if (!firstLoteByProduct.has(productKey)) {
+        firstLoteByProduct.set(productKey, lote);
+      }
+    }
+
+    return new Set(
+      Array.from(firstLoteByProduct.values()).map((lote) => lote.id)
+    );
+  }, [inventoryLotes]);
+
   const sortedLotes = useMemo(() => {
     return [...filteredData].sort((a, b) => {
       // Los lotes con fecha de vencimiento tienen prioridad.
@@ -85,7 +128,6 @@ const LotesPage: React.FC = () => {
       return entryA - entryB;
     });
   }, [filteredData]);
-
 
   const totalItems = sortedLotes.length;; //obtenemos la cantidad total de items 
 
@@ -199,7 +241,7 @@ const LotesPage: React.FC = () => {
         setSelectedLote(lote);
         setIsEditDrawerOpen(true);
       },
-      hidden: (lote) => !canWrite || lote.quantity == 0,
+      hidden: (lote) => !canWrite || lote.quantity == 0 || !priorityLoteIds.has(lote.id),
     },
   ];
 
