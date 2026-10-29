@@ -37,6 +37,8 @@ const TreatmentCatalogPage: React.FC = () => {
         useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+    const [selectedStatus, setSelectedStatus] = useState<"ACTIVE" | "INACTIVE">("ACTIVE");
+
     const [selectedTreatment, setSelectedTreatment] = useState<TreatmentCatalogModel | null>(null);
 
     const ITEMS_PER_PAGE = 10;
@@ -45,8 +47,7 @@ const TreatmentCatalogPage: React.FC = () => {
     const searchFields: (keyof TreatmentCatalogModel)[] = [
         "name",
         "basePrice",
-        "estimatedDurationMinutes",
-        "active",
+        "estimatedDurationMinutes"
     ];
 
     const {
@@ -59,8 +60,16 @@ const TreatmentCatalogPage: React.FC = () => {
         delay: 800,
     });
 
+    const filteredTreatments = useMemo(() => {
+        return filteredData.filter((treatment) =>
+            selectedStatus === "ACTIVE"
+                ? Number(treatment.active) === 1
+                : Number(treatment.active) === 0
+        );
+    }, [filteredData, selectedStatus]);
 
-    const totalItems = filteredData.length; //obtenemos la cantidad total de items 
+
+    const totalItems = filteredTreatments.length; //obtenemos la cantidad total de items 
 
     const totalPages = Math.max(
         1,
@@ -79,11 +88,11 @@ const TreatmentCatalogPage: React.FC = () => {
 
     const currentTreatments = useMemo(
         () =>
-            filteredData.slice(
+            filteredTreatments.slice(
                 startIndex,
                 endIndex
             ),
-        [startIndex, endIndex, filteredData]
+        [startIndex, endIndex, filteredTreatments]
     );
 
 
@@ -226,14 +235,44 @@ const TreatmentCatalogPage: React.FC = () => {
                 {/* Encabezado */}
                 <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Servicios</h1> */}
-                    <SearchInput
-                        value={search}
-                        onChange={handleSearch}
-                        placeholder="Buscar Servicio..."
-                    />
+                    <div className="flex flex-row gap-2 md:w-1/2">
+                        <SearchInput
+                            value={search}
+                            onChange={handleSearch}
+                            placeholder="Buscar Servicio..."
+                        />
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => {
+                                    setSelectedStatus("ACTIVE");
+                                    setCurrentPage(1);
+                                }}
+                                className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${selectedStatus === "ACTIVE"
+                                    ? "bg-[#001D4A] text-white border-[#001D4A]"
+                                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                    }`}
+                            >
+                                Activos
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setSelectedStatus("INACTIVE");
+                                    setCurrentPage(1);
+                                }}
+                                className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${selectedStatus === "INACTIVE"
+                                    ? "bg-[#001D4A] text-white border-[#001D4A]"
+                                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                    }`}
+                            >
+                                Inactivos
+                            </button>
+                        </div>
+                    </div>
                     <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
-                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
-                            : "bg-slate-300 cursor-not-allowed opacity-70"
+                        ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+                        : "bg-slate-300 cursor-not-allowed opacity-70"
                         }`}>
                         <Plus className="w-4 h-4" />
                         <span>Nuevo Servicio</span>

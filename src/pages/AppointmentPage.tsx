@@ -401,7 +401,7 @@ const AppointmentPage: React.FC = () => {
         },
         {
             key: "startAppointmentTime",
-            header: "Fecha de inicio",
+            header: "Fecha y hora de inicio",
             className: "w-24 md:w-50",
             render: (appointment: AppointmentModel) => (
                 <span className="text-sm text-slate-500">
@@ -417,7 +417,7 @@ const AppointmentPage: React.FC = () => {
         },
         {
             key: "endAppointmentTime",
-            header: "Fecha de finalización",
+            header: "Fecha y hora de finalización",
             className: "w-24 md:w-50",
             render: (appointment: AppointmentModel) => (
                 <span className="text-sm text-slate-500">

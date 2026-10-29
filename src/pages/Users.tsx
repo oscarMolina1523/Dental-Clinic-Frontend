@@ -43,21 +43,29 @@ const UsersPage: React.FC = () => {
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
-  const searchFields: (keyof UserModel)[] = [
+  const searchFields = [
     "fullName",
     "email",
     "phoneNumber",
     "active",
-    "roleId",
-  ];
+    "roleName",
+    "specialties",
+  ] as const;
+
+  const searchableUsers = useMemo(() => {
+    return users.map((user) => ({
+      ...user,
+      roleName: getRoleName(user.roleId) ?? "",
+    }));
+  }, [users]);
 
   const {
     search,
     setSearch,
     filteredData,
-  } = useTableSearch<UserModel>({
-    data: users,
-    fields: searchFields,
+  } = useTableSearch({
+    data: searchableUsers,
+    fields: [...searchFields],
     delay: 800,
   });
 
@@ -140,7 +148,7 @@ const UsersPage: React.FC = () => {
       className: "w-50 md:w-60 pr-2",
       render: (user: UserModel) => (
         <span className="text-sm text-slate-500 break-words whitespace-normal">
-          {user.specialties ?? "N/A"} 
+          {user.specialties ?? "N/A"}
         </span>
       ),
     },
@@ -249,9 +257,9 @@ const UsersPage: React.FC = () => {
               setIsCreateDrawerOpen(true)
             }
             className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
-                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
-                            : "bg-slate-300 cursor-not-allowed opacity-70"
-                        }`}>
+              ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+              : "bg-slate-300 cursor-not-allowed opacity-70"
+              }`}>
             <Plus className="w-4 h-4" />
             <span>Nuevo Usuario</span>
           </button>
