@@ -910,6 +910,17 @@ export const useEditAppointmentDrawer = (
         const startDate = new Date(form.startAppointmentTime);
         const endDate = new Date(form.endAppointmentTime);
 
+        const originalStartDate = new Date(appointment.startAppointmentTime);
+        const originalEndDate = new Date(appointment.endAppointmentTime);
+
+        const dateChanged =
+            startDate.getTime() !== originalStartDate.getTime() ||
+            endDate.getTime() !== originalEndDate.getTime();
+
+        const updatedStatus = dateChanged
+            ? "SCHEDULED"
+            : appointment.status;
+
         if (endDate <= startDate) {
             showToast(
                 "error",
@@ -1000,7 +1011,8 @@ export const useEditAppointmentDrawer = (
             clinicalNotes: cleanedClinicalNotes.join(", "),
 
             isInvoiced: form.isInvoiced,
-            isClinicalProgressRegistered: form.isClinicalProgressRegistered
+            isClinicalProgressRegistered: form.isClinicalProgressRegistered,
+            status: updatedStatus,
         };
 
         // ============================================================
@@ -1016,7 +1028,6 @@ export const useEditAppointmentDrawer = (
                     data: {
                         appointment: {
                             ...baseAppointment,
-                            status: appointment.status,
                             treatmentId: String(treatment.id),
                             treatmentPlanId: undefined,
                             cancelationNotes: appointment.cancelationNotes,
@@ -1071,7 +1082,6 @@ export const useEditAppointmentDrawer = (
                 data: {
                     appointment: {
                         ...baseAppointment,
-                        status: appointment.status,
                         cancelationNotes: appointment.cancelationNotes,
                         reminderSent: appointment.reminderSent,
                         treatmentId: undefined,
