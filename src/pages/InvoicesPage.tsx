@@ -294,7 +294,7 @@ const InvoicesPage: React.FC = () => {
             )}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 {/* Encabezado */}
-                <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
+                <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-2 mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
                     <SearchInput
                         value={search}
@@ -311,7 +311,7 @@ const InvoicesPage: React.FC = () => {
                 </div>
 
                 {/* Tabla de Facturas */}
-                <div className="overflow-x-auto max-h-100">
+                <div className="overflow-x-auto max-h-110">
                     {isLoading ? (
                         <TableSkeleton
                             columns={columns}

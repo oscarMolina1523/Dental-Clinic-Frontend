@@ -483,7 +483,7 @@ const AppointmentPage: React.FC = () => {
                 setSelectedAppointment(appointment);
                 setIsEditDrawerOpen(true);
             },
-            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced || role === UserRole.Dentist,
+            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced || role === UserRole.Admin,
         },
         {
             label: "Cambios de estados",
