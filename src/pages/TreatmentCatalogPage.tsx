@@ -104,9 +104,9 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "description",
             header: "Descripción",
-            className: "w-20 md:w-60",
+            className: "w-20 md:w-70 pr-4",
             render: (treatment: TreatmentCatalogModel) => (
-                <p className="text-sm text-slate-500 whitespace-normal break-words">
+                <p className="text-sm text-slate-500 truncate">
                     {treatment.description}
                 </p>
             ),
@@ -114,9 +114,9 @@ const TreatmentCatalogPage: React.FC = () => {
         {
             key: "specialities",
             header: "Especialidades",
-            className: "w-20 md:w-80",
+            className: "w-20 md:w-60",
             render: (treatment: TreatmentCatalogModel) => (
-                <p className="text-sm text-slate-500 whitespace-normal break-words pr-4">
+                <p className="text-sm text-slate-500 truncate pr-4">
                     {treatment.specialities}
                 </p>
             ),
@@ -241,7 +241,7 @@ const TreatmentCatalogPage: React.FC = () => {
                 </div>
 
                 {/* Tabla de Servicios */}
-                <div className="overflow-x-auto max-h-100">
+                <div className="overflow-x-auto max-h-120">
                     {isLoading ? (
                         <TableSkeleton
                             columns={columns}

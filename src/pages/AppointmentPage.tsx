@@ -766,7 +766,7 @@ const AppointmentPage: React.FC = () => {
                 </div>
 
                 {/* Tabla de Citas */}
-                <div className="overflow-x-auto max-h-100 ">
+                <div className="overflow-x-auto max-h-100 mt-6">
                     {isLoading ? (
                         <TableSkeleton
                             columns={columns}

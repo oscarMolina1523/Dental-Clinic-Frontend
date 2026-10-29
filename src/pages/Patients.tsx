@@ -111,7 +111,7 @@ const PatientsPage: React.FC = () => {
           <img
             src={patient.image}
             alt={patient.name}
-            className="w-9 h-9 rounded-full object-cover border border-slate-200"
+            className="w-7 h-7 rounded-full object-cover border border-slate-200"
           />
 
           <span className="text-sm font-semibold text-slate-800">
@@ -241,7 +241,7 @@ const PatientsPage: React.FC = () => {
 
 
   return (
-    <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
+    <div className="h-full w-full bg-[#f8fafc] px-8 py-4 flex flex-col justify-between select-none">
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
         {/* Encabezado */}
         <div className="flex flex-col gap-2 md:flex-row items-end md:items-center justify-between pb-6 mb-2">
@@ -261,7 +261,7 @@ const PatientsPage: React.FC = () => {
         </div>
 
         {/* Tabla de Pacientes */}
-        <div className="overflow-x-auto max-h-100">
+        <div className="overflow-x-auto max-h-120">
           {isLoading ? (
             <TableSkeleton
               columns={columns}

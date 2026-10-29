@@ -33,6 +33,7 @@ const DataTable = <T,>({
 
                         {actions && actions.length > 0 && (
                             <th className="pb-3 pr-2 text-right font-normal">
+                                Acciones
                             </th>
                         )}
 
