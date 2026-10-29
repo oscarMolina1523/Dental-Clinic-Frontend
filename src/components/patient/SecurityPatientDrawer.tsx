@@ -112,27 +112,30 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
         }
 
 
-        if (email !== patient.email && !email?.trim()) {
-            showToast("error", "El correo electrónico no puede estar vacío.");
-            return;
-        }
+        // Validar correo y teléfono únicamente si el paciente es mayor de edad
+        if (!isMinor) {
+            if (email !== patient.email && !email?.trim()) {
+                showToast("error", "El correo electrónico no puede estar vacío.");
+                return;
+            }
 
-        if (!phone.trim()) {
-            showToast("error", "Debes tener un número de contacto.");
-            return;
-        }
+            if (!phone.trim()) {
+                showToast("error", "Debes tener un número de contacto.");
+                return;
+            }
 
-        if (!validatePhoneNumber(phone)) {
-            showToast(
-                "error",
-                "Ingrese un número de teléfono válido de 8 dígitos del paciente."
-            );
-            return;
-        }
+            if (!validatePhoneNumber(phone)) {
+                showToast(
+                    "error",
+                    "Ingrese un número de teléfono válido de 8 dígitos del paciente."
+                );
+                return;
+            }
 
-        if (!address.trim()) {
-            showToast("error", "Debes tener una dirección.");
-            return;
+            if (!address.trim()) {
+                showToast("error", "Debes tener una dirección.");
+                return;
+            }
         }
 
         if (!image.trim()) {
@@ -166,18 +169,28 @@ const SecurityPatientDrawer: React.FC<SecurityPatientDrawerProps> = ({
 
             // Evaluar cambios y encolar peticiones específicas
 
-            // Cambiar Email
-            if (email !== patient.email) {
-                promises.push(changeEmail({ id: patient.id, email: email.trim() }));
+            // Cambiar email solo si es mayor de edad
+            if (!isMinor && email !== patient.email) {
+                promises.push(
+                    changeEmail({
+                        id: patient.id,
+                        email: email!.trim(),
+                    })
+                );
             }
 
-            // Cambiar Numero de telefono
-            if (phone !== patient.phoneNumber) {
-                promises.push(changePhone({ id: patient.id, phoneNumber: phone }));
+            // Cambiar teléfono solo si es mayor de edad
+            if (!isMinor && phone !== patient.phoneNumber) {
+                promises.push(
+                    changePhone({
+                        id: patient.id,
+                        phoneNumber: phone,
+                    })
+                );
             }
 
             // Cambiar dirección
-            if (address !== patient.address) {
+            if ( !isMinor && address !== patient.address) {
                 promises.push(changeAddress({ id: patient.id, address: address }));
             }
 
