@@ -87,6 +87,14 @@ const AppointmentPage: React.FC = () => {
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
 
+    type AppointmentPeriod = "ALL" | "DAY" | "WEEK" | "MONTH";
+
+    const [selectedPeriod, setSelectedPeriod] =
+        useState<AppointmentPeriod>("ALL");
+
+    const [selectedStatus, setSelectedStatus] =
+        useState<AppointmentStatus | "ALL">("ALL");
+
     const searchFields: (keyof AppointmentModel)[] = [
         "patientFullName",
         "dentistFullName",
@@ -180,6 +188,27 @@ const AppointmentPage: React.FC = () => {
         handleStart(selectedAppointment.id);
     };
 
+    // const filteredAppointments = useMemo(() => {
+    //     if (role === UserRole.Admin || role === UserRole.Receptionist) {
+    //         return appointments;
+    //     }
+
+    //     return appointments.filter(
+    //         (appointment) => appointment.dentistId === user?.id
+    //     );
+    // }, [appointments, role, user?.roleId]);
+
+    // const {
+    //     search,
+    //     setSearch,
+    //     filteredData,
+    // } = useTableSearch<AppointmentModel>({
+    //     data: filteredAppointments,
+    //     fields: searchFields,
+    //     delay: 800,
+    // });
+
+
     const filteredAppointments = useMemo(() => {
         if (role === UserRole.Admin || role === UserRole.Receptionist) {
             return appointments;
@@ -188,14 +217,94 @@ const AppointmentPage: React.FC = () => {
         return appointments.filter(
             (appointment) => appointment.dentistId === user?.id
         );
-    }, [appointments, role, user?.roleId]);
+    }, [appointments, role, user?.id]);
+
+    const appointmentsByFilters = useMemo(() => {
+        const now = new Date();
+
+        // Inicio del día actual
+        const startOfDay = new Date(now);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        // Inicio del día siguiente
+        const startOfTomorrow = new Date(startOfDay);
+        startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+
+        // Inicio de la semana: lunes
+        const startOfWeek = new Date(startOfDay);
+        const dayOfWeek = startOfWeek.getDay();
+
+        startOfWeek.setDate(
+            startOfWeek.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)
+        );
+
+        // Inicio de la próxima semana
+        const startOfNextWeek = new Date(startOfWeek);
+        startOfNextWeek.setDate(startOfNextWeek.getDate() + 7);
+
+        // Inicio del mes actual
+        const startOfMonth = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            1
+        );
+
+        // Inicio del próximo mes
+        const startOfNextMonth = new Date(
+            now.getFullYear(),
+            now.getMonth() + 1,
+            1
+        );
+
+        return filteredAppointments.filter((appointment) => {
+            const appointmentDate = new Date(
+                appointment.startAppointmentTime
+            );
+
+            // Filtro por período
+            let matchesPeriod = true;
+
+            if (selectedPeriod !== "ALL") {
+                if (Number.isNaN(appointmentDate.getTime())) {
+                    matchesPeriod = false;
+                } else {
+                    switch (selectedPeriod) {
+                        case "DAY":
+                            matchesPeriod =
+                                appointmentDate >= startOfDay &&
+                                appointmentDate < startOfTomorrow;
+                            break;
+
+                        case "WEEK":
+                            matchesPeriod =
+                                appointmentDate >= startOfWeek &&
+                                appointmentDate < startOfNextWeek;
+                            break;
+
+                        case "MONTH":
+                            matchesPeriod =
+                                appointmentDate >= startOfMonth &&
+                                appointmentDate < startOfNextMonth;
+                            break;
+                    }
+                }
+            }
+
+            // Filtro por estado
+            const matchesStatus =
+                selectedStatus === "ALL" ||
+                appointment.status === selectedStatus;
+
+            return matchesPeriod && matchesStatus;
+        });
+    }, [filteredAppointments, selectedPeriod, selectedStatus]);
 
     const {
         search,
         setSearch,
         filteredData,
     } = useTableSearch<AppointmentModel>({
-        data: filteredAppointments,
+        data: appointmentsByFilters,
         fields: searchFields,
         delay: 800,
     });
@@ -553,7 +662,7 @@ const AppointmentPage: React.FC = () => {
     ]);
 
     return (
-        <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
+        <div className="h-full w-full bg-[#f8fafc] px-8 py-4 flex flex-col justify-between select-none">
             {toast && (
                 <Toast
                     type={toast.type}
@@ -563,7 +672,7 @@ const AppointmentPage: React.FC = () => {
             )}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 {/* Encabezado */}
-                <div className="flex flex-col md:flex-row gap-2 items-end md:items-center justify-between pb-6 mb-2">
+                <div className="flex flex-col md:flex-row gap-2 items-end md:items-center justify-between mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
                     <SearchInput
                         value={search}
@@ -580,8 +689,84 @@ const AppointmentPage: React.FC = () => {
                     </button>
                 </div>
 
+                {/* Filtros por período */}
+                <div className="flex flex-row gap-4">
+                    <div>
+                        <p className="text-sm font-semibold text-slate-700 mb-3">
+                            Filtrar por período
+                        </p>
+
+                        <div className="flex flex-wrap gap-2">
+                            {[
+                                { value: "ALL", label: "Todas" },
+                                { value: "DAY", label: "Hoy" },
+                                { value: "WEEK", label: "Esta semana" },
+                                { value: "MONTH", label: "Este mes" },
+                            ].map((period) => (
+                                <button
+                                    key={period.value}
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedPeriod(
+                                            period.value as AppointmentPeriod
+                                        );
+                                        setCurrentPage(1);
+                                    }}
+                                    className={`p-2 rounded-lg text-sm font-medium
+                                            border transition-colors cursor-pointer
+                                            ${selectedPeriod === period.value
+                                            ? "bg-[#001D4A] text-white border-[#001D4A]"
+                                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                        }`}
+                                >
+                                    {period.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Filtros por estado */}
+                    <div>
+                        <p className="text-sm font-semibold text-slate-700 mb-3">
+                            Filtrar por estado
+                        </p>
+
+                        <div className="flex flex-wrap gap-2">
+                            {[
+                                { value: "ALL", label: "Todos los estados" },
+                                { value: "SCHEDULED", label: "Programadas" },
+                                { value: "CONFIRMED", label: "Confirmadas" },
+                                { value: "IN_PROGRESS", label: "En progreso" },
+                                { value: "COMPLETED", label: "Completadas" },
+                                { value: "ABANDONED", label: "Abandonadas" },
+                                { value: "CANCELLED", label: "Abortadas" },
+                                { value: "NO_SHOW", label: "No asistió" },
+                            ].map((status) => (
+                                <button
+                                    key={status.value}
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedStatus(
+                                            status.value as AppointmentStatus | "ALL"
+                                        );
+                                        setCurrentPage(1);
+                                    }}
+                                    className={`p-2 rounded-lg text-xs sm:text-sm
+                                            font-medium border transition-colors cursor-pointer
+                                            ${selectedStatus === status.value
+                                            ? "bg-blue-50 text-blue-700 border-blue-300"
+                                            : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                                        }`}
+                                >
+                                    {status.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
                 {/* Tabla de Citas */}
-                <div className="overflow-x-auto max-h-100">
+                <div className="overflow-x-auto max-h-100 ">
                     {isLoading ? (
                         <TableSkeleton
                             columns={columns}
@@ -601,7 +786,7 @@ const AppointmentPage: React.FC = () => {
             </div>
 
             {/* Paginación de la Tabla */}
-            <div className="flex items-center justify-between pt-4 px-2 text-xs text-slate-500">
+            <div className="flex items-center justify-between text-xs text-slate-500">
                 <Pagination
                     currentPage={validPage}
                     totalItems={totalItems}

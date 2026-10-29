@@ -159,7 +159,7 @@ const LotesPage: React.FC = () => {
     {
       key: "productName",
       header: "Producto",
-      className: "pl-2 w-40 md:w-60",
+      className: "pl-2 w-40 md:w-70",
       render: (inventory: InventoryLoteModel) => (
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-slate-800">
