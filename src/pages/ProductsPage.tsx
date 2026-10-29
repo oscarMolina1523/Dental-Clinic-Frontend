@@ -44,23 +44,43 @@ const ProductsPage: React.FC = () => {
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
 
-  const searchFields: (keyof ProductModel)[] = [
+  const searchFields = [
     "name",
     "barcode",
     "category_id",
-    "measurement_unit_id"
-  ];
+    "measurementName",
+    "measurementAbbreviation",
+    "categoryName"
+  ] as const;
+
+  const searchableProducts = useMemo(() => {
+    return products.map((product) => {
+      const measurement = measurementUnites.find(
+        (item) => item.id === product.measurement_unit_id
+      );
+
+      const category = categories.find(
+        (item) => item.id === product.category_id
+      );
+
+      return {
+        ...product,
+        measurementName: measurement?.name ?? "",
+        measurementAbbreviation: measurement?.abreviation ?? "",
+        categoryName: category?.name ?? "",
+      };
+    });
+  }, [products, measurementUnites, categories]);
 
   const {
     search,
     setSearch,
     filteredData,
-  } = useTableSearch<ProductModel>({
-    data: products,
-    fields: searchFields,
+  } = useTableSearch({
+    data: searchableProducts,
+    fields: [...searchFields],
     delay: 800,
   });
-
 
   const totalItems = filteredData.length; //obtenemos la cantidad total de items 
 
@@ -213,9 +233,9 @@ const ProductsPage: React.FC = () => {
             placeholder="Buscar producto..."
           />
           <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
-                            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
-                            : "bg-slate-300 cursor-not-allowed opacity-70"
-                        }`}>
+            ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
+            : "bg-slate-300 cursor-not-allowed opacity-70"
+            }`}>
             <Plus className="w-4 h-4" />
             <span>Nuevo Producto</span>
           </button>
