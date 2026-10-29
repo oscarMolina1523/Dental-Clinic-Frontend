@@ -6,6 +6,7 @@ import User from "../../models/UserModel";
 import { useRoles } from "../../hooks/useRoles";
 import { getRoleName } from "../../hooks/useRolePermitions";
 import { validatePassword } from "../../utils/validatePassword";
+import { useAppointments } from "../../hooks/useAppointment";
 
 interface SecurityUserDrawerProps {
     isOpen: boolean;
@@ -18,6 +19,12 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
     onHide,
     user,
 }) => {
+
+    const {
+        data: appointments = [],
+        isLoading: isLoadingAppointments,
+    } = useAppointments(1, 100);
+
     const [prevUser, setPrevUser] = useState<User | null>(user);
 
     const { data: roles = [], isLoading: isLoadingRoles } = useRoles();
@@ -89,6 +96,33 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
 
     const handleSubmit = async () => {
         if (!user) return;
+
+        // Validar antes de desactivar un usuario que actualmente está activo.
+        if (user.active && !isActive) {
+            if (isLoadingAppointments) {
+                showToast(
+                    "error",
+                    "Espera a que termine la validación de las citas."
+                );
+                return;
+            }
+
+            const activeAppointments = appointments.filter(
+                (appointment) =>
+                    String(appointment.dentistId) === String(user.id) &&
+                    ["SCHEDULED", "CONFIRMED", "IN_PROGRESS"].includes(
+                        appointment.status
+                    )
+            );
+
+            if (activeAppointments.length > 0) {
+                showToast(
+                    "error",
+                    `No se puede desactivar este usuario porque tiene ${activeAppointments.length} cita(s) programada(s), confirmada(s) o en progreso.`
+                );
+                return;
+            }
+        }
 
         //  Validaciones de que han cambiado campos
         const isPasswordDirty = Boolean(currentPassword || newPassword || confirmPassword);
