@@ -17,6 +17,7 @@ import TableSkeleton from "../components/skeleton/TableSkeleton";
 import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 import { useAppointmentOrchestratorById } from "../hooks/useAppointmentOrchestrator";
 import { useNotifications } from "../hooks/usenotifications";
+import { AppointmentCalendar } from "../components/appointment/AppointmentCalendar";
 
 const AppointmentPage: React.FC = () => {
     const { role, user } = useRolePermissions();
@@ -86,6 +87,7 @@ const AppointmentPage: React.FC = () => {
 
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
+    const [viewMode, setViewMode] = useState<"table" | "calendar">("table");
 
     type AppointmentPeriod = "ALL" | "DAY" | "WEEK" | "MONTH";
 
@@ -754,6 +756,22 @@ const AppointmentPage: React.FC = () => {
                         onChange={handleSearch}
                         placeholder="Buscar cita..."
                     />
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setViewMode("table")}
+                            className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors ${viewMode === "table" ? "bg-[#001D4A] text-white" : "bg-white text-slate-600 border border-slate-200"
+                                }`}
+                        >
+                            Tabla
+                        </button>
+                        <button
+                            onClick={() => setViewMode("calendar")}
+                            className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors ${viewMode === "calendar" ? "bg-[#001D4A] text-white" : "bg-white text-slate-600 border border-slate-200"
+                                }`}
+                        >
+                            Calendario
+                        </button>
+                    </div>
                     <button disabled={isDisabled} onClick={() => setIsCreateDrawerOpen(true)}
                         className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${isDisabled
                             ? "bg-slate-300 cursor-not-allowed opacity-70"
@@ -771,6 +789,15 @@ const AppointmentPage: React.FC = () => {
                             columns={columns}
                             rows={10}
                             actions
+                        />
+                    ) : viewMode === "calendar" ? (
+                        <AppointmentCalendar
+                            appointments={filteredData}
+                            period={selectedPeriod}
+                            onSelectEvent={(appointment) => {
+                                setSelectedAppointment(appointment);
+                                setIsStatusModalOpen(true);
+                            }}
                         />
                     ) : (
                         <DataTable
