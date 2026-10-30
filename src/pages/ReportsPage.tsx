@@ -415,6 +415,11 @@ const ReportsPage: React.FC = () => {
       )
       : 0;
 
+  const totalAppointmentsByDonut = appointmentStatusData.reduce(
+    (total, item) => total + item.value,
+    0
+  );
+
   /*
    * =========================================================
    * LOADING
@@ -620,14 +625,22 @@ const ReportsPage: React.FC = () => {
         ==================================================== */}
 
         <div className="rounded-2xl bg-white p-6 shadow-sm">
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Estado de las citas
-            </h2>
+          <div className="mb-6 flex flex-row justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">
+                Estado de las citas
+              </h2>
 
-            <p className="text-sm text-slate-500">
-              Distribución de las citas
-            </p>
+              <p className="text-sm text-slate-500">
+                Distribución de las citas
+              </p>
+            </div>
+
+            <div className="rounded-lg bg-red-50 px-3 py-2">
+              <span className="text-xs font-medium text-red-600">
+                {totalAppointmentsByDonut} Citas
+              </span>
+            </div>
           </div>
 
           <div className="h-[320px] w-full">
@@ -687,17 +700,17 @@ const ReportsPage: React.FC = () => {
           <div className="mb-6 flex items-start justify-between">
             <div>
               <h2 className="text-lg font-semibold text-slate-900">
-                Deudor con pagos pendientes
+                Clientes con pagos pendientes
               </h2>
 
               <p className="text-sm text-slate-500">
-                Deudores con mayor saldo pendiente
+                Clientes con mayor saldo pendiente
               </p>
             </div>
 
             <div className="rounded-lg bg-red-50 px-3 py-2">
               <span className="text-xs font-medium text-red-600">
-                {patientsWithDebt.length} deudores
+                {patientsWithDebt.length} Clientes
               </span>
             </div>
           </div>
@@ -705,14 +718,14 @@ const ReportsPage: React.FC = () => {
           <div className="overflow-x-auto">
             {patientsWithDebt.length === 0 ? (
               <div className="flex h-[300px] items-center justify-center text-sm text-slate-400">
-                No hay deudores con pagos pendientes
+                No hay Clientes con pagos pendientes
               </div>
             ) : (
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 text-left">
                     <th className="pb-3 font-medium text-slate-500">
-                      Deudor
+                      Cliente
                     </th>
 
                     <th className="pb-3 text-center font-medium text-slate-500">
