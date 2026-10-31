@@ -303,7 +303,7 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
                                 name="username"
                                 value={form.username}
                                 onChange={handleChange}
-                                placeholder="correo@ejemplo.com"
+                                placeholder="ej. juan.roberto"
                                 className="
                                 w-full
                                 px-3 py-2.5

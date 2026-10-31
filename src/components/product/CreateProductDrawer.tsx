@@ -94,7 +94,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
     };
 
     const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement >
     ) => {
         const { name, value } = e.target;
 
@@ -533,8 +533,7 @@ const CreateProductDrawer: React.FC<CreateProductProps> = ({ isOpen, onHide }) =
                             Descripción
                         </label>
 
-                        <input
-                            type="text"
+                        <textarea
                             name="description"
                             value={form.description}
                             onChange={handleChange}

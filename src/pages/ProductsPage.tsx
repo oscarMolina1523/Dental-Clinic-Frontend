@@ -19,7 +19,7 @@ const ProductsPage: React.FC = () => {
   const {
     data: products = [],
     isLoading
-  } = useProducts(1, 10);
+  } = useProducts(1, 100);
   const { data: measurementUnites = [] } = useMeasurementUnites();
   const { data: categories = [] } = useCategories();
   const {

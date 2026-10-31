@@ -762,14 +762,14 @@ const AppointmentPage: React.FC = () => {
                             className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors ${viewMode === "table" ? "bg-[#001D4A] text-white" : "bg-white text-slate-600 border border-slate-200"
                                 }`}
                         >
-                            Tabla
+                            Vista Tabla
                         </button>
                         <button
                             onClick={() => setViewMode("calendar")}
                             className={`px-4 py-2 text-sm font-medium rounded-xl transition-colors ${viewMode === "calendar" ? "bg-[#001D4A] text-white" : "bg-white text-slate-600 border border-slate-200"
                                 }`}
                         >
-                            Calendario
+                            Vista Calendario
                         </button>
                     </div>
                     <button disabled={isDisabled} onClick={() => setIsCreateDrawerOpen(true)}
