@@ -103,7 +103,7 @@ const TreatmentCatalogPage: React.FC = () => {
             className: "pl-2 w-50 md:w-60",
             render: (treatment: TreatmentCatalogModel) => (
                 <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-slate-800">
+                    <span className="text-sm font-semibold text-slate-800 truncate">
                         {treatment.name}
                     </span>
 

@@ -105,7 +105,7 @@ const UsersPage: React.FC = () => {
       header: "Nombre",
       className: "pl-2 w-50 md:w-60",
       render: (user: UserModel) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pr-2">
 
           <img
             src={user.image}
@@ -113,7 +113,7 @@ const UsersPage: React.FC = () => {
             className="w-8 h-8 rounded-full object-cover border border-slate-200"
           />
 
-          <span className="text-sm font-semibold text-slate-800">
+          <span className="text-sm font-semibold text-slate-800 truncate">
             {user.fullName}
           </span>
 
@@ -135,9 +135,9 @@ const UsersPage: React.FC = () => {
     {
       key: "email",
       header: "Email",
-      className: "w-50 md:w-50",
+      className: "w-50",
       render: (user: UserModel) => (
-        <span className="text-sm text-slate-500">
+        <span className="block text-sm text-slate-500 truncate pr-2">
           {user.email}
         </span>
       ),
@@ -147,7 +147,7 @@ const UsersPage: React.FC = () => {
       header: "Especialidades",
       className: "w-50 md:w-60 pr-2",
       render: (user: UserModel) => (
-        <span className="text-sm text-slate-500 break-words whitespace-normal">
+        <span className="text-sm text-slate-500 truncate">
           {user.specialties ?? "N/A"}
         </span>
       ),
