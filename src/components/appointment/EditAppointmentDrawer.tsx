@@ -28,7 +28,6 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     onHide,
     appointment,
 }) => {
-
     const patientId = appointment?.patientId || "";
 
     const {
@@ -67,6 +66,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         canMarkAsInvoiced,
         handlePatientChange,
         handleDentistChange,
+        handleSpecialityChange,
         handleChange,
         updateField,
         handleTreatmentChange,
@@ -266,7 +266,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                         dentistSpecialities={dentistSpecialities}
                         onPatientChange={handlePatientChange}
                         onDentistChange={handleDentistChange}
-                        onSpecialityChange={(speciality) => updateField("dentistSpeciality", speciality)}
+                        onSpecialityChange={handleSpecialityChange}
                         onUpdateField={updateField}
                     />
 

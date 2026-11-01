@@ -301,6 +301,26 @@ export const useEditAppointmentDrawer = (
         });
     };
 
+    const clearSelectedTreatments = () => {
+        setSelectedTreatments([]);
+        setTreatmentDetails([]);
+
+        // Restablecer la duración de la cita
+        // a la hora de inicio, sin duración adicional.
+        setForm((prev) => {
+            if (!prev?.startAppointmentTime) return prev;
+
+            const startDate = new Date(prev.startAppointmentTime);
+
+            if (Number.isNaN(startDate.getTime())) return prev;
+
+            return {
+                ...prev,
+                endAppointmentTime: new Date(startDate.getTime()),
+            };
+        });
+    };
+
     const handlePatientChange = (selectedPatient: PatientModel | null) => {
         if (!selectedPatient) return;
 
@@ -344,8 +364,24 @@ export const useEditAppointmentDrawer = (
                 dentistSpeciality: "",
             };
         });
+
+        // Limpiar servicios del especialista anterior
+        clearSelectedTreatments();
     };
 
+    const handleSpecialityChange = (speciality: string) => {
+        setForm((prev) => {
+            if (!prev) return prev;
+
+            return {
+                ...prev,
+                dentistSpeciality: speciality,
+            };
+        });
+
+        // Limpiar servicios de la especialidad anterior
+        clearSelectedTreatments();
+    };
     const handleChange = (
         e: React.ChangeEvent<
             HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -1134,6 +1170,7 @@ export const useEditAppointmentDrawer = (
             }
         );
     };
+
     return {
         // Estado local
         form,
@@ -1165,6 +1202,7 @@ export const useEditAppointmentDrawer = (
         // Handlers de acción
         handlePatientChange,
         handleDentistChange,
+        handleSpecialityChange,
         handleChange,
         updateField,
         handleTreatmentChange,

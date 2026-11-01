@@ -49,8 +49,6 @@ export const rolePermissions: Record<string, string[]> = {
         "/medical-progress",
         "/treatments",
         "/treatment-plan",
-        "/inventories",
-        "/inventory-lotes",
     ],
 
     // RECEPTIONIST
@@ -58,6 +56,8 @@ export const rolePermissions: Record<string, string[]> = {
         "/patients",
         "/agenda",
         "/invoices",
+        "/inventories",
+        "/inventory-lotes",
     ],
 };
 
