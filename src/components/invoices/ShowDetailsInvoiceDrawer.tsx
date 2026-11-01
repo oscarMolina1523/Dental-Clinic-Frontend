@@ -10,6 +10,8 @@ import { InstallmentStatusSpanishOptions } from "../../utils/installmentStatus.e
 import { PaymentMehodsSpanishOptions } from "../../utils/paymentMethodsStatus.enum";
 import { exportInvoicePdf } from "../../services/invoicePdf";
 import { FileDown } from "lucide-react";
+import { useTreatments } from "../../hooks/useTreatmentsCatalog";
+import { useTreatmentPlanDetailById } from "../../hooks/useTreatmentPlanDetails";
 
 interface ShowDetailsInvoiceDrawerProps {
     isOpen: boolean;
@@ -24,6 +26,35 @@ const ShowDetailsInvoiceDrawer: React.FC<
     onHide,
     invoice,
 }) => {
+
+        const {
+            data: treatments = [],
+            isLoading
+        } = useTreatments();
+
+        /*
+            * =========================================================
+            * TRATAMIENTO INDIVIDUAL O PLAN DE TRATAMIENTO
+            * =========================================================
+            */
+
+        // Si existen ambos IDs por algún error, se prioriza treatmentId.
+        const individualTreatmentId = invoice?.treatmentId;
+
+        const treatmentPlanId = individualTreatmentId
+            ? undefined
+            : invoice?.treatmentPlanId;
+
+        const individualTreatment = treatments.find(
+            (treatment) => treatment.id === individualTreatmentId
+        );
+
+        const {
+            data: treatmentPlanDetail,
+            isLoading: isLoadingTreatmentPlanDetail,
+            isError: isTreatmentPlanDetailError,
+            error: treatmentPlanDetailError,
+        } = useTreatmentPlanDetailById(treatmentPlanId ?? "");
 
         /*
          * =========================================================
@@ -208,11 +239,10 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             />
                                         </div>
                                     </div>
-
                                     <div className="flex flex-col md:flex-row gap-2 w-full">
                                         {/* PACIENTE */}
 
-                                        <div>
+                                        <div className="flex-1">
                                             <label
                                                 className="
                                             block
@@ -244,9 +274,45 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             />
                                         </div>
 
+                                        {/* ESPECIALISTA */}
+
+                                        <div className="flex-1">
+                                            <label
+                                                className="
+                                            block
+                                            text-sm
+                                            font-medium
+                                            text-slate-700
+                                            mb-2
+                                        "
+                                            >
+                                                Especialista
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                value={
+                                                    invoice.dentistFullName || ""
+                                                }
+                                                disabled
+                                                className="
+                                            w-full
+                                            px-3 py-2.5
+                                            border border-slate-200
+                                            rounded-lg
+                                            text-sm
+                                            bg-slate-50
+                                            text-slate-500
+                                            outline-none
+                                        "
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-col md:flex-row gap-2 w-full">
                                         {/* TOTAL */}
 
-                                        <div>
+                                        <div className="flex-1">
                                             <label
                                                 className="
                                             block
@@ -283,7 +349,7 @@ const ShowDetailsInvoiceDrawer: React.FC<
 
                                         {/* PAGADO */}
 
-                                        <div>
+                                        <div className="flex-1">
                                             <label
                                                 className="
                                             block
@@ -320,7 +386,7 @@ const ShowDetailsInvoiceDrawer: React.FC<
 
                                         {/* PENDIENTE */}
 
-                                        <div>
+                                        <div className="flex-1">
                                             <label
                                                 className="
                                             block
@@ -355,6 +421,163 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                             />
                                         </div>
                                     </div>
+
+                                    {/* =================================================
+                                        TRATAMIENTOS FACTURADOS
+                                    ================================================= */}
+
+                                    <div className="border-t border-slate-100 pt-5 space-y-4">
+
+                                        <div className="flex items-center gap-4 my-6">
+                                            <div className="flex-1 h-px bg-slate-200" />
+
+                                            <h2 className="text-sm font-semibold text-slate-700 whitespace-nowrap">
+                                                Tratamientos facturados
+                                            </h2>
+
+                                            <div className="flex-1 h-px bg-slate-200" />
+                                        </div>
+
+                                        {/* TRATAMIENTO INDIVIDUAL */}
+
+                                        {individualTreatmentId && (
+                                            isLoading ? (
+                                                <p className="text-sm text-slate-500">
+                                                    Consultando tratamiento...
+                                                </p>
+                                            ) : individualTreatment ? (
+                                                <div className="border border-slate-200 rounded-xl p-4 space-y-3">
+
+                                                    <p className="text-sm font-semibold text-slate-700">
+                                                        {individualTreatment.name}
+                                                    </p>
+
+                                                    <div className="flex flex-col md:flex-row gap-3">
+
+                                                        <div className="flex-1">
+                                                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                                                                Precio
+                                                            </label>
+
+                                                            <p className="text-sm text-slate-700">
+                                                                {Number(individualTreatment.basePrice || 0)
+                                                                    .toLocaleString("es-NI", {
+                                                                        style: "currency",
+                                                                        currency: "NIO",
+                                                                    })}
+                                                            </p>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm text-slate-500">
+                                                    No se encontró el tratamiento asociado.
+                                                </p>
+                                            )
+                                        )}
+
+                                        {/* DETALLE DEL PLAN DE TRATAMIENTO */}
+
+                                        {treatmentPlanId && (
+                                            isLoadingTreatmentPlanDetail ? (
+                                                <p className="text-sm text-slate-500">
+                                                    Consultando detalle del plan...
+                                                </p>
+                                            ) : isTreatmentPlanDetailError ? (
+                                                <div className="border border-red-200 bg-red-50 rounded-xl p-4">
+                                                    <p className="text-sm text-red-700">
+                                                        {treatmentPlanDetailError?.message ||
+                                                            "No se pudo consultar el detalle del plan."}
+                                                    </p>
+                                                </div>
+                                            ) : treatmentPlanDetail && treatmentPlanDetail.length > 0 ? (
+
+                                                <div className="space-y-3">
+
+                                                    {treatmentPlanDetail.map((detail) => (
+
+                                                        <div
+                                                            key={detail.id}
+                                                            className="border border-slate-200 rounded-xl p-4 space-y-3"
+                                                        >
+
+
+
+                                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                                <div>
+                                                                    <label className="block text-xs font-medium text-slate-500 mb-1">
+                                                                        Tratamiento
+                                                                    </label>
+
+                                                                    <p className="text-sm font-semibold text-slate-700">
+                                                                        {detail.treatmentName}
+                                                                    </p>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="block text-xs font-medium text-slate-500 mb-1">
+                                                                        Precio unitario
+                                                                    </label>
+
+                                                                    <p className="text-sm text-slate-700">
+                                                                        {Number(detail.unitPrice || 0).toLocaleString("es-NI", {
+                                                                            style: "currency",
+                                                                            currency: "NIO",
+                                                                        })}
+                                                                    </p>
+                                                                </div>
+
+                                                                <div>
+                                                                    <label className="block text-xs font-medium text-slate-500 mb-1">
+                                                                        Subtotal
+                                                                    </label>
+
+                                                                    <p className="text-sm font-semibold text-slate-700">
+                                                                        {Number(detail.subtotal || 0).toLocaleString("es-NI", {
+                                                                            style: "currency",
+                                                                            currency: "NIO",
+                                                                        })}
+                                                                    </p>
+                                                                </div>
+
+                                                            </div>
+
+                                                            {detail.toothNumber != null && (
+                                                                <div>
+                                                                    <label className="block text-xs font-medium text-slate-500 mb-1">
+                                                                        Número de pieza dental
+                                                                    </label>
+
+                                                                    <p className="text-sm text-slate-700">
+                                                                        {detail.toothNumber}
+                                                                    </p>
+                                                                </div>
+                                                            )}
+
+                                                        </div>
+
+                                                    ))}
+
+                                                </div>
+
+                                            ) : (
+                                                <p className="text-sm text-slate-500 border border-slate-200 rounded-xl p-4">
+                                                    No se encontró el detalle del plan de tratamiento.
+                                                </p>
+                                            )
+                                        )}
+
+                                        {/* SIN TRATAMIENTO */}
+
+                                        {!individualTreatmentId && !treatmentPlanId && (
+                                            <p className="text-sm text-slate-500 border border-slate-200 rounded-xl p-4">
+                                                Esta factura no tiene tratamientos asociados.
+                                            </p>
+                                        )}
+
+                                    </div>
+
 
                                 </div>
                             </div>

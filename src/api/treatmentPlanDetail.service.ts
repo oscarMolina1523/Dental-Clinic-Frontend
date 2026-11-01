@@ -30,8 +30,8 @@ export default class TreatmentPlanDetailService extends HTTPService {
    */
   async getById(
     id: string
-  ): Promise<TreatmentPlanDetail | null> {
-    const response = await super.get<TreatmentPlanDetail | null>(
+  ): Promise<TreatmentPlanDetail[] | null> {
+    const response = await super.get<TreatmentPlanDetail[] | null>(
       `${this.path}/${id}`
     );
 
