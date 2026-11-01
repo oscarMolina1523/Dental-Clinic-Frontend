@@ -420,10 +420,11 @@ const MedicalPrescriptionSection: React.FC<
                     text-slate-700
                     mb-2
                 ">
-                        Instrucciones Generales
+                        Instrucciones Generales *
                     </label>
 
                     <textarea
+                        required
                         name="generalInstructions"
                         value={
                             form.generalInstructions

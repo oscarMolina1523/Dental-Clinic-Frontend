@@ -190,10 +190,11 @@ const InstallmentPaymentFormSection: React.FC<InstallmentPaymentFormSectionProps
                                                 text-slate-700
                                                 mb-2
                                             ">
-                            Referencia
+                            Referencia *
                         </label>
 
                         <input
+                            required
                             type="text"
                             value={
                                 transactionReference

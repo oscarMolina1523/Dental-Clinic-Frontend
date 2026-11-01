@@ -132,10 +132,11 @@ const NoPlanFormSection: React.FC<NoPlanFormSectionProps> = ({
                     {(directPaymentForm.paymentMethod === "TRANSFER" || directPaymentForm.paymentMethod === "CARD") && (
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Referencia
+                                Referencia *
                             </label>
                             <input
                                 type="text"
+                                required
                                 value={directPaymentForm.transactionReference}
                                 onChange={(e) =>
                                     setDirectPaymentForm((prev) => ({
