@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   CalendarDays,
+  CheckSquare,
   ChevronDown,
+  Download,
   FileText,
   Image,
   Pill,
+  Square,
   Stethoscope,
   X,
 } from "lucide-react";
@@ -14,6 +17,10 @@ import {
   useClinicalProgressOrchestratorByPatientId,
 } from "../../hooks/useClinicalProgressOrchestrator";
 import { dentalChartStatusSpanishOptions } from "../../utils/dentalChartStatus.enum";
+import { useTableSearch } from "../../shared/Table/useTableSearch";
+import SearchInput from "../../shared/Table/SearchInput";
+import Pagination from "../../shared/Table/Pagination";
+import { exportClinicalProgressPdf } from "../../services/clinicalProgressPdf";
 
 interface ClinicalProgressDrawerProps {
   isOpen: boolean;
@@ -39,6 +46,100 @@ const ShowClinicalProgressDrawer: React.FC<
     } = useClinicalProgressOrchestratorByPatientId(
       patient?.id ?? ""
     );
+
+    const ITEMS_PER_PAGE = 10;
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+
+    const [selectedProgressIds, setSelectedProgressIds] = useState<string[]>([]);
+    const [isExporting, setIsExporting] = useState(false);
+
+    const searchableProgresses = useMemo(
+      () =>
+        clinicalProgresses.map((item) => ({
+          ...item,
+          searchText: [
+            item.clinicalProgress?.diagnosis,
+            item.clinicalProgress?.observations,
+            item.medicalPrescription?.medicalPrescription?.dentistFullName,
+            item.medicalPrescription?.medicalPrescription?.generalInstructions,
+            item.medicalPrescription?.details
+              ?.map((detail) => detail.medicine)
+              .join(" "),
+            item.clinicalProgress?.registrationDate,
+          ]
+            .filter(Boolean)
+            .join(" "),
+        })),
+      [clinicalProgresses]
+    );
+
+    const {
+      search,
+      setSearch,
+      filteredData,
+    } = useTableSearch({
+      data: searchableProgresses,
+      fields: ["searchText"],
+      delay: 500,
+    });
+
+    const progressByDate = useMemo(() => {
+      return filteredData.filter((item) => {
+        const registrationDate = new Date(
+          item.clinicalProgress.registrationDate
+        );
+
+        if (Number.isNaN(registrationDate.getTime())) {
+          return false;
+        }
+
+        // Fecha inicial: desde las 00:00:00
+        if (startDate) {
+          const fromDate = new Date(`${startDate}T00:00:00`);
+
+          if (registrationDate < fromDate) {
+            return false;
+          }
+        }
+
+        // Fecha final: hasta las 23:59:59
+        if (endDate) {
+          const toDate = new Date(`${endDate}T23:59:59.999`);
+
+          if (registrationDate > toDate) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }, [filteredData, startDate, endDate]);
+
+    const totalItems = progressByDate.length;
+
+    const totalPages = Math.max(
+      1,
+      Math.ceil(totalItems / ITEMS_PER_PAGE)
+    );
+
+    const validPage = Math.min(currentPage, totalPages);
+
+    const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
+
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+
+    const currentProgresses = progressByDate.slice(
+      startIndex,
+      endIndex
+    );
+
+    const handleSearch = (value: string) => {
+      setSearch(value);
+      setCurrentPage(1);
+    };
 
     if (!isOpen) {
       return null;
@@ -68,6 +169,51 @@ const ShowClinicalProgressDrawer: React.FC<
         hour: "2-digit",
         minute: "2-digit",
       });
+    };
+
+    const toggleSelectedProgress = (id: string) => {
+      setSelectedProgressIds((prev) =>
+        prev.includes(id)
+          ? prev.filter((item) => item !== id)
+          : [...prev, id]
+      );
+    };
+
+    const toggleSelectAll = () => {
+      if (selectedProgressIds.length === clinicalProgresses.length) {
+        setSelectedProgressIds([]);
+        return;
+      }
+
+      setSelectedProgressIds(
+        clinicalProgresses.map(
+          (item) => item.clinicalProgress.id
+        )
+      );
+    };
+
+    const handleExportSelected = async () => {
+      if (!patient || selectedProgressIds.length === 0) return;
+
+      try {
+        setIsExporting(true);
+
+        const selectedProgresses = clinicalProgresses.filter(
+          (item) =>
+            selectedProgressIds.includes(
+              item.clinicalProgress.id
+            )
+        );
+
+        await exportClinicalProgressPdf(
+          patient,
+          selectedProgresses
+        );
+      } catch (error) {
+        console.error("Error al generar expediente:", error);
+      } finally {
+        setIsExporting(false);
+      }
     };
 
     return (
@@ -228,20 +374,142 @@ const ShowClinicalProgressDrawer: React.FC<
                 <div className="space-y-3">
 
                   <div className="mb-5">
-                    <h3 className="text-sm font-semibold text-slate-700">
-                      Historial clínico
-                    </h3>
+                    <div className="flex flex-row items-center justify-between gap-2">
+                      <div className="flex flex-col items-center gap-2">
+                        <h3 className="text-sm font-semibold text-slate-700">
+                          Historial clínico
+                        </h3>
 
-                    <p className="text-xs text-slate-400 mt-1">
-                      {clinicalProgresses.length}{" "}
-                      {clinicalProgresses.length === 1
-                        ? "registro"
-                        : "registros"}{" "}
-                      clínicos
-                    </p>
+                        <p className="text-xs text-slate-400 mt-1">
+                          {totalItems}{" "}
+                          {totalItems === 1 ? "registro clínico" : "registros clínicos"}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row gap-2 mb-4">
+
+                        {/* Seleccionar todas */}
+                        <button
+                          type="button"
+                          onClick={toggleSelectAll}
+                          className="
+                            flex items-center justify-center gap-2
+                            px-3 py-2
+                            rounded-lg
+                            border border-slate-200
+                            text-sm font-medium text-slate-600
+                            hover:bg-slate-50
+                            transition-colors
+                        "
+                        >
+                          {selectedProgressIds.length === clinicalProgresses.length ? (
+                            <CheckSquare className="w-4 h-4" />
+                          ) : (
+                            <Square className="w-4 h-4" />
+                          )}
+
+                          {selectedProgressIds.length === clinicalProgresses.length
+                            ? "Deseleccionar todas"
+                            : "Seleccionar todas"}
+                        </button>
+
+                        {/* Descargar seleccionados */}
+                        <button
+                          type="button"
+                          onClick={handleExportSelected}
+                          disabled={selectedProgressIds.length === 0 || isExporting}
+                          className="
+                            flex items-center justify-center gap-2
+                            px-3 py-2
+                            rounded-lg
+                            bg-[#001D4A]
+                            text-white
+                            text-sm font-medium
+                            hover:bg-blue-900
+                            disabled:opacity-50
+                            disabled:cursor-not-allowed
+                            transition-colors
+                        "
+                        >
+                          <Download className="w-4 h-4" />
+
+                          {isExporting
+                            ? "Generando PDF..."
+                            : `Descargar seleccionados (${selectedProgressIds.length})`}
+                        </button>
+                      </div>
+                      {/* limpiador de filtros */}
+                      {(startDate || endDate || search) && (
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setStartDate("");
+                              setEndDate("");
+                              setSearch("");
+                              setCurrentPage(1);
+                              setOpenProgressId(null);
+                            }}
+                            className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                          >
+                            Limpiar filtros
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2">
+                      {/* buscador */}
+                      <SearchInput
+                        value={search}
+                        onChange={handleSearch}
+                        placeholder="Buscar por diagnóstico, especialista..."
+                      />
+                      {/* filtrador por fechas */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                        {/* Fecha inicial */}
+                        <div>
+                          <label className="block text-xs font-medium text-slate-600 mb-1.5">
+                            Desde
+                          </label>
+
+                          <input
+                            type="date"
+                            value={startDate}
+                            max={endDate || undefined}
+                            onChange={(e) => {
+                              setStartDate(e.target.value);
+                              setCurrentPage(1);
+                              setOpenProgressId(null);
+                            }}
+                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                          />
+                        </div>
+
+                        {/* Fecha final */}
+                        <div>
+                          <label className="block text-xs font-medium text-slate-600 mb-1.5">
+                            Hasta
+                          </label>
+
+                          <input
+                            type="date"
+                            value={endDate}
+                            min={startDate || undefined}
+                            onChange={(e) => {
+                              setEndDate(e.target.value);
+                              setCurrentPage(1);
+                              setOpenProgressId(null);
+                            }}
+                            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                          />
+                        </div>
+
+                      </div>
+                    </div>
                   </div>
 
-                  {clinicalProgresses.map(
+                  {currentProgresses.map(
                     (item, index) => {
                       const progressId =
                         item.clinicalProgress.id;
@@ -281,7 +549,25 @@ const ShowClinicalProgressDrawer: React.FC<
                           "
                           >
                             <div className="flex items-center gap-3">
-
+                              <input
+                                type="checkbox"
+                                checked={selectedProgressIds.includes(
+                                  item.clinicalProgress.id
+                                )}
+                                onChange={() =>
+                                  toggleSelectedProgress(item.clinicalProgress.id)
+                                }
+                                onClick={(e) => e.stopPropagation()}
+                                className="
+                                    w-4 h-4
+                                    rounded
+                                    border-slate-300
+                                    text-blue-600
+                                    focus:ring-blue-500
+                                    cursor-pointer
+                                    shrink-0
+                                "
+                              />
                               <div
                                 className="
                                 w-9
@@ -542,11 +828,33 @@ const ShowClinicalProgressDrawer: React.FC<
                     }
                   )}
 
+                  {currentProgresses.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <FileText className="w-10 h-10 text-slate-300 mb-3" />
+
+                      <p className="text-sm font-medium text-slate-600">
+                        No se encontraron consultas
+                      </p>
+
+                      <p className="text-xs text-slate-400 mt-1">
+                        Intenta con otro término de búsqueda.
+                      </p>
+                    </div>
+                  )}
+
                 </div>
               )}
 
           </div>
-
+          <div className="mt-6 pt-4 border-t border-slate-100 mb-4">
+            <Pagination
+              currentPage={validPage}
+              totalItems={totalItems}
+              itemsPerPage={ITEMS_PER_PAGE}
+              onPageChange={setCurrentPage}
+              label="Consultas"
+            />
+          </div>
         </div>
       </div>
     );
