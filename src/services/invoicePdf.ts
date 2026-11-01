@@ -19,6 +19,12 @@ import {
 import { loadImageAsBase64 } from "./medicalPrescriptionPdf";
 import logoClinica from "../assets/logo.webp";
 
+interface InvoicePdfService {
+    name: string;
+    toothNumber?: number | null;
+    unitPrice: number | string;
+    subtotal: number | string;
+}
 interface InvoicePdfPaymentPlanDetails {
     paymentPlan: {
         totalAmount?: number | string;
@@ -33,7 +39,8 @@ interface InvoicePdfPaymentPlanDetails {
 
 export const exportInvoicePdf = async (
     invoice: Invoice,
-    planDetails?: InvoicePdfPaymentPlanDetails | null
+    planDetails?: InvoicePdfPaymentPlanDetails | null,
+    services: InvoicePdfService[] = []
 ) => {
     const doc = new jsPDF({
         orientation: "portrait",
@@ -148,6 +155,13 @@ export const exportInvoicePdf = async (
 
     addInfo("N.º de factura:", textOrDefault(invoice.invoiceNumber));
     addInfo("Cliente:", textOrDefault(invoice.patientFullName));
+    addInfo("Especialista:", textOrDefault(invoice.dentistFullName));
+    addInfo("Fecha de creación:", textOrDefault(new Date(invoice.createdAt).toLocaleDateString()));
+    if (invoice?.hasInstallment) {
+        addInfo("Tipo de pago:", "Plan de cuotas");
+    } else {
+        addInfo("Tipo de pago:", "Pago directo");
+    }
     addInfo("Estado:", invoiceStatus);
 
     // Resumen económico
@@ -196,6 +210,53 @@ export const exportInvoicePdf = async (
 
         currentY += 5;
     };
+
+    // Detalle de servicios realizados
+    addSectionTitle("Detalle de servicios realizados");
+
+    autoTable(doc, {
+        startY: currentY,
+        margin: { left: margin, right: margin, bottom: 20 },
+        head: [[
+            "Servicio",
+            "Pieza dental",
+            "Precio unitario",
+            "Subtotal",
+        ]],
+        body: services.length
+            ? services.map((service) => [
+                service.name,
+                service.toothNumber != null
+                    ? String(service.toothNumber)
+                    : "No aplica",
+                formatCurrency(service.unitPrice),
+                formatCurrency(service.subtotal),
+            ])
+            : [["Sin servicios registrados", "-", "-", "-"]],
+        theme: "grid",
+        styles: {
+            font: "helvetica",
+            fontSize: 8,
+            cellPadding: 3,
+            overflow: "linebreak",
+        },
+        headStyles: {
+            fillColor: [15, 118, 110],
+            textColor: [255, 255, 255],
+            fontStyle: "bold",
+        },
+        bodyStyles: {
+            textColor: [30, 41, 59],
+        },
+        columnStyles: {
+            0: { cellWidth: 75 },
+            1: { halign: "center" },
+            2: { halign: "right" },
+            3: { halign: "right" },
+        },
+    });
+
+    currentY = (pdf.lastAutoTable?.finalY ?? currentY) + 10;
 
     // Información del plan de cuotas (si existe)
     if (planDetails?.paymentPlan) {

@@ -83,10 +83,26 @@ const ShowDetailsInvoiceDrawer: React.FC<
             isError: isPaymentPlanError,
             error: paymentPlanError,
         } = usePaymentPlanById(
-            invoice?.status !== "PAID" && invoice?.hasInstallment
+            invoice?.hasInstallment
                 ? invoice?.id
                 : undefined
         );
+
+        const invoiceServices = individualTreatmentId
+            ? individualTreatment
+                ? [{
+                    name: individualTreatment.name,
+                    toothNumber: null,
+                    unitPrice: individualTreatment.basePrice,
+                    subtotal: individualTreatment.basePrice,
+                }]
+                : []
+            : (treatmentPlanDetail ?? []).map((detail) => ({
+                name: detail.treatmentName,
+                toothNumber: detail.toothNumber,
+                unitPrice: detail.unitPrice,
+                subtotal: detail.subtotal,
+            }));
 
         return (
             <>
@@ -133,7 +149,7 @@ const ShowDetailsInvoiceDrawer: React.FC<
                                 type="button"
                                 onClick={() => {
                                     if (invoice) {
-                                        exportInvoicePdf(invoice, paymentPlanDetails ?? null);
+                                        exportInvoicePdf(invoice, paymentPlanDetails ?? null, invoiceServices);
                                     }
                                 }}
                                 disabled={!invoice || isLoadingPaymentPlan}

@@ -23,6 +23,7 @@ const InvoicesPage: React.FC = () => {
         data: invoices = [],
         isLoading
     } = useInvoices();
+
     const { role } = useRolePermissions();
 
     const { addNotification, removeNotification } = useNotifications();
