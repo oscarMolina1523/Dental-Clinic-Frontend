@@ -42,7 +42,7 @@ export function useTreatmentPlanDetails(
 export function useTreatmentPlanDetailById(
   id: string
 ) {
-  return useQuery<TreatmentPlanDetail | null, Error>({
+  return useQuery<TreatmentPlanDetail[] | null, Error>({
     queryKey: [
       "treatmentPlanDetailById",
       id,

@@ -309,6 +309,13 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
             dentistFullName: selectedDentist.fullName,
             dentistSpeciality: "",
         }));
+
+        // Limpiar servicios y detalles anteriores
+        setSelectedTreatments([]);
+        setTreatmentDetails([]);
+
+        // Restablecer duración de la cita a 30 minutos
+        updateEndAppointmentTime(form.startAppointmentTime, []);
     };
 
     const handleAddTreatment = (
@@ -554,7 +561,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         if (!dentistSpeciality) {
             showToast(
                 "error",
-                "El dentista seleccionado no tiene una especialidad registrada."
+                "No tiene una especialidad seleccionada."
             );
             return;
         }
@@ -908,6 +915,13 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
                                         ...prev,
                                         dentistSpeciality: speciality,
                                     }));
+
+                                    // Limpiar servicios de la especialidad anterior
+                                    setSelectedTreatments([]);
+                                    setTreatmentDetails([]);
+
+                                    // Restablecer duración de la cita
+                                    updateEndAppointmentTime(form.startAppointmentTime, []);
                                 }}
                             />
                         </div>

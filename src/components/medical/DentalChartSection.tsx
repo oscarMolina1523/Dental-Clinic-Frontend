@@ -9,6 +9,7 @@ import type {
 
 import type { DentalChartDto } from "../../models/DentalChartModel";
 import { dentalChartStatusSpanishOptions, type DentalChartDetailsStatus } from "../../utils/dentalChartStatus.enum";
+import { isValidToothNumber } from "../../utils/validToothNumber";
 
 interface DentalChartSectionProps {
   appointment: Appointment | null;
@@ -322,15 +323,19 @@ const DentalChartSection: React.FC<
                           Number(e.target.value)
                         )
                       }
-                      className="
-                    w-full
-                    px-3 py-2.5
-                    border border-slate-200
-                    rounded-lg
-                    text-sm
-                    outline-none
-                    focus:border-blue-500
-                  "
+                      className={`
+                        w-full
+                        px-3 py-2.5
+                        border rounded-lg
+                        text-sm
+                        outline-none
+                        focus:ring-2
+                        ${detail.toothNumber &&
+                          !isValidToothNumber(detail.toothNumber)
+                          ? "border-red-400 focus:border-red-500 focus:ring-red-500/10"
+                          : "border-slate-200 focus:border-blue-500"
+                        }
+                      `}
                     />
                   </div>
 

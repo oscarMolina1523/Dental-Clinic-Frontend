@@ -378,6 +378,9 @@ const RegisterPaymentDrawer: React.FC<
                                     invoice: {
                                         patientId: invoice.patientId,
                                         patientFullName: invoice.patientFullName,
+                                        dentistId: invoice.dentistId,
+                                        dentistFullName: invoice.dentistFullName,
+                                        createdAt: invoice.createdAt,
                                         treatmentPlanId: invoice.treatmentPlanId,
                                         treatmentId: invoice.treatmentId,
                                         totalAmount: newTotalAmount,

@@ -12,7 +12,6 @@ import type {
   TreatmentPlanOrchestratorResponse,
 } from "../models/TreatmentPlanOrchestratorModel";
 
-
 const treatmentPlanOrchestratorService =
   new TreatmentPlanOrchestratorService();
 

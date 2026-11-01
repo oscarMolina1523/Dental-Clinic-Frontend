@@ -301,6 +301,26 @@ export const useEditAppointmentDrawer = (
         });
     };
 
+    const clearSelectedTreatments = () => {
+        setSelectedTreatments([]);
+        setTreatmentDetails([]);
+
+        // Restablecer la duración de la cita
+        // a la hora de inicio, sin duración adicional.
+        setForm((prev) => {
+            if (!prev?.startAppointmentTime) return prev;
+
+            const startDate = new Date(prev.startAppointmentTime);
+
+            if (Number.isNaN(startDate.getTime())) return prev;
+
+            return {
+                ...prev,
+                endAppointmentTime: new Date(startDate.getTime()),
+            };
+        });
+    };
+
     const handlePatientChange = (selectedPatient: PatientModel | null) => {
         if (!selectedPatient) return;
 
@@ -344,8 +364,24 @@ export const useEditAppointmentDrawer = (
                 dentistSpeciality: "",
             };
         });
+
+        // Limpiar servicios del especialista anterior
+        clearSelectedTreatments();
     };
 
+    const handleSpecialityChange = (speciality: string) => {
+        setForm((prev) => {
+            if (!prev) return prev;
+
+            return {
+                ...prev,
+                dentistSpeciality: speciality,
+            };
+        });
+
+        // Limpiar servicios de la especialidad anterior
+        clearSelectedTreatments();
+    };
     const handleChange = (
         e: React.ChangeEvent<
             HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -368,6 +404,39 @@ export const useEditAppointmentDrawer = (
     ) => {
         setForm((prev) => {
             if (!prev) return prev;
+
+            if (name === "startAppointmentTime") {
+                if (!(value instanceof Date) && typeof value !== "string") {
+                    return prev;
+                }
+
+                const newStart = new Date(value);
+                const previousStart = new Date(prev.startAppointmentTime);
+                const previousEnd = new Date(prev.endAppointmentTime);
+
+                if (
+                    Number.isNaN(newStart.getTime()) ||
+                    Number.isNaN(previousStart.getTime()) ||
+                    Number.isNaN(previousEnd.getTime())
+                ) {
+                    return prev;
+                }
+
+                // Diferencia original entre inicio y final.
+                const originalDuration =
+                    previousEnd.getTime() - previousStart.getTime();
+
+                // Mantener esa misma duración con el nuevo inicio.
+                const newEnd = new Date(
+                    newStart.getTime() + originalDuration
+                );
+
+                return {
+                    ...prev,
+                    startAppointmentTime: newStart,
+                    endAppointmentTime: newEnd,
+                };
+            }
 
             return {
                 ...prev,
@@ -886,7 +955,7 @@ export const useEditAppointmentDrawer = (
         if (!form.dentistSpeciality.trim()) {
             showToast(
                 "error",
-                "El dentista seleccionado no tiene una especialidad registrada."
+                "No tiene una especialidad seleccionada."
             );
             return;
         }
@@ -1134,6 +1203,7 @@ export const useEditAppointmentDrawer = (
             }
         );
     };
+
     return {
         // Estado local
         form,
@@ -1165,6 +1235,7 @@ export const useEditAppointmentDrawer = (
         // Handlers de acción
         handlePatientChange,
         handleDentistChange,
+        handleSpecialityChange,
         handleChange,
         updateField,
         handleTreatmentChange,

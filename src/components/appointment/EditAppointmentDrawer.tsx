@@ -28,7 +28,6 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
     onHide,
     appointment,
 }) => {
-
     const patientId = appointment?.patientId || "";
 
     const {
@@ -67,6 +66,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         canMarkAsInvoiced,
         handlePatientChange,
         handleDentistChange,
+        handleSpecialityChange,
         handleChange,
         updateField,
         handleTreatmentChange,
@@ -134,13 +134,16 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         const invoice: InvoiceDto = {
             patientId,
             patientFullName,
+            dentistId: form?.dentistId ?? "",
+            dentistFullName: form?.dentistFullName ?? "",
             treatmentId: treatmentId ?? undefined,
             treatmentPlanId: treatmentPlanId ?? undefined,
             totalAmount,
             paidAmount: 0,
             pendingAmount: totalAmount,
             status: "PENDING",
-            hasInstallment: false
+            hasInstallment: false,
+            createdAt: new Date(),
         };
 
         const data: CreateInvoiceWithPaymentDto = {
@@ -263,7 +266,7 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                         dentistSpecialities={dentistSpecialities}
                         onPatientChange={handlePatientChange}
                         onDentistChange={handleDentistChange}
-                        onSpecialityChange={(speciality) => updateField("dentistSpeciality", speciality)}
+                        onSpecialityChange={handleSpecialityChange}
                         onUpdateField={updateField}
                     />
 
@@ -276,16 +279,11 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                         isStartingTreatment={isStartingTreatment}
                         isCompletingTreatment={isCompletingTreatment}
                         isCancelingTreatment={isCancelingTreatment}
-                        isPending={isPending}
-                        isMarkingAsInvoiced={isMarkingAsInvoiced}
-                        canMarkAsInvoiced={canMarkAsInvoiced()}
                         onTreatmentChange={handleTreatmentChange}
                         onStartTreatment={handleStartTreatment}
                         onCompleteTreatment={handleCompleteTreatment}
                         onCancelTreatment={handleCancelTreatment}
                         onRemoveTreatment={handleRemoveTreatment}
-                        handleSubmitInvoice={handleSubmitInvoice}
-                        isLoadingInvoiceWithPayment={isLoadingInvoiceWithPayment}
                     />
 
                     <AppointmentClinicalNotesSection
@@ -309,6 +307,34 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
                         onReasonChange={handleChange}
                     />
                 </div>
+
+                {canMarkAsInvoiced() && (
+                    <button
+                        type="button"
+                        onClick={handleSubmitInvoice}
+                        disabled={
+                            isPending ||
+                            isMarkingAsInvoiced ||
+                            isLoadingInvoiceWithPayment
+                        }
+                        className="
+                                        w-full
+                                        px-4 py-2.5
+                                        text-sm font-medium
+                                        text-white
+                                        bg-emerald-600
+                                        hover:bg-emerald-700
+                                        rounded-lg
+                                        cursor-pointer
+                                        disabled:opacity-50
+                                        disabled:cursor-not-allowed
+                                    "
+                    >
+                        {isMarkingAsInvoiced
+                            ? "Generando..."
+                            : "Generar factura"}
+                    </button>
+                )}
             </GenericDrawer>
         </>
     );

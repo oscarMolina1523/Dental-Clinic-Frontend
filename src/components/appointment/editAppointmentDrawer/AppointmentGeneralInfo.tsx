@@ -4,6 +4,7 @@ import type PatientModel from "../../../models/PatientModel";
 import type UserModel from "../../../models/UserModel";
 import { DateTimePicker } from "../../../shared/DateTimePicker/DateTimePicker";
 import type { UpdateAppointmentDTO } from "../../../models/AppointmentModel";
+import { useRolePermissions, UserRole } from "../../../hooks/useRolePermitions";
 
 interface AppointmentGeneralInfoProps {
     form: UpdateAppointmentDTO | null | undefined;
@@ -44,6 +45,10 @@ export const AppointmentGeneralInfo: React.FC<AppointmentGeneralInfoProps> = ({
     onSpecialityChange,
     onUpdateField,
 }) => {
+    const { role } = useRolePermissions();
+
+    const canWrite = role !== UserRole.Dentist; //solo los especialistas no pueden editar la cita, los demás roles sí
+
     return (
         <>
             <div className="flex flex-col md:flex-row gap-2 w-full">
@@ -63,7 +68,7 @@ export const AppointmentGeneralInfo: React.FC<AppointmentGeneralInfoProps> = ({
                         }
                         searchPlaceholder="Buscar paciente por nombres..."
                         noResultsMessage="No se encontraron pacientes."
-                        disabled={isLoadingPatients}
+                        disabled={isLoadingPatients || !canWrite}
                         onChange={onPatientChange}
                     />
                 </div>
@@ -88,7 +93,7 @@ export const AppointmentGeneralInfo: React.FC<AppointmentGeneralInfoProps> = ({
                         }
                         searchPlaceholder="Buscar especialista por nombre..."
                         noResultsMessage="No se encontraron especialistas."
-                        disabled={isLoadingUsers}
+                        disabled={isLoadingUsers || !canWrite}
                         onChange={onDentistChange}
                     />
                 </div>
@@ -110,7 +115,7 @@ export const AppointmentGeneralInfo: React.FC<AppointmentGeneralInfoProps> = ({
                         noResultsMessage="No se encontraron especialidades."
                         disabled={
                             !form?.dentistId ||
-                            dentistSpecialities.length === 0
+                            dentistSpecialities.length === 0 || !canWrite
                         }
                         onChange={onSpecialityChange}
                     />

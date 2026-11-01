@@ -12,17 +12,11 @@ interface AppointmentServicesSectionProps {
     isStartingTreatment: boolean;
     isCompletingTreatment: boolean;
     isCancelingTreatment: boolean;
-    isPending: boolean;
-    isMarkingAsInvoiced: boolean;
-    canMarkAsInvoiced: boolean;
     onTreatmentChange: (treatment: TreatmentCatalogModel) => void;
     onStartTreatment: (detailId?: string) => void;
     onCompleteTreatment: (detailId?: string) => void;
     onCancelTreatment: (detailId?: string) => void;
     onRemoveTreatment: (treatmentId: string) => void;
-
-    handleSubmitInvoice: () => void;
-    isLoadingInvoiceWithPayment: boolean;
 }
 
 export const AppointmentServicesSection: React.FC<AppointmentServicesSectionProps> = ({
@@ -34,17 +28,11 @@ export const AppointmentServicesSection: React.FC<AppointmentServicesSectionProp
     isStartingTreatment,
     isCompletingTreatment,
     isCancelingTreatment,
-    isPending,
-    isMarkingAsInvoiced,
-    canMarkAsInvoiced,
     onTreatmentChange,
     onStartTreatment,
     onCompleteTreatment,
     onCancelTreatment,
     onRemoveTreatment,
-
-    handleSubmitInvoice,
-    isLoadingInvoiceWithPayment
 }) => {
     return (
         <>
@@ -351,32 +339,6 @@ export const AppointmentServicesSection: React.FC<AppointmentServicesSectionProp
                             </p>
                         </p>
                     </div>
-                    {canMarkAsInvoiced && (
-                        <button
-                            type="button"
-                            onClick={handleSubmitInvoice}
-                            disabled={
-                                isPending ||
-                                isMarkingAsInvoiced ||
-                                isLoadingInvoiceWithPayment
-                            }
-                            className="
-                                        px-4 py-2.5
-                                        text-sm font-medium
-                                        text-white
-                                        bg-emerald-600
-                                        hover:bg-emerald-700
-                                        rounded-lg
-                                        cursor-pointer
-                                        disabled:opacity-50
-                                        disabled:cursor-not-allowed
-                                    "
-                        >
-                            {isMarkingAsInvoiced
-                                ? "Generando..."
-                                : "Generar factura"}
-                        </button>
-                    )}
                 </div>
             )}
 
