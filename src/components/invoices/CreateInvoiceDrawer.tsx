@@ -452,11 +452,14 @@ const CreateInvoiceDrawer: React.FC<CreateInvoiceProps> = ({
             patientId,
             patientFullName,
             treatmentPlanId,
+            dentistId: "not-implemented-yet",
+            dentistFullName:"not-implemented-yet",
             totalAmount,
             paidAmount,
             pendingAmount,
             status,
             hasInstallment: Boolean(form.isInstallmentPayment),
+            createdAt: new Date()
         };
 
         // ==========================================

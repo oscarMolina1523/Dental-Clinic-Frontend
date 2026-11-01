@@ -134,13 +134,16 @@ const EditAppointmentDrawer: React.FC<EditAppointmentDrawerProps> = ({
         const invoice: InvoiceDto = {
             patientId,
             patientFullName,
+            dentistId: form?.dentistId ?? "", 
+            dentistFullName: form?.dentistFullName ?? "",
             treatmentId: treatmentId ?? undefined,
             treatmentPlanId: treatmentPlanId ?? undefined,
             totalAmount,
             paidAmount: 0,
             pendingAmount: totalAmount,
             status: "PENDING",
-            hasInstallment: false
+            hasInstallment: false,
+            createdAt: new Date(),
         };
 
         const data: CreateInvoiceWithPaymentDto = {

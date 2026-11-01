@@ -147,7 +147,7 @@ const UsersPage: React.FC = () => {
       header: "Especialidades",
       className: "w-50 md:w-60 pr-2",
       render: (user: UserModel) => (
-        <span className="text-sm text-slate-500 truncate">
+        <span className="block text-sm text-slate-500 truncate">
           {user.specialties ?? "N/A"}
         </span>
       ),
