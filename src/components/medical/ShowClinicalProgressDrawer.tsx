@@ -1,10 +1,13 @@
 import React, { useMemo, useState } from "react";
 import {
   CalendarDays,
+  CheckSquare,
   ChevronDown,
+  Download,
   FileText,
   Image,
   Pill,
+  Square,
   Stethoscope,
   X,
 } from "lucide-react";
@@ -17,6 +20,7 @@ import { dentalChartStatusSpanishOptions } from "../../utils/dentalChartStatus.e
 import { useTableSearch } from "../../shared/Table/useTableSearch";
 import SearchInput from "../../shared/Table/SearchInput";
 import Pagination from "../../shared/Table/Pagination";
+import { exportClinicalProgressPdf } from "../../services/clinicalProgressPdf";
 
 interface ClinicalProgressDrawerProps {
   isOpen: boolean;
@@ -48,6 +52,9 @@ const ShowClinicalProgressDrawer: React.FC<
     const [currentPage, setCurrentPage] = useState(1);
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+
+    const [selectedProgressIds, setSelectedProgressIds] = useState<string[]>([]);
+    const [isExporting, setIsExporting] = useState(false);
 
     const searchableProgresses = useMemo(
       () =>
@@ -162,6 +169,51 @@ const ShowClinicalProgressDrawer: React.FC<
         hour: "2-digit",
         minute: "2-digit",
       });
+    };
+
+    const toggleSelectedProgress = (id: string) => {
+      setSelectedProgressIds((prev) =>
+        prev.includes(id)
+          ? prev.filter((item) => item !== id)
+          : [...prev, id]
+      );
+    };
+
+    const toggleSelectAll = () => {
+      if (selectedProgressIds.length === clinicalProgresses.length) {
+        setSelectedProgressIds([]);
+        return;
+      }
+
+      setSelectedProgressIds(
+        clinicalProgresses.map(
+          (item) => item.clinicalProgress.id
+        )
+      );
+    };
+
+    const handleExportSelected = async () => {
+      if (!patient || selectedProgressIds.length === 0) return;
+
+      try {
+        setIsExporting(true);
+
+        const selectedProgresses = clinicalProgresses.filter(
+          (item) =>
+            selectedProgressIds.includes(
+              item.clinicalProgress.id
+            )
+        );
+
+        await exportClinicalProgressPdf(
+          patient,
+          selectedProgresses
+        );
+      } catch (error) {
+        console.error("Error al generar expediente:", error);
+      } finally {
+        setIsExporting(false);
+      }
     };
 
     return (
@@ -333,6 +385,59 @@ const ShowClinicalProgressDrawer: React.FC<
                           {totalItems === 1 ? "registro clínico" : "registros clínicos"}
                         </p>
                       </div>
+
+                      <div className="flex flex-col sm:flex-row gap-2 mb-4">
+
+                        {/* Seleccionar todas */}
+                        <button
+                          type="button"
+                          onClick={toggleSelectAll}
+                          className="
+                            flex items-center justify-center gap-2
+                            px-3 py-2
+                            rounded-lg
+                            border border-slate-200
+                            text-sm font-medium text-slate-600
+                            hover:bg-slate-50
+                            transition-colors
+                        "
+                        >
+                          {selectedProgressIds.length === clinicalProgresses.length ? (
+                            <CheckSquare className="w-4 h-4" />
+                          ) : (
+                            <Square className="w-4 h-4" />
+                          )}
+
+                          {selectedProgressIds.length === clinicalProgresses.length
+                            ? "Deseleccionar todas"
+                            : "Seleccionar todas"}
+                        </button>
+
+                        {/* Descargar seleccionados */}
+                        <button
+                          type="button"
+                          onClick={handleExportSelected}
+                          disabled={selectedProgressIds.length === 0 || isExporting}
+                          className="
+                            flex items-center justify-center gap-2
+                            px-3 py-2
+                            rounded-lg
+                            bg-[#001D4A]
+                            text-white
+                            text-sm font-medium
+                            hover:bg-blue-900
+                            disabled:opacity-50
+                            disabled:cursor-not-allowed
+                            transition-colors
+                        "
+                        >
+                          <Download className="w-4 h-4" />
+
+                          {isExporting
+                            ? "Generando PDF..."
+                            : `Descargar seleccionados (${selectedProgressIds.length})`}
+                        </button>
+                      </div>
                       {/* limpiador de filtros */}
                       {(startDate || endDate || search) && (
                         <div className="flex justify-end">
@@ -444,7 +549,25 @@ const ShowClinicalProgressDrawer: React.FC<
                           "
                           >
                             <div className="flex items-center gap-3">
-
+                              <input
+                                type="checkbox"
+                                checked={selectedProgressIds.includes(
+                                  item.clinicalProgress.id
+                                )}
+                                onChange={() =>
+                                  toggleSelectedProgress(item.clinicalProgress.id)
+                                }
+                                onClick={(e) => e.stopPropagation()}
+                                className="
+                                    w-4 h-4
+                                    rounded
+                                    border-slate-300
+                                    text-blue-600
+                                    focus:ring-blue-500
+                                    cursor-pointer
+                                    shrink-0
+                                "
+                              />
                               <div
                                 className="
                                 w-9
