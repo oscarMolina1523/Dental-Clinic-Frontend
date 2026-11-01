@@ -561,7 +561,7 @@ const CreateAppointmentDrawer: React.FC<CreateAppointmentProps> = ({ isOpen, onH
         if (!dentistSpeciality) {
             showToast(
                 "error",
-                "El dentista seleccionado no tiene una especialidad registrada."
+                "No tiene una especialidad seleccionada."
             );
             return;
         }
