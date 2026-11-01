@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, Download, CheckSquare } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -12,6 +12,7 @@ import EditInventoryDrawer from "../components/inventory/EditInventoryDrawer";
 import TableSkeleton from "../components/skeleton/TableSkeleton";
 import { useRolePermissions, UserRole } from "../hooks/useRolePermitions";
 import { useNotifications } from "../hooks/usenotifications";
+import { exportInventoryPdf } from "../services/inventoryPdf";
 
 const InventoryPage: React.FC = () => {
 
@@ -35,6 +36,9 @@ const InventoryPage: React.FC = () => {
   const [isEditDrawerOpen, setIsEditDrawerOpen] =
     useState(false);
   const [selectedInventory, setSelectedInventory] = useState<InventoryModel | null>(null);
+
+  const [selectedInventoryIds, setSelectedInventoryIds] = useState<string[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
 
   const ITEMS_PER_PAGE = 10;
   const [currentPage, setCurrentPage] = useState(1);
@@ -84,6 +88,20 @@ const InventoryPage: React.FC = () => {
 
   const columns: TableColumn<typeof inventories[number]>[] = [
     {
+      key: "id",
+      header: "Seleccionar",
+      className: "w-20 text-center",
+      render: (inventory: InventoryModel) => (
+        <input
+          type="checkbox"
+          checked={selectedInventoryIds.includes(inventory.id)}
+          onChange={() => toggleInventorySelection(inventory.id)}
+          className="w-4 h-4 cursor-pointer accent-blue-600"
+          aria-label={`Seleccionar ${inventory.productName}`}
+        />
+      ),
+    },
+    {
       key: "productName",
       header: "Nombre del inventario",
       className: "pl-2 w-40 md:w-100",
@@ -131,6 +149,62 @@ const InventoryPage: React.FC = () => {
     },
 
   ];
+
+  // Seleccionar o deseleccionar un inventario.
+  const toggleInventorySelection = (id: string) => {
+    setSelectedInventoryIds((previous) =>
+      previous.includes(id)
+        ? previous.filter((itemId) => itemId !== id)
+        : [...previous, id]
+    );
+  };
+
+  // Seleccionar todos los inventarios del resultado de búsqueda.
+  const toggleSelectAll = () => {
+    const allFilteredSelected =
+      filteredData.length > 0 &&
+      filteredData.every((inventory) =>
+        selectedInventoryIds.includes(inventory.id)
+      );
+
+    if (allFilteredSelected) {
+      const filteredIds = new Set(
+        filteredData.map((inventory) => inventory.id)
+      );
+
+      setSelectedInventoryIds((previous) =>
+        previous.filter((id) => !filteredIds.has(id))
+      );
+      return;
+    }
+
+    setSelectedInventoryIds((previous) =>
+      Array.from(
+        new Set([
+          ...previous,
+          ...filteredData.map((inventory) => inventory.id),
+        ])
+      )
+    );
+  };
+
+  // Descargar inventarios seleccionados.
+  const handleExportSelected = async () => {
+    const selectedInventories = inventories.filter((inventory) =>
+      selectedInventoryIds.includes(inventory.id)
+    );
+
+    if (!selectedInventories.length) return;
+
+    try {
+      setIsExporting(true);
+      await exportInventoryPdf(selectedInventories);
+    } catch (error) {
+      console.error("Error al generar el PDF del inventario:", error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const handleSearch = (value: string) => {
     setSearch(value);
@@ -180,6 +254,39 @@ const InventoryPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar inventario..."
           />
+          <div className="flex flex-row gap-2">
+            <button
+              type="button"
+              onClick={toggleSelectAll}
+              disabled={filteredData.length === 0 || isExporting}
+              className="flex items-center gap-2 text-sm font-medium px-3 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <CheckSquare className="w-4 h-4" />
+              <span>
+                {filteredData.length > 0 &&
+                  filteredData.every((item) =>
+                    selectedInventoryIds.includes(item.id)
+                  )
+                  ? "Deseleccionar todos"
+                  : "Seleccionar todos"}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleExportSelected}
+              disabled={selectedInventoryIds.length === 0 || isExporting}
+              className="flex items-center gap-2 text-sm font-medium px-3 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4" />
+              <span>
+                {isExporting
+                  ? "Generando..."
+                  : `Descargar seleccionados (${selectedInventoryIds.length})`}
+              </span>
+            </button>
+          </div>
+
           <button disabled={!canWrite} onClick={() => setIsCreateDrawerOpen(true)} className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${canWrite
             ? "bg-[#2563eb] hover:bg-blue-700 cursor-pointer"
             : "bg-slate-300 cursor-not-allowed opacity-70"
