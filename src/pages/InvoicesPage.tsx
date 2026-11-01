@@ -44,6 +44,9 @@ const InvoicesPage: React.FC = () => {
     const [isDetailsDrawerOpen, setIsDetailsDrawerOpen] =
         useState(false);
 
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+
     const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
     const {
@@ -83,14 +86,25 @@ const InvoicesPage: React.FC = () => {
     });
 
     const filteredInvoices = useMemo(() => {
-        if (selectedStatus === "ALL") {
-            return filteredData;
-        }
+        return filteredData.filter((invoice) => {
+            // Filtro por estado
+            const matchesStatus =
+                selectedStatus === "ALL" ||
+                invoice.status === selectedStatus;
 
-        return filteredData.filter(
-            (invoice) => invoice.status === selectedStatus
-        );
-    }, [filteredData, selectedStatus]);
+            // Filtro por rango de fechas
+            const invoiceDate = new Date(invoice.createdAt);
+            invoiceDate.setHours(0, 0, 0, 0);
+
+            const matchesStartDate = !startDate ||
+                invoiceDate >= new Date(`${startDate}T00:00:00`);
+
+            const matchesEndDate = !endDate ||
+                invoiceDate <= new Date(`${endDate}T23:59:59.999`);
+
+            return matchesStatus && matchesStartDate && matchesEndDate;
+        });
+    }, [filteredData, selectedStatus, startDate, endDate]);
 
     const totalItems = filteredInvoices.length; //obtenemos la cantidad total de items 
 
@@ -119,16 +133,17 @@ const InvoicesPage: React.FC = () => {
     );
 
     const columns: TableColumn<typeof invoices[number]>[] = [
-        // {
-        //     key: "invoiceNumber",
-        //     header: "Número de factura",
-        //     className: "w-40 md:w-60",
-        //     render: (invoice: Invoice) => (
-        //         <span className="text-sm text-slate-500">
-        //             {invoice.invoiceNumber}
-        //         </span>
-        //     ),
-        // },
+        {
+            key: "createdAt",
+            header: "Fecha de creación",
+            className: "w-40",
+
+            render: (invoice: Invoice) => (
+                <span className="text-sm text-slate-500">
+                    {new Date(invoice.createdAt).toLocaleDateString()}
+                </span>
+            ),
+        },
         {
             key: "patientFullName",
             header: "Cliente",
@@ -305,7 +320,7 @@ const InvoicesPage: React.FC = () => {
             )}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                 {/* Encabezado */}
-                <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-2 mb-2">
+                <div className="flex flex-col md:flex-row items-end gap-2 md:items-end justify-between pb-2 mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
                     <SearchInput
                         value={search}
@@ -313,6 +328,53 @@ const InvoicesPage: React.FC = () => {
                         placeholder="Buscar Factura..."
                     />
 
+                    <div className="flex flex-wrap items-center gap-2">
+                        <div>
+                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                                Desde
+                            </label>
+                            <input
+                                type="date"
+                                value={startDate}
+                                max={endDate || undefined}
+                                onChange={(e) => {
+                                    setStartDate(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                                className="border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 outline-none focus:border-[#001D4A]"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-xs font-medium text-slate-500 mb-1">
+                                Hasta
+                            </label>
+                            <input
+                                type="date"
+                                value={endDate}
+                                min={startDate || undefined}
+                                onChange={(e) => {
+                                    setEndDate(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                                className="border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 outline-none focus:border-[#001D4A]"
+                            />
+                        </div>
+
+                        {(startDate || endDate) && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setStartDate("");
+                                    setEndDate("");
+                                    setCurrentPage(1);
+                                }}
+                                className="mt-5 text-sm text-red-500 hover:text-red-700 font-medium"
+                            >
+                                Limpiar fechas
+                            </button>
+                        )}
+                    </div>
                     <div className="flex flex-wrap items-center gap-2">
                         {[
                             { value: "ALL", label: "Todas" },
@@ -327,8 +389,8 @@ const InvoicesPage: React.FC = () => {
                                     setCurrentPage(1);
                                 }}
                                 className={`rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${selectedStatus === tab.value
-                                        ? "border-[#001D4A] bg-[#001D4A] text-white"
-                                        : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                                    ? "border-[#001D4A] bg-[#001D4A] text-white"
+                                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
                                     }`}
                             >
                                 {tab.label}
