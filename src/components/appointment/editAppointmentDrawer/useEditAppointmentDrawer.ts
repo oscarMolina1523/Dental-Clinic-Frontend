@@ -399,19 +399,51 @@ export const useEditAppointmentDrawer = (
     };
 
     const updateField = (
-        name: keyof UpdateAppointmentDTO,
-        value: string | boolean | Date
-    ) => {
-        setForm((prev) => {
-            if (!prev) return prev;
+    name: keyof UpdateAppointmentDTO,
+    value: string | boolean | Date
+) => {
+    setForm((prev) => {
+        if (!prev) return prev;
+
+        if (name === "startAppointmentTime") {
+            if (!(value instanceof Date) && typeof value !== "string") {
+                return prev;
+            }
+
+            const newStart = new Date(value);
+            const previousStart = new Date(prev.startAppointmentTime);
+            const previousEnd = new Date(prev.endAppointmentTime);
+
+            if (
+                Number.isNaN(newStart.getTime()) ||
+                Number.isNaN(previousStart.getTime()) ||
+                Number.isNaN(previousEnd.getTime())
+            ) {
+                return prev;
+            }
+
+            // Diferencia original entre inicio y final.
+            const originalDuration =
+                previousEnd.getTime() - previousStart.getTime();
+
+            // Mantener esa misma duración con el nuevo inicio.
+            const newEnd = new Date(
+                newStart.getTime() + originalDuration
+            );
 
             return {
                 ...prev,
-                [name]: value,
+                startAppointmentTime: newStart,
+                endAppointmentTime: newEnd,
             };
-        });
-    };
+        }
 
+        return {
+            ...prev,
+            [name]: value,
+        };
+    });
+};
     const handleAddTreatment = (
         treatment: TreatmentCatalogModel
     ) => {
