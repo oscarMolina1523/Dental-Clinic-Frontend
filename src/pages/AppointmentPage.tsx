@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Plus, Pencil, Menu, X, CheckCircle2, Play, Check, UserX, XCircle } from "lucide-react";
+import { Plus, Pencil, Menu, X, CheckCircle2, Play, Check, UserX, XCircle, ChevronRight, ChevronLeft } from "lucide-react";
 import type { TableAction, TableColumn } from "../shared/Table/types";
 import DataTable from "../shared/Table/DataTable";
 import Pagination from "../shared/Table/Pagination";
@@ -88,6 +88,8 @@ const AppointmentPage: React.FC = () => {
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState(1);
     const [viewMode, setViewMode] = useState<"table" | "calendar">("table");
+
+    const [calendarDate, setCalendarDate] = useState<Date>(() => new Date());
 
     type AppointmentPeriod = "ALL" | "DAY" | "WEEK" | "MONTH";
 
@@ -190,26 +192,35 @@ const AppointmentPage: React.FC = () => {
         handleStart(selectedAppointment.id);
     };
 
-    // const filteredAppointments = useMemo(() => {
-    //     if (role === UserRole.Admin || role === UserRole.Receptionist) {
-    //         return appointments;
-    //     }
+    const handleCalendarNavigation = (direction: "PREV" | "NEXT" | "TODAY") => {
+        if (direction === "TODAY") {
+            setCalendarDate(new Date());
+            return;
+        }
 
-    //     return appointments.filter(
-    //         (appointment) => appointment.dentistId === user?.id
-    //     );
-    // }, [appointments, role, user?.roleId]);
+        setCalendarDate((previousDate) => {
+            const nextDate = new Date(previousDate);
 
-    // const {
-    //     search,
-    //     setSearch,
-    //     filteredData,
-    // } = useTableSearch<AppointmentModel>({
-    //     data: filteredAppointments,
-    //     fields: searchFields,
-    //     delay: 800,
-    // });
+            const amount = direction === "NEXT" ? 1 : -1;
 
+            switch (selectedPeriod) {
+                case "DAY":
+                    nextDate.setDate(nextDate.getDate() + amount);
+                    break;
+
+                case "MONTH":
+                    nextDate.setMonth(nextDate.getMonth() + amount);
+                    break;
+
+                case "WEEK":
+                case "ALL":
+                    nextDate.setDate(nextDate.getDate() + amount * 7);
+                    break;
+            }
+
+            return nextDate;
+        });
+    };
 
     const filteredAppointments = useMemo(() => {
         if (role === UserRole.Admin || role === UserRole.Receptionist) {
@@ -222,7 +233,9 @@ const AppointmentPage: React.FC = () => {
     }, [appointments, role, user?.id]);
 
     const appointmentsByFilters = useMemo(() => {
-        const now = new Date();
+        const now = viewMode === "calendar"
+            ? calendarDate
+            : new Date();
 
         // Inicio del día actual
         const startOfDay = new Date(now);
@@ -299,7 +312,7 @@ const AppointmentPage: React.FC = () => {
 
             return matchesPeriod && matchesStatus;
         });
-    }, [filteredAppointments, selectedPeriod, selectedStatus]);
+    }, [filteredAppointments, selectedPeriod, selectedStatus, viewMode, calendarDate,]);
 
     const {
         search,
@@ -566,7 +579,6 @@ const AppointmentPage: React.FC = () => {
         setCurrentPage(1);
     };
 
-
     useEffect(() => {
         if (isLoading) return;
 
@@ -598,7 +610,6 @@ const AppointmentPage: React.FC = () => {
         addNotification,
         removeNotification,
     ]);
-
 
     useEffect(() => {
         if (isLoading || appointments.length === 0) return;
@@ -662,6 +673,57 @@ const AppointmentPage: React.FC = () => {
         isLoading,
         markAsAbandonedMutation.mutate,
     ]);
+
+    const getCalendarDateLabel = () => {
+        switch (selectedPeriod) {
+            case "DAY":
+                return calendarDate.toLocaleDateString("es-NI", {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                });
+
+            case "WEEK": {
+                const startOfWeek = new Date(calendarDate);
+                const day = startOfWeek.getDay();
+
+                startOfWeek.setDate(
+                    startOfWeek.getDate() - (day === 0 ? 6 : day - 1)
+                );
+                startOfWeek.setHours(0, 0, 0, 0);
+
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+                const startLabel = startOfWeek.toLocaleDateString("es-NI", {
+                    day: "numeric",
+                    month: "long",
+                });
+
+                const endLabel = endOfWeek.toLocaleDateString("es-NI", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                });
+
+                return `${startLabel} - ${endLabel}`;
+            }
+
+            case "MONTH":
+                return calendarDate.toLocaleDateString("es-NI", {
+                    month: "long",
+                    year: "numeric",
+                });
+
+            case "ALL":
+            default:
+                return calendarDate.toLocaleDateString("es-NI", {
+                    month: "long",
+                    year: "numeric",
+                });
+        }
+    };
 
     return (
         <div className="h-full w-full bg-[#f8fafc] px-8 py-4 flex flex-col justify-between select-none">
@@ -772,6 +834,32 @@ const AppointmentPage: React.FC = () => {
                             Vista Calendario
                         </button>
                     </div>
+                    {viewMode === "calendar" && (
+                        <div className="flex items-center gap-2">
+
+                            <button
+                                type="button"
+                                onClick={() => handleCalendarNavigation("PREV")}
+                                className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50"
+                                title="Anterior"
+                            >
+                                <ChevronLeft size={20} />
+                            </button>
+
+                            <span className="text-sm font-semibold text-slate-700 min-w-40 text-center capitalize">
+                                {getCalendarDateLabel()}
+                            </span>
+
+                            <button
+                                type="button"
+                                onClick={() => handleCalendarNavigation("NEXT")}
+                                className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50"
+                                title="Siguiente"
+                            >
+                                <ChevronRight size={20} />
+                            </button>
+                        </div>
+                    )}
                     <button disabled={isDisabled} onClick={() => setIsCreateDrawerOpen(true)}
                         className={`flex items-center gap-2 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm shadow-blue-500/20 ${isDisabled
                             ? "bg-slate-300 cursor-not-allowed opacity-70"
@@ -794,6 +882,8 @@ const AppointmentPage: React.FC = () => {
                         <AppointmentCalendar
                             appointments={filteredData}
                             period={selectedPeriod}
+                            date={calendarDate}
+                            onNavigate={setCalendarDate}
                             onSelectEvent={(appointment) => {
                                 setSelectedAppointment(appointment);
                                 setIsStatusModalOpen(true);

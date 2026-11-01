@@ -22,12 +22,16 @@ interface AppointmentCalendarProps {
     appointments: AppointmentModel[];
     onSelectEvent: (appointment: AppointmentModel) => void;
     period: "ALL" | "DAY" | "WEEK" | "MONTH";
+    date: Date;
+    onNavigate: (date: Date) => void
 }
 
 export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
     appointments,
     onSelectEvent,
     period,
+    date,
+    onNavigate,
 }) => {
     const events = useMemo<CalendarEvent[]>(
         () =>
@@ -63,6 +67,9 @@ export const AppointmentCalendar: React.FC<AppointmentCalendarProps> = ({
         <div className="h-[700px] w-full bg-white rounded-2xl border border-slate-100 p-4">
             <Calendar<CalendarEvent>
                 localizer={localizer}
+                date={date}
+                onNavigate={(nextDate) => onNavigate(nextDate)}
+
                 events={events}
                 culture="es"
                 // Sincronizamos la vista automáticamente con los botones de arriba
