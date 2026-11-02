@@ -296,7 +296,7 @@ const EditUserDrawer: React.FC<EditUserDrawerProps> = ({
                 onHide={onHide}
                 title="Editar Usuario"
                 description="Modifica la información del usuario"
-                width="w-112.5 md:w-200"
+                width="w-80 md:w-200"
                 footer={
                     <>
                         <button

@@ -254,7 +254,7 @@ const InventoryPage: React.FC = () => {
             onChange={handleSearch}
             placeholder="Buscar inventario..."
           />
-          <div className="flex flex-row gap-2">
+          <div className="flex flex-col md:flex-row gap-2">
             <button
               type="button"
               onClick={toggleSelectAll}

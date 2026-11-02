@@ -129,7 +129,7 @@ const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
 
                     {/* Panel desplegable */}
                     {isNotificationsOpen && (
-                        <div className="absolute right-0 top-full mt-3 w-100 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50">
+                        <div className="absolute right-0 top-full mt-3 w-80 md:w-100 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden z-50">
                             {/* Encabezado */}
                             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                                 <div>
