@@ -242,7 +242,6 @@ const ShowClinicalProgressDrawer: React.FC<
           relative
           z-10
           h-full
-          w-full
           max-w-3xl
           bg-white
           shadow-2xl
@@ -251,6 +250,7 @@ const ShowClinicalProgressDrawer: React.FC<
           animate-in
           slide-in-from-right
           duration-300
+          w-80 md:w-200
         "
         >
 
@@ -374,7 +374,7 @@ const ShowClinicalProgressDrawer: React.FC<
                 <div className="space-y-3">
 
                   <div className="mb-5">
-                    <div className="flex flex-row items-center justify-between gap-2">
+                    <div className="flex flex-col items-start md:flex-row md:items-center justify-between gap-2">
                       <div className="flex flex-col items-center gap-2">
                         <h3 className="text-sm font-semibold text-slate-700">
                           Historial clínico

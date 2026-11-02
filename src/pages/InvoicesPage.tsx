@@ -311,7 +311,7 @@ const InvoicesPage: React.FC = () => {
     }, [invoices, isLoading, addNotification, removeNotification]);
 
     return (
-        <div className="h-full w-full bg-[#f8fafc] p-8 flex flex-col justify-between select-none">
+        <div className="h-full w-full bg-[#f8fafc] p-4 md:p-8 flex flex-col justify-between select-none">
             {toast && (
                 <Toast
                     type={toast.type}

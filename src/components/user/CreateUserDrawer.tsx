@@ -193,7 +193,7 @@ const CreateUserDrawer: React.FC<CreateUserProps> = ({ isOpen, onHide }) => {
                 onHide={onHide}
                 title="Nuevo Usuario"
                 description="Registra un nuevo usuario"
-                width="w-112.5 md:w-200"
+                width="w-80 md:w-200"
                 footer={
                     <>
                         <button

@@ -235,7 +235,7 @@ const TreatmentCatalogPage: React.FC = () => {
                 {/* Encabezado */}
                 <div className="flex flex-col md:flex-row items-end gap-2 md:items-center justify-between pb-6 mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Servicios</h1> */}
-                    <div className="flex flex-row gap-2 md:w-1/2">
+                    <div className="flex flex-col items-end md:flex-row gap-2 w-full md:w-1/2">
                         <SearchInput
                             value={search}
                             onChange={handleSearch}

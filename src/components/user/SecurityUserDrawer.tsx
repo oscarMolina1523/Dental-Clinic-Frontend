@@ -251,7 +251,7 @@ const SecurityUserDrawer: React.FC<SecurityUserDrawerProps> = ({
                 onHide={onHide}
                 title="Seguridad del Usuario"
                 description="Modifica la información sensible del usuario"
-                width="w-112.5 md:w-150"
+                width="w-80 md:w-150"
                 footer={
                     <>
                         <button

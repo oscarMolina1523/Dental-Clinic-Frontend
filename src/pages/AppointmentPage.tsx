@@ -726,7 +726,7 @@ const AppointmentPage: React.FC = () => {
     };
 
     return (
-        <div className="h-full w-full bg-[#f8fafc] px-8 py-4 flex flex-col justify-between select-none">
+        <div className="h-full w-full bg-[#f8fafc] px-4 md:px-8 md:py-4 flex flex-col justify-between select-none">
             {toast && (
                 <Toast
                     type={toast.type}
@@ -735,7 +735,7 @@ const AppointmentPage: React.FC = () => {
                 />
             )}
             {/* Filtros por período */}
-            <div className="flex flex-row justify-between">
+            <div className="flex flex-col md:flex-row justify-between gap-2">
                 <div>
                     <p className="text-sm font-semibold text-slate-700 mb-3">
                         Filtrar por período
@@ -809,7 +809,7 @@ const AppointmentPage: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 min-h-120">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:min-h-120">
                 {/* Encabezado */}
                 <div className="flex flex-col md:flex-row gap-2 items-end md:items-center justify-between mb-2">
                     {/* <h1 className="text-xl font-bold text-[#001D4A]">Productos</h1> */}
@@ -902,7 +902,7 @@ const AppointmentPage: React.FC = () => {
             </div>
 
             {/* Paginación de la Tabla */}
-            <div className="flex items-center justify-between text-xs text-slate-500">
+            <div className="flex items-center justify-between text-xs text-slate-500 ">
                 <Pagination
                     currentPage={validPage}
                     totalItems={totalItems}
