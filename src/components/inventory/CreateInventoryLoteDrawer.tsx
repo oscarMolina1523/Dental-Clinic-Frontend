@@ -65,7 +65,7 @@ const CreateInventoryLoteDrawer: React.FC<CreateInventoryLoteProps> = ({
     const {
         data: products = [],
         isLoading: isLoadingProducts,
-    } = useProducts(1, 10);
+    } = useProducts(1, 100);
 
     // Un solo proveedor para todos los lotes.
     const [form, setForm] = useState({
