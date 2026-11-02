@@ -62,6 +62,10 @@ const ReportsPage: React.FC = () => {
     "age" | "gender" | "maritalStatus"
   >("age");
 
+  const [appointmentReportType, setAppointmentReportType] = useState<
+    "day" | "week" | "month" | "year"
+  >("month");
+
   const totalPatients = patients.length;
 
   const totalAppointments = appointments.length;
@@ -138,33 +142,14 @@ const ReportsPage: React.FC = () => {
    * =========================================================
    */
 
-  const appointmentsByMonth = useMemo(() => {
-    const months = [
-      "Ene",
-      "Feb",
-      "Mar",
-      "Abr",
-      "May",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dic",
-    ];
 
-    const result = months.map((month, index) => ({
-      month,
-      citas: 0,
-      monthIndex: index,
-    }));
+  const appointmentsByPeriod = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    appointments.forEach((appointment) => {
-      const item = appointment as unknown as Record<
-        string,
-        unknown
-      >;
+    // Obtener la fecha de cada cita.
+    const getAppointmentDate = (appointment: typeof appointments[number]) => {
+      const item = appointment as unknown as Record<string, unknown>;
 
       const rawDate =
         item.date ??
@@ -172,17 +157,158 @@ const ReportsPage: React.FC = () => {
         item.scheduledDate ??
         item.createdAt;
 
-      if (!rawDate) return;
+      if (!rawDate) return null;
+
+      // Evitar desfases de zona horaria cuando viene YYYY-MM-DD.
+      if (
+        typeof rawDate === "string" &&
+        /^\d{4}-\d{2}-\d{2}$/.test(rawDate)
+      ) {
+        const [year, month, day] = rawDate.split("-").map(Number);
+        const date = new Date(year, month - 1, day);
+        return Number.isNaN(date.getTime()) ? null : date;
+      }
 
       const date = new Date(String(rawDate));
 
-      if (Number.isNaN(date.getTime())) return;
+      return Number.isNaN(date.getTime()) ? null : date;
+    };
 
-      result[date.getMonth()].citas += 1;
-    });
+    const dates = appointments
+      .map(getAppointmentDate)
+      .filter((date): date is Date => date !== null);
 
-    return result;
-  }, [appointments]);
+    // ------------------------------------------
+    // POR DÍA: últimos 7 días
+    // ------------------------------------------
+
+    if (appointmentReportType === "day") {
+      const result = Array.from({ length: 7 }, (_, index) => {
+        const date = new Date(today);
+        date.setDate(today.getDate() - (6 - index));
+
+        return {
+          key: date.toDateString(),
+          label: date.toLocaleDateString("es-NI", {
+            day: "2-digit",
+            month: "short",
+          }),
+          citas: 0,
+        };
+      });
+
+      dates.forEach((date) => {
+        const item = result.find(
+          (entry) => entry.key === new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate()
+          ).toDateString()
+        );
+
+        if (item) item.citas++;
+      });
+
+      return result.map(({ label, citas }) => ({ label, citas }));
+    }
+
+    // ------------------------------------------
+    // POR SEMANA: últimas 8 semanas
+    // ------------------------------------------
+
+    if (appointmentReportType === "week") {
+      const currentMonday = new Date(today);
+      const dayOfWeek = (currentMonday.getDay() + 6) % 7;
+
+      currentMonday.setDate(
+        currentMonday.getDate() - dayOfWeek
+      );
+
+      const result = Array.from({ length: 8 }, (_, index) => {
+        const start = new Date(currentMonday);
+        start.setDate(currentMonday.getDate() - (7 * (7 - index)));
+
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+
+        return {
+          start,
+          end,
+          label: `${start.toLocaleDateString("es-NI", {
+            day: "2-digit",
+            month: "short",
+          })} - ${end.toLocaleDateString("es-NI", {
+            day: "2-digit",
+            month: "short",
+          })}`,
+          citas: 0,
+        };
+      });
+
+      dates.forEach((date) => {
+        const item = result.find(
+          (entry) =>
+            date >= entry.start &&
+            date <= new Date(
+              entry.end.getFullYear(),
+              entry.end.getMonth(),
+              entry.end.getDate(),
+              23, 59, 59, 999
+            )
+        );
+
+        if (item) item.citas++;
+      });
+
+      return result.map(({ label, citas }) => ({ label, citas }));
+    }
+
+    // ------------------------------------------
+    // POR MES: los 12 meses del año actual
+    // ------------------------------------------
+
+    if (appointmentReportType === "month") {
+      const months = [
+        "Ene", "Feb", "Mar", "Abr",
+        "May", "Jun", "Jul", "Ago",
+        "Sep", "Oct", "Nov", "Dic",
+      ];
+
+      const result = months.map((month, index) => ({
+        monthIndex: index,
+        label: month,
+        citas: 0,
+      }));
+
+      dates.forEach((date) => {
+        if (date.getFullYear() === today.getFullYear()) {
+          result[date.getMonth()].citas++;
+        }
+      });
+
+      return result.map(({ label, citas }) => ({ label, citas }));
+    }
+
+    // ------------------------------------------
+    // POR AÑO: todos los años con registros
+    // ------------------------------------------
+
+    const years = Array.from(
+      new Set(dates.map((date) => date.getFullYear()))
+    ).sort((a, b) => a - b);
+
+    if (!years.length) {
+      years.push(today.getFullYear());
+    }
+
+    return years.map((year) => ({
+      label: String(year),
+      citas: dates.filter(
+        (date) => date.getFullYear() === year
+      ).length,
+    }));
+  }, [appointments, appointmentReportType]);
+
 
   const patientDemographicData = useMemo(() => {
     if (!patients.length) {
@@ -571,31 +697,46 @@ const ReportsPage: React.FC = () => {
         ==================================================== */}
 
         <div className="rounded-2xl bg-white p-2 md:p-6 shadow-sm">
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-slate-900">
-              Citas por mes
-            </h2>
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">
+                Citas por período
+              </h2>
 
-            <p className="text-sm text-slate-500">
-              Evolución de las citas registradas
-            </p>
+              <p className="text-sm text-slate-500">
+                Evolución de las citas registradas
+              </p>
+            </div>
+
+            <select
+              value={appointmentReportType}
+              onChange={(event) =>
+                setAppointmentReportType(
+                  event.target.value as "day" | "week" | "month" | "year"
+                )
+              }
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-indigo-500"
+            >
+              <option value="day">Por día (últimos 7 días)</option>
+              <option value="week">Por semana (últimas 8 semanas)</option>
+              <option value="month">Por mes (año actual)</option>
+              <option value="year">Por año (histórico)</option>
+            </select>
           </div>
 
           <div className="h-[320px] w-full">
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
-              <LineChart data={appointmentsByMonth}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={appointmentsByPeriod}>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   vertical={false}
                 />
 
                 <XAxis
-                  dataKey="month"
+                  dataKey="label"
                   tickLine={false}
                   axisLine={false}
+                  tick={{ fontSize: 11 }}
                 />
 
                 <YAxis
