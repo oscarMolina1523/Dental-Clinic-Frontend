@@ -18,7 +18,7 @@ const CreateInventoryDrawer: React.FC<CreateInventoryProps> = ({ isOpen, onHide 
     const {
         data: products = [],
         isLoading: isLoadingProducts
-    } = useProducts(1, 10);
+    } = useProducts(1, 100);
 
     const [form, setForm] = useState({
         productId: "",
