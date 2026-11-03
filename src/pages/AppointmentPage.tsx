@@ -337,7 +337,8 @@ const AppointmentPage: React.FC = () => {
     );
 
     const isDisabled = !canWrite || role === UserRole.Dentist; //no tiene permisos de escritura o es dentista
-    const cantRegistermedicalProgress = !canWrite || role === UserRole.Admin; //no tiene permisos de escritura o es dentista
+    // || role === UserRole.Admin
+    const cantRegistermedicalProgress = !canWrite ; //no tiene permisos de escritura o es dentista
 
     //para obtener solo los lotes que queremos por pagina, los visibles
     const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
@@ -498,7 +499,8 @@ const AppointmentPage: React.FC = () => {
                 setSelectedAppointment(appointment);
                 setIsEditDrawerOpen(true);
             },
-            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced || role === UserRole.Admin,
+            // || role === UserRole.Admin
+            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced ,
         },
         {
             label: "Cambios de estados",

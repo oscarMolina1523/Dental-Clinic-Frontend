@@ -13,6 +13,22 @@ import { FileDown } from "lucide-react";
 import { useTreatments } from "../../hooks/useTreatmentsCatalog";
 import { useTreatmentPlanDetailById } from "../../hooks/useTreatmentPlanDetails";
 
+const formatLocalDate = (value?: string | Date | null): string => {
+    if (!value) return "N/A";
+
+    const dateString = value instanceof Date
+        ? [
+            value.getFullYear(),
+            String(value.getMonth() + 1).padStart(2, "0"),
+            String(value.getDate()).padStart(2, "0"),
+        ].join("-")
+        : value.substring(0, 10);
+
+    const [year, month, day] = dateString.split("-");
+
+    return `${day}/${month}/${year}`;
+};
+
 interface ShowDetailsInvoiceDrawerProps {
     isOpen: boolean;
     onHide: () => void;
@@ -1184,15 +1200,7 @@ const ShowDetailsInvoiceDrawer: React.FC<
 
                                                                             <input
                                                                                 type="text"
-                                                                                value={
-                                                                                    installment.dueDate
-                                                                                        ? new Date(
-                                                                                            installment.dueDate
-                                                                                        ).toLocaleDateString(
-                                                                                            "es-NI"
-                                                                                        )
-                                                                                        : "N/A"
-                                                                                }
+                                                                                value={formatLocalDate(installment.dueDate)}
                                                                                 disabled
                                                                                 className="
                                                                             w-full
@@ -1405,15 +1413,7 @@ const ShowDetailsInvoiceDrawer: React.FC<
 
                                                                             <input
                                                                                 type="text"
-                                                                                value={
-                                                                                    payment.payment_date
-                                                                                        ? new Date(
-                                                                                            payment.payment_date
-                                                                                        ).toLocaleDateString(
-                                                                                            "es-NI"
-                                                                                        )
-                                                                                        : "N/A"
-                                                                                }
+                                                                                value={formatLocalDate(payment.payment_date)}
                                                                                 disabled
                                                                                 className="
                                                                             w-full

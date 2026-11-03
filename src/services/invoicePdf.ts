@@ -59,8 +59,43 @@ export const exportInvoicePdf = async (
             currency: "NIO",
         });
 
+    // const formatDate = (value?: string | Date | null) => {
+    //     if (!value) return "No especificada";
+
+    //     const date = new Date(value);
+
+    //     if (Number.isNaN(date.getTime())) {
+    //         return "No especificada";
+    //     }
+
+    //     return date.toLocaleString("es-NI", {
+    //         day: "2-digit",
+    //         month: "2-digit",
+    //         year: "numeric",
+    //         hour: "2-digit",
+    //         minute: "2-digit",
+    //     });
+    // };
+
     const formatDate = (value?: string | Date | null) => {
         if (!value) return "No especificada";
+
+        // Si es una fecha sin hora, conservar el día exacto.
+        if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}/.test(value)) {
+            const [year, month, day] = value.substring(0, 10).split("-").map(Number);
+
+            // Fecha de calendario: no convertirla desde UTC.
+            if (
+                !value.includes("T") ||
+                value.includes("T00:00:00")
+            ) {
+                return new Date(year, month - 1, day).toLocaleDateString("es-NI", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                });
+            }
+        }
 
         const date = new Date(value);
 

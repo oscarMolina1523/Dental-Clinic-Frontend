@@ -16,6 +16,7 @@ import InvoiceSummarySection from "./InvoiceSummarySection";
 import InstallmentSelectorSection from "./InstallmentSelectrSection";
 import InstallmentDetailsSection from "./InstallmentDetailsSection";
 import InstallmentPaymentFormSection from "./InstallmentPaymentFormSection";
+import { getLocalDate } from "../../utils/getLocalDate";
 
 interface RegisterPaymentDrawerProps {
     isOpen: boolean;
@@ -70,14 +71,14 @@ const RegisterPaymentDrawer: React.FC<
             paymentMethod: "" as PaymentMethods | "",
             transactionReference: "",
             servedBy: "b0459bf8f4656468",
-            paymentDate: new Date().toISOString().split("T")[0],
+            paymentDate: getLocalDate(),
         });
 
         // Estado para el formulario de generación de cuotas
         const [installmentForm, setInstallmentForm] = useState({
             numberOfInstallments: 2,
             interestRate: "0",
-            firstDueDate: new Date().toISOString().split("T")[0],
+            firstDueDate: getLocalDate(),
         });
 
         const [toast, setToast] = useState<{
@@ -144,9 +145,7 @@ const RegisterPaymentDrawer: React.FC<
 
         const [paymentDate, setPaymentDate] =
             useState(
-                new Date()
-                    .toISOString()
-                    .split("T")[0]
+                getLocalDate()
             );
 
         /*
@@ -219,9 +218,7 @@ const RegisterPaymentDrawer: React.FC<
             setTransactionReference("");
 
             setPaymentDate(
-                new Date()
-                    .toISOString()
-                    .split("T")[0]
+                getLocalDate()
             );
         }
 
@@ -237,9 +234,7 @@ const RegisterPaymentDrawer: React.FC<
             setTransactionReference("");
 
             setPaymentDate(
-                new Date()
-                    .toISOString()
-                    .split("T")[0]
+                getLocalDate(),
             );
 
             setDirectPaymentForm({
@@ -247,7 +242,7 @@ const RegisterPaymentDrawer: React.FC<
                 paymentMethod: "",
                 transactionReference: "",
                 servedBy: "system",
-                paymentDate: new Date().toISOString().split("T")[0],
+                paymentDate: getLocalDate(),
             });
 
             setIsInstallmentPayment(false);

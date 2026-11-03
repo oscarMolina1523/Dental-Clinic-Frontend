@@ -47,7 +47,6 @@ export const rolePermissions: Record<string, string[]> = {
         "/agenda",
         "/prescriptions",
         "/medical-progress",
-        "/treatments",
         "/treatment-plan",
     ],
 
