@@ -338,7 +338,7 @@ const AppointmentPage: React.FC = () => {
 
     const isDisabled = !canWrite || role === UserRole.Dentist; //no tiene permisos de escritura o es dentista
     // || role === UserRole.Admin
-    const cantRegistermedicalProgress = !canWrite ; //no tiene permisos de escritura o es dentista
+    const cantRegistermedicalProgress = !canWrite; //no tiene permisos de escritura o es dentista
 
     //para obtener solo los lotes que queremos por pagina, los visibles
     const startIndex = (validPage - 1) * ITEMS_PER_PAGE;
@@ -500,7 +500,7 @@ const AppointmentPage: React.FC = () => {
                 setIsEditDrawerOpen(true);
             },
             // || role === UserRole.Admin
-            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced ,
+            hidden: (appointment) => !canWrite || appointment.status === "CANCELLED" || appointment.status === "COMPLETED" || appointment.isInvoiced,
         },
         {
             label: "Cambios de estados",
@@ -520,6 +520,18 @@ const AppointmentPage: React.FC = () => {
                 return cantRegistermedicalProgress || !canChangeStatus(appointment.status) || appointment?.isClinicalProgressRegistered;
             },
         },
+
+        {
+            label: "Abortar cita abandonada",
+            icon: <XCircle className="w-4 h-4 text-rose-600" />,
+            onClick: (appointment) => {
+                setSelectedAppointment(appointment);
+                setIsCancelModalOpen(true);
+            },
+            hidden: (appointment) =>
+                !canWrite || appointment.status !== "ABANDONED",
+        },
+
     ];
 
     const handleCompleteAppointment = () => {
