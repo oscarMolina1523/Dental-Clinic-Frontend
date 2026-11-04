@@ -35,6 +35,7 @@ const ShowClinicalProgressDrawer: React.FC<
   onHide,
   patient,
 }) => {
+
     const [openProgressId, setOpenProgressId] =
       useState<string | null>(null);
 

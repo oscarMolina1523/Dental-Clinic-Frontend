@@ -60,6 +60,11 @@ const DentalChartSection: React.FC<
         return null;
       }
 
+      // Si hay dientes registrados, las observaciones son obligatorias
+      if (hasDetails && !hasObservations) {
+        return null;
+      }
+
       return {
         dentalChart: {
           ...chart,

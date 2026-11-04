@@ -202,6 +202,42 @@ const CreateClinicalProgressDrawer: React.FC<
                 return false;
             }
 
+            /*
+            * ODONTOGRAMA
+            */
+
+            if (dentalChart) {
+                const hasDetails = dentalChart.details.length > 0;
+
+                const hasObservations =
+                    dentalChart.dentalChart.observations.trim().length > 0;
+
+                if (hasDetails && !hasObservations) {
+                    showToast(
+                        "error",
+                        "Las observaciones del odontograma son obligatorias cuando agrega piezas dentales."
+                    );
+
+                    return false;
+                }
+
+                const invalidDetail = dentalChart.details.some(
+                    (detail) =>
+                        !detail.toothNumber ||
+                        !detail.face.trim() ||
+                        !detail.toothStatus
+                );
+
+                if (invalidDetail) {
+                    showToast(
+                        "error",
+                        "Debe completar los datos de cada pieza dental."
+                    );
+
+                    return false;
+                }
+            }
+
             return true;
         };
 
@@ -473,7 +509,7 @@ const CreateClinicalProgressDrawer: React.FC<
                 );
             }
         };
-        
+
         return (
             <>
                 {toast && (
