@@ -115,7 +115,15 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
         }
 
         if (newIsPM && updated24 > 17) {
-            updated24 = 17;
+            updated24 = 13;
+        }
+
+        if (!newIsPM && updated24 < 8) {
+            updated24 = 8;
+        }
+
+        if (newIsPM && updated24 < 12) {
+            updated24 = 13;
         }
 
         const finalH = String(updated24).padStart(2, "0");
